@@ -52,7 +52,7 @@ int main(){
     // start exploration procedure
     Obstacle *obstacles = populate_obstacles(&n_obs);
     results = shortest_path(obstacles, n_obs);
-    // output_result(results, n_obs);
+    output_result(results, n_obs);
     return 0;
 }
 
@@ -60,7 +60,7 @@ int main(){
 void output_result(Obstacle* results, int n_obs){
     int i;
     for(i = 0; i < n_obs; i++){
-        printf("%d ",results[i]);
+        printf("%d ",results[i].id);
     }
     printf("\n");
 }
@@ -99,14 +99,6 @@ Obstacle* heuristic_euclidean(Obstacle *obstacles, int n){
             dist[obstacles[j].id*n_locations + obstacles[i].id] = dist[obstacles[i].id*n_locations + obstacles[j].id];
         }
     }
-    //delete_s
-    for(i = 0; i < n_locations; i++){
-        for(j = 0; j < n_locations; j++){
-            printf("%d|%.0f\t", i*n_locations + j, dist[i*n_locations + j]);
-        }
-        printf("\n");
-    }
-    //delete_e
     // calculate shortest cycle
     int* min_path = malloc(sizeof(int)*n);
     double min_dist = FLT_MAX;
@@ -116,26 +108,14 @@ Obstacle* heuristic_euclidean(Obstacle *obstacles, int n){
     }
     permutation(order, 1, n, &min_dist, min_path);
 
-    printf("Freed\n");
     free(dist);
     free(order);
 
-    // Printing here for debugging purposes. Delete once function works
-    printf("In heuristic_euclidean():\n");
-    for(i = 0; i < n; i++){
-        printf("%d ", min_path[i]);
-    }
-    putchar('\n');
-
-    // returning Obstacle objects
-    Obstacle* tmp = obstacles;
-    int index = 0;
-    while(tmp != NULL){
+    int index;
+    for(index = 0; index < n - 1; index++){
         for(j = index; j < n; j++){
-            if(tmp->id == min_path[j]){
-                swap_obs(tmp, obstacles + j);
-                tmp+=1;
-                index+=1;
+            if((obstacles+j)->id == min_path[index]){
+                swap_obs(obstacles + index, obstacles + j);
                 break;
             }
         }
@@ -153,15 +133,10 @@ void permutation(int* path_order, int l, int r, double* min_dist, int* min_path)
     int i;
     double distance_buffer;
     if(l == r){
-        for(i = 0; i < r; i++) printf("%d ", path_order[i]);        // delete
         distance_buffer = calc_path(path_order, r, dist);
-        printf("%.0f", distance_buffer);
-        printf("\n");
         if(distance_buffer < *min_dist){
-            printf("New min path %.2f: ", *min_dist);
             for(i = 0; i < r; i++){
                 min_path[i] = path_order[i];
-                printf("%d ", min_path[i]);
             }
             *min_dist = distance_buffer;
         }
@@ -179,8 +154,6 @@ double calc_path(int* path, int n_location, double* dist){
     int i;
     double path_length = 0;
     for(i = 0; i < n_location - 1; i++){
-        // printf("%d-%d: %d\n", path[i], path[i+1], path[i]*n_location + path[i+1]);
-        // printf("%.2f\n", dist[path[i]*n_location + path[i+1]]);
         path_length+=dist[path[i]*n_location + path[i+1]];
     }
 
