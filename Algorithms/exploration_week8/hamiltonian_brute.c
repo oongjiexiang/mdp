@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 
 // Data structures
 typedef struct _obstacle{
@@ -51,7 +52,7 @@ int main(){
     // start exploration procedure
     Obstacle *obstacles = populate_obstacles(&n_obs);
     results = shortest_path(obstacles, n_obs);
-    output_result(results, n_obs);
+    // output_result(results, n_obs);
     return 0;
 }
 
@@ -108,7 +109,7 @@ Obstacle* heuristic_euclidean(Obstacle *obstacles, int n){
     //delete_e
     // calculate shortest cycle
     int* min_path = malloc(sizeof(int)*n);
-    double min_dist = -1;
+    double min_dist = FLT_MAX;
     int* order = malloc(sizeof(int)*n);
     for(i = 0; i < n; i++){
         order[i] = i+1;
@@ -153,9 +154,14 @@ void permutation(int* path_order, int l, int r, double* min_dist, int* min_path)
     double distance_buffer;
     if(l == r){
         for(i = 0; i < r; i++) printf("%d ", path_order[i]);        // delete
-        if(calc_path(path_order, r+1, dist) < *min_dist){
+        distance_buffer = calc_path(path_order, r, dist);
+        printf("%.0f", distance_buffer);
+        printf("\n");
+        if(distance_buffer < *min_dist){
+            printf("New min path %.2f: ", *min_dist);
             for(i = 0; i < r; i++){
                 min_path[i] = path_order[i];
+                printf("%d ", min_path[i]);
             }
             *min_dist = distance_buffer;
         }
@@ -173,8 +179,8 @@ double calc_path(int* path, int n_location, double* dist){
     int i;
     double path_length = 0;
     for(i = 0; i < n_location - 1; i++){
-        printf("%d-%d: %d\n", path[i], path[i+1], path[i]*n_location + path[i+1]);
-        printf("%.2f\n", dist[path[i]*n_location + path[i+1]]);
+        // printf("%d-%d: %d\n", path[i], path[i+1], path[i]*n_location + path[i+1]);
+        // printf("%.2f\n", dist[path[i]*n_location + path[i+1]]);
         path_length+=dist[path[i]*n_location + path[i+1]];
     }
 
@@ -185,15 +191,16 @@ double calc_path(int* path, int n_location, double* dist){
 
 // Done
 void swap(int *a, int *b){
-    int *temp;
-    temp = b;
+    int temp;
+    temp = *a;
     *a = *b;
-    *b = *temp;
+    *b = temp;
 }
 
+// Done
 void swap_obs(Obstacle *a, Obstacle *b){
-    Obstacle *temp;
-    temp = b;
+    Obstacle temp;
+    temp = *a;
     *a = *b;
-    *b = *temp;
+    *b = temp;
 }
