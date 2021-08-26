@@ -185,130 +185,71 @@
                 android:textColor="@color/colorBlack"
                 android:textSize="26px" />
 
+            <Button
+                android:id="@+id/upBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:background="#00FFFFFF"
+                android:foreground="@drawable/outline_arrow_upward_24" />
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_marginTop="20dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/f1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:background="@color/light_blue"
-                    android:text="F1" />
-
-                <Button
-                    android:id="@+id/f2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/light_blue"
-                    android:text="F2" />
-            </LinearLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <Button
-                    android:id="@+id/upBtn"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="56dp"
-                    android:layout_marginLeft="56dp"
-                    android:layout_marginTop="23dp"
-                    android:layout_marginEnd="56dp"
-                    android:layout_marginRight="56dp"
-                    android:background="#FFFFFF"
-                    android:foreground="@drawable/outline_arrow_upward_24"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/downBtn"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="56dp"
-                    android:layout_marginLeft="56dp"
-                    android:layout_marginEnd="56dp"
-                    android:layout_marginRight="56dp"
-                    android:layout_marginBottom="23dp"
-                    android:background="#FFFFFF"
-                    android:foreground="@drawable/outline_arrow_downward_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                android:layout_height="50dp">
 
                 <Button
                     android:id="@+id/leftBtn"
                     android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginLeft="25dp"
-                    android:layout_marginTop="67dp"
-                    android:layout_marginBottom="78dp"
-                    android:background="#FFFFFF"
-                    android:foreground="@drawable/outline_arrow_back_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:background="#00FFFFFF"
+                    android:foreground="@drawable/outline_arrow_back_24" />
 
                 <Button
                     android:id="@+id/rightBtn"
                     android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="67dp"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginRight="25dp"
-                    android:layout_marginBottom="78dp"
-                    android:background="#FFFFFF"
-                    android:foreground="@drawable/outline_arrow_forward_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="47dp"
+                    android:layout_marginLeft="47dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_weight="1"
+                    android:background="#00FFFFFF"
+                    android:foreground="@drawable/outline_arrow_forward_24" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/downBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="0dp"
+                android:background="#00FFFFFF"
+                android:foreground="@drawable/outline_arrow_downward_24" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="584dp"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
         android:layout_height="270dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:orientation="horizontal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.411"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.984">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:layout_editor_absoluteX="339dp">
 
         <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabGravity="center"
-            app:tabIndicatorColor="#99E8F8"
-            app:tabMinWidth="240dp">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Map Configuration" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mode" />
-
-        </com.google.android.material.tabs.TabLayout>
-    </LinearLayout>
+            android:background="?attr/colorPrimary"
+            app:tabGravity="fill" />
+    </androidx.viewpager.widget.ViewPager>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
