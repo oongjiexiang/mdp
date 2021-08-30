@@ -16,6 +16,8 @@ struct Vertex{
     double y_start;    //starts from 0
     double y_end;      // ends at vertex height -1
     bool is_obstacle;
+    bool is_goal;
+    bool visited;
     int g_cost;         //cost of distance from the starting vertex costs are multiplied by 10 to make them whole numbers which will be easier to work with
     int h_cost;         //cost of distance from current vertex to the final vertex
 };
@@ -36,106 +38,207 @@ struct Grid{
     struct AdjList* array;
 };
 
+struct QNode{
+    struct Vertex* vertex;
+    struct QNode* next;
+};
+//structure for q
+struct Queue{
+    struct QNode* head;
+    struct QNode* tail;
+};
+
 
 //function prototypes
+//----queue functions----
+void initialize_queue(struct Queue* q);
+bool enqueue(struct Queue* q, struct Vertex* vertex);
+int dequeue(struct Queue* q);
+bool move_closest_node_to_front_q(struct Queue* q,double* distance_array);
 //----graph generation----
 struct AdjListNode* new_adj_list_node(struct Vertex* vertex_addr);
 struct Grid* create_grid(int grid_size);
 void add_edge(struct Grid* grid, int src_vertex, int dest_vertex,struct Vertex* src_vertex_addr, struct Vertex* dest_vertex_addr);
 void initialize_vertex(int grid_length, int grid_height, int total_length, int total_height, struct Vertex* vertexArray);
 void connect_grid(struct Grid* grid, struct Vertex* vertex_array, int grid_length, int grid_height, int total_length, int total_height);
-
 //----search----
-void add_obstacle(struct Vertex* vertex_addr);
-void plan_path(struct Grid* grid, struct Vertex* vertex_path_array, int src_vertex_number, int number_of_obstacles, int number_of_vertices);
+bool plan_path_2(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, int src_vertex_number,int grid_size,int number_of_goals, double* distance_array, int* prev_array);
+bool plan_path(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, struct Vertex* src_vertex_addr,int grid_size,int number_of_goals);
 struct Vertex* find_closest_vertex(struct Vertex* vertex_array, int src_vertex, bool* visited, int no_of_vertex);
-void distance_to_goals(struct Vertex* vertex_array,double* distance_array,int* vertex_number_array,bool* visited, int src_vertex, int number_of_goals, int no_of_vertex);
+//void distance_to_goals(struct Vertex* vertex_array,double* distance_array,int* vertex_number_array,bool* visited, int src_vertex, int number_of_goals, int no_of_vertex);
 
-int main()
-{
-    //-------------testing function to generate a 20 by 20 grid-----------------
-    int i,j;
-    //generate vertices
-    int total_grid_count = 25;
+
+//swap function to go through all possible permutations of order to visit each goal
+
+//find_shortest_path to iterate through all possible paths and return shortest path
+
+int main(){
+    //testing function
+    int total_grid_count, grid_length, grid_height, total_length, total_height,goals,i,j;
+    total_grid_count = 25;
+    grid_length=10;
+    grid_height=10;
+    total_length=50;
+    total_height=50;
+    goals=4;
+    //possible to put these into grid struct instead so we do not pass as many variables into the functions
+
     struct Vertex* vertex_array = (struct Vertex*) malloc(total_grid_count*sizeof(struct Vertex));
-
-    initialize_vertex(10,10,50,50,vertex_array);
-
-    //generate graph
-    struct Grid* g = create_grid(25);
-
-    connect_grid(g,vertex_array,10,10,50,50);
-
-    struct AdjListNode *list_ptr = NULL;
-    struct Vertex *vertexA =NULL;
-
-    //print the vertices and it's neighbors
-    for(i=0;i<25;i++){
-    list_ptr = g->array[i].head;
-    //printf("current vertex: index = %d, vertex number = %d\n", i,list_ptr->vertex_addr->vertex_number);
-
-    vertexA= list_ptr->vertex_addr;
-        while(list_ptr != NULL){
-            vertexA = list_ptr->vertex_addr;
-            //printf("connected to %d \n", vertexA->vertex_number);
-            list_ptr = list_ptr->next;
-        }
-    }
-    bool* visited = (bool*)malloc(total_grid_count*sizeof(bool));
+    struct Grid* grid = create_grid(total_grid_count);
+    struct Vertex* goals_order = (struct Vertex*)malloc(goals*sizeof(struct Vertex));
+    double* distance_array = (double*)malloc(total_grid_count*sizeof(double));
     for(j=0;j<total_grid_count;j++){
-        visited[j]=false;
-        //printf("vertex x start pos: %f\n",vertex_array[j].x_start);
-        //printf("vertex x end pos: %f\n",vertex_array[j].x_end);
-        //printf("vertex y start pos: %f\n",vertex_array[j].y_start);
-        //printf("vertex y end pos: %f\n",vertex_array[j].y_end);
+        distance_array[j]=100000;
     }
-    find_closest_vertex(vertex_array,5,visited,25);
-    double* distance_array=(double*)malloc(total_grid_count*sizeof(double));
-    int* vertex_number_array = (int*)malloc(total_grid_count*sizeof(int));
+    int* prev_array = (int*)malloc(total_grid_count*sizeof(int));
 
-    vertex_array[4].is_obstacle=true;
-    vertex_array[10].is_obstacle=true;
-    vertex_array[7].is_obstacle=true;
-
-    distance_to_goals(vertex_array,distance_array,vertex_number_array,visited,0,3,25);
-    for(i=0;i<3;i++){
-
-    printf("distance of vertex %d: %f\n", vertex_number_array[i],distance_array[i]);
-    }
+    //---print vertex and neighbours----
+    struct AdjList* ptr = (struct AdjList*)malloc(sizeof(struct AdjList));
+    struct AdjListNode* ptr2 = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
+    initialize_vertex(grid_length,grid_height,total_length,total_height,vertex_array);
+    connect_grid(grid,vertex_array,grid_length,grid_height,total_length,total_height);
     /*
-    //-------------testing function to generate a 5 by 5 grid-----------------
-    int i;
-    //generate vertices
-    int total_grid_count = 400;
-    struct Vertex* vertex_array = (struct Vertex*) malloc(total_grid_count*sizeof(struct Vertex));
+    for(i=0;i<grid->grid_size;i++){
+        ptr = &grid->array[i];
+        ptr2=ptr->head;
+        while(ptr2->next!=NULL){
 
-    initialize_vertex(10,10,50,50,vertex_array);
+        printf("vertex %d neighbours %d\n",vertex_array[i].vertex_number,ptr2->vertex_addr->vertex_number);
 
-    //generate graph
-    struct Grid* g = create_grid(25);
-
-    coonnect_grid(g,vertex_array,10,10,50,50);
-
-    struct AdjListNode *list_ptr = NULL;
-    struct Vertex *vertexA =NULL;
-
-    for(i=0;i<25;i++){
-    list_ptr = g->array[i].head;
-    printf("current vertex: index = %d, vertex number = %d\n", i,list_ptr->vertex_addr->vertex_number);
-
-    vertexA= list_ptr->vertex_addr;
-        while(list_ptr != NULL){
-            vertexA = list_ptr->vertex_addr;
-            printf("connected to %d \n", vertexA->vertex_number);
-            list_ptr = list_ptr->next;
+        ptr2=ptr2->next;
         }
+    }*/
+
+    //setting obstacles and goals
+    vertex_array[12].is_goal=true;
+    vertex_array[9].is_goal=true;
+    vertex_array[13].is_goal=true;
+    vertex_array[24].is_goal=true;
+
+    vertex_array[21].is_obstacle=true;
+    vertex_array[16].is_obstacle=true;
+
+
+    plan_path_2(grid,vertex_array,goals_order,22,total_grid_count,goals,distance_array,prev_array);
+    printf("Starting location: 22\n");
+
+    for(i=0;i<grid->grid_size;i++){
+        printf("%d distance %f\n",i, distance_array[i]);
+        printf("prev %d\n",prev_array[i]);
     }
-    */
+/*
+    for(i=0;i<grid->grid_size;i++){
+        printf("distance: %f, prev: %d \n",distance_array[i],prev_array[i]);
+    }
+
+    plan_path(grid,vertex_array,goals_order,&vertex_array[22],total_grid_count,goals);
+    printf("Starting location: 22\n");
+    printf("Order of goals closest to you are: \n");
+
+
+
+    for(i=0;i<goals;i++){
+        printf("%d gcost: %d \n", goals_order[i].vertex_number,goals_order[i].g_cost);
+    }*/
+
+    free(goals_order);
+    free(grid);
+    free(vertex_array);
+
     return 0;
 }
 
+//----queue functions----
+void initialize_queue(struct Queue* q){
+    q->head=NULL;
+    q->tail=NULL;
+}
+//enqueues a vertex
+bool enqueue(struct Queue* q, struct Vertex* vertex){
+    //create the new node
+    struct QNode* new_node = (struct QNode*)malloc(sizeof(struct QNode));
+    if(new_node==NULL)
+        return false;
 
+    new_node->vertex = vertex;
+    new_node->next = NULL;
 
+    //if q is not empty connect new node to the end of q
+    if(q->tail!=NULL){
+        q->tail->next = new_node;
+    }
+    //if q is empty add new node to head of q
+    if(q->head == NULL){
+        q->head = new_node;
+    }
+    //update the q tail
+    q->tail=new_node;
+    return true;
+}
+//dequeues a node in the q and returns the vertex number
+int dequeue(struct Queue* q){
+    int vertex_removed;
+    //return if head is empty
+    if(q->head == NULL){
+        printf("Queue is empty!");
+        return -1;
+    }
+    vertex_removed = q->head->vertex->vertex_number;
+
+    q->head=q->head->next;
+    //q the q becomes empty, set tail = null
+    if(q->head==NULL){
+        q->tail=NULL;
+    }
+    return vertex_removed;
+}
+//move the highest priority(shortest distance, gcost) node to the front of q (only moves the first node with highest priority) if 2 nodes have equal priority, move only the first one
+bool move_closest_node_to_front_q(struct Queue* q,double* distance_array){
+    if(q->head==NULL){
+        return false;
+    }
+    if(q->head==q->tail){
+        return true;
+    }
+    //pointers to keep track of locations
+    struct QNode* prev=q->head;
+    struct QNode* curr=q->head;
+    struct QNode* smallest =q->head;
+    struct QNode* temp = NULL;
+    double shortest_distance;
+    //assume shortest distance is head for now
+    shortest_distance=distance_array[q->head->vertex->vertex_number];
+
+    //if shortest distance is the first node, no need to move
+    while(curr->next!=NULL){
+        //move curr pointer forward
+        curr=curr->next;
+
+        //if current node has a smaller gcost(shorter distance)
+        if(distance_array[curr->vertex->vertex_number] < shortest_distance){
+            shortest_distance=distance_array[curr->vertex->vertex_number];
+            //save the node just before the smallest node
+            temp = prev;
+            smallest=curr;
+        }
+        //move prev pointer forward
+        prev=curr;
+    }
+
+    //first element is the smallest and no sorting is needed
+    if(temp==NULL){
+        return false;
+    }
+    //after the loop the smallest node and the node before it is saved in smallest and temp respectively
+    //if smallest is the head, q in the right order
+    if(smallest!=q->head){
+    temp->next=smallest->next;
+    smallest->next=q->head;
+    q->head=smallest;
+    }
+
+    return true;
+}
 
 //create a new adjacency list node
 struct AdjListNode* new_adj_list_node(struct Vertex* vertex){
@@ -179,21 +282,25 @@ void initialize_vertex(int grid_length, int grid_height, int total_length, int t
     no_of_grids_length = total_length/grid_length;
     no_of_grids_height = total_height/grid_height;
 
-    for(i=1;i<=no_of_grids_height;i++){
-        for(j=1;j<=no_of_grids_length;j++){
+
+    for(i=0;i<no_of_grids_height;i++){
+        for(j=0;j<no_of_grids_length;j++){
                 //vertex index starts from 0
-            vertex_index = (i-1)*no_of_grids_length+(j-1);
+            vertex_index = i*no_of_grids_length+j;
             vertex_array[vertex_index].vertex_number = vertex_index;
-            vertex_array[vertex_index].x_start =  (double)((j-1)*grid_length);
-            vertex_array[vertex_index].x_end =  (double)(j*grid_length-1);
-            vertex_array[vertex_index].y_start =  (double)((i-1)*grid_height);
-            vertex_array[vertex_index].y_end =  (double)(i*grid_height-1);
+            vertex_array[vertex_index].x_start =  (double)(j*grid_length);
+            vertex_array[vertex_index].x_end =  (double)((j+1)*grid_length-1);
+            vertex_array[vertex_index].y_start =  (double)(i*grid_height);
+            vertex_array[vertex_index].y_end =  (double)((i+1)*grid_height-1);
             vertex_array[vertex_index].is_obstacle = false;
+            vertex_array[vertex_index].is_goal=false;
+            vertex_array[vertex_index].visited=false;
             //initialise to 0 until we get the starting locations and target locations
-            vertex_array[vertex_index].g_cost = 0;
+            vertex_array[vertex_index].g_cost = 10000; //very large number
             vertex_array[vertex_index].h_cost = 0;
         }
     }
+
 }
 
 
@@ -389,61 +496,154 @@ void connect_grid(struct Grid* grid, struct Vertex* vertex_array, int grid_lengt
 
 
 //-------------------------Search algorithm-----------------------------------
+//Puts the goals in order of shortest distance from source into the goal array
+//needs to be changed, some parts are still not correct
+//add a distance array and a previous node array
 /*
-// pass in the grid, array to store the path, distance to reach the path, source vertex, obstacle/goal count, total number of vertices
-void plan_path(struct Grid* grid, struct Vertex* vertex_path_array, int src_vertex_number, int number_of_obstacles, int number_of_vertices){
-    //all vertices have already been initialized to -1
-    int goals_found, i;
-    //create an array to track the vertices that have been visited and initialize to false
-    bool* visited_array = (bool*) malloc(number_of_vertices*sizeof(bool));
-    //create an array to store shortest distance of each vertex from the source initialize to -1 to represent infinity
-    int* distance_array = (int*) malloc(number_of_vertices*sizeof(int));
-    for(i=0;i<number_of_vertices;i++){
-        visited_array[i]=false;
-        distance_array[i]=-1;
-    }
-    //create an array to store which node is the previous node of the current node, eg. vertex 2's previous node is vertex 1
-    struct Vertex* previous_vertex = (struct Vertex*)malloc(number_of_vertices*sizeof(struct Vertex));
-
-    //distance for source vertex to itself
-    distance_array[src_vertex_number]=0;
-
-    //create a loop to check all neighbors of the src vertex
-
-    free(visited_array);
-    free(distance_array);
-}
-*/
-
-//finds the closest vertex using the formula: sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1))
-//can be used to update the gcost
-struct Vertex* find_closest_vertex(struct Vertex* vertex_array, int src_vertex, bool* visited, int no_of_vertex){
-    //assuming locataion of the pos is at the bottom left corner
-    int i,closest_distance,closest_vertex_number;
-    closest_vertex_number=-1;
+bool plan_path(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, struct Vertex* src_vertex_addr,int grid_size,int number_of_goals){
+    int i,goals_found,current_vertex_number;
     double x1,x2,y1,y2,temp;
-    x1=vertex_array[src_vertex].x_start;
-    y1=vertex_array[src_vertex].y_start;
-    closest_distance=100000; //just a very large number
+    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
+    struct Vertex* current_vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
+    struct AdjListNode* list_ptr = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
 
-    for(i=0;i<no_of_vertex;i++){
-        if(visited[i]==false && i!=src_vertex){
-            //calculatae distance to source
-            x2 = vertex_array[i].x_start;
-            y2 = vertex_array[i].y_start;
-            temp = sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1));
-            //update g cost
-            //vertex_array[i].g_cost=temp;
-            printf("closest distance %d: %f\n",i,temp);
-            if(temp<closest_distance){
-                closest_distance=temp;
-                closest_vertex_number=i;
+    goals_found=0;
+    for(i=0;i<grid_size;i++){
+        enqueue(q,&vertex_array[i]);
+    }
+    //set src distance to 0
+    src_vertex_addr->g_cost=0;
+    x1 = src_vertex_addr->x_start;
+    y1 = src_vertex_addr->y_start;
+
+    //move src to the front of the q
+    move_closest_node_to_front_q(q);
+
+    //while there are still vertices unvisited
+    while(q->head!=NULL){
+        current_vertex_number=dequeue(q);
+        current_vertex=&vertex_array[current_vertex_number];
+
+        current_vertex->visited=true;
+        if(current_vertex->is_goal==true){
+            //add vertex to array
+            goal_array[goals_found]=*current_vertex;
+            goals_found++;
+            if(goals_found==number_of_goals){
+            return true;
             }
         }
-    }
-    return &vertex_array[closest_vertex_number];
-};
 
+        list_ptr=grid->array[current_vertex_number].head;
+
+        //look through all the neighbours
+        while(list_ptr->next!=NULL){
+            //if vertex has not been visited
+            if(list_ptr->vertex_addr->visited==false){
+                x2 = list_ptr->vertex_addr->x_start;
+                y2 = list_ptr->vertex_addr->y_start;
+                temp = sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1));
+                //check if new distance is minimum distance
+                if(temp<list_ptr->vertex_addr->g_cost){
+                    //update new cost
+                    list_ptr->vertex_addr->g_cost=temp;
+                }
+            }
+            list_ptr=list_ptr->next;
+        }
+        //move closest vertex to the front of the q, it will be explored next
+        move_closest_node_to_front_q(q);
+    }
+
+    free(q);
+    free(current_vertex);
+    free(list_ptr);
+    return false;
+}*/
+
+
+bool plan_path_2(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, int src_vertex_number,int grid_size,int number_of_goals, double* distance_array, int* prev_array){
+    int i,goals_found,current_vertex_number,prev,neighbour_number;
+    double x1,x2,y1,y2,temp;
+    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
+    struct Vertex* current_vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
+    struct AdjListNode* list_ptr = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
+
+    goals_found=0;
+    for(i=0;i<grid_size;i++){
+        enqueue(q,&vertex_array[i]);
+    }
+    current_vertex_number = src_vertex_number;
+    //set src distance to 0
+    vertex_array[src_vertex_number].g_cost=0;
+    distance_array[current_vertex_number]=0;
+    prev_array[current_vertex_number]=-1;
+
+
+    //move src to the front of the q
+    move_closest_node_to_front_q(q,distance_array);
+
+    //while there are still vertices unvisited
+    while(q->head!=NULL){
+        prev = current_vertex_number;
+        current_vertex_number=dequeue(q);
+        current_vertex=&vertex_array[current_vertex_number];
+
+        current_vertex->visited=true;
+        prev_array[current_vertex_number]=prev;
+        if(current_vertex->is_goal==true){
+            //add vertex to array
+            goal_array[goals_found]=*current_vertex;
+            goals_found++;
+            if(goals_found==number_of_goals){
+                return true;
+            }
+        }
+
+
+        list_ptr=grid->array[current_vertex_number].head;
+
+        //look through all the neighbours
+        while(list_ptr->next!=NULL){
+            //if vertex has not been visited
+            if(list_ptr->vertex_addr->visited==false){
+                neighbour_number = list_ptr->next->vertex_addr->vertex_number;
+                //if current vertex is src
+                if(neighbour_number==src_vertex_number){
+                    x1 = vertex_array[src_vertex_number].x_start;
+                    y1 = vertex_array[src_vertex_number].y_start;
+                }
+                else{
+                    x1=vertex_array[current_vertex_number].x_start;
+                    y1=vertex_array[current_vertex_number].y_start;
+                }
+                x2 = list_ptr->vertex_addr->x_start;
+                y2 = list_ptr->vertex_addr->y_start;
+                temp = sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1))+distance_array[current_vertex_number];
+
+                //check if new distance is minimum distance
+                if(temp<distance_array[neighbour_number]){
+                    //update new cost
+                    list_ptr->vertex_addr->g_cost=temp;
+
+                    distance_array[neighbour_number]=temp;
+                }
+            }
+            list_ptr=list_ptr->next;
+        }
+
+        //move closest vertex to the front of the q, it will be explored next
+
+        move_closest_node_to_front_q(q,distance_array);
+        printf("qhead %d \n",q->head->vertex->vertex_number);
+    }
+
+    //free(q);
+    //free(current_vertex);
+    //free(list_ptr);
+    return false;
+}
+/*
 //brute force method to find nearest goals
 void distance_to_goals(struct Vertex* vertex_array,double* distance_array,int* vertex_number_array,bool* visited, int src_vertex, int number_of_goals, int no_of_vertex){
     //find closest vertex
@@ -470,3 +670,6 @@ void distance_to_goals(struct Vertex* vertex_array,double* distance_array,int* v
     }
 
 }
+*/
+
+

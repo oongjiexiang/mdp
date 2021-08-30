@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/exploreTime"
+        android:id="@+id/exploreTimeTextView2"
         android:layout_width="150dp"
         android:layout_height="25dp"
         android:layout_marginStart="96dp"
@@ -34,10 +34,11 @@
         android:textAlignment="center"
         android:textColor="@color/colorBlack"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ExploreTextView" />
 
     <TextView
-        android:id="@+id/exploreTime2"
+        android:id="@+id/fastestTimeTextView2"
         android:layout_width="150dp"
         android:layout_height="25dp"
         android:layout_marginEnd="96dp"
@@ -49,7 +50,8 @@
         android:textAlignment="center"
         android:textColor="@color/colorBlack"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fastestTextView2" />
 
     <TextView
         android:id="@+id/fastestTextView2"
@@ -66,49 +68,53 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/exploreBtn"
+    <ToggleButton
+        android:id="@+id/exploreToggleBtn"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="28dp"
-        android:text="Explore"
+        android:layout_marginStart="76dp"
+        android:layout_marginLeft="76dp"
+        android:layout_marginTop="112dp"
+        android:text="Exploration"
+        android:textOff="EXPLORE"
+        android:textOn="STOP"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exploreTime" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/exploreBtn2"
+    <ToggleButton
+        android:id="@+id/fastestToggleBtn"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
         android:layout_marginTop="28dp"
-        android:layout_marginEnd="168dp"
-        android:layout_marginRight="168dp"
-        android:text="Explore"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exploreTime" />
+        android:layout_marginEnd="44dp"
+        android:layout_marginRight="44dp"
+        android:text="FASTEST"
+        android:textOff="FASTEST"
+        android:textOn="STOP"
+        app:layout_constraintEnd_toStartOf="@+id/fastestResetImageBtn"
+        app:layout_constraintTop_toBottomOf="@+id/fastestTimeTextView2" />
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/exploreResetImageBtn"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="38dp"
-        android:layout_marginLeft="38dp"
+        android:layout_marginStart="43dp"
+        android:layout_marginLeft="43dp"
         android:layout_marginTop="30dp"
         android:background="#00FFFFFF"
-        app:layout_constraintStart_toEndOf="@+id/exploreBtn"
-        app:layout_constraintTop_toBottomOf="@+id/exploreTime"
+        app:layout_constraintStart_toEndOf="@+id/exploreToggleBtn"
+        app:layout_constraintTop_toBottomOf="@+id/exploreTimeTextView2"
         app:srcCompat="@drawable/ic_refresh" />
 
     <ImageButton
-        android:id="@+id/imageButton4"
+        android:id="@+id/fastestResetImageBtn"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="38dp"
-        android:layout_marginLeft="38dp"
         android:layout_marginTop="30dp"
+        android:layout_marginEnd="90dp"
+        android:layout_marginRight="90dp"
         android:background="#00FFFFFF"
-        app:layout_constraintStart_toEndOf="@+id/exploreBtn2"
-        app:layout_constraintTop_toBottomOf="@+id/exploreTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exploreTimeTextView2"
         app:srcCompat="@drawable/ic_refresh" />
 </androidx.constraintlayout.widget.ConstraintLayout>

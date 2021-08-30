@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
     static TextView robotStatusTextView;
     static Button f1, f2;
+    static Button upBtn, downBtn, leftBtn, rightBtn;
     Button reconfigure;
     ReconfigureFragment reconfigureFragment = new ReconfigureFragment();
 
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("connStatus", "Disconnected");
         editor.commit();
 
-        Button printMDFStringButton = (Button) findViewById(R.id.printMDFString);
+        /*Button printMDFStringButton = (Button) findViewById(R.id.printMDFString);
         printMDFStringButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.commit();
                 refreshMessageReceived();
             }
-        });
+        });*/
 
         // Toolbar
         Button bluetoothButton = (Button) findViewById(R.id.bluetoothButton);
@@ -105,16 +107,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent popup = new Intent(MainActivity.this, BluetoothPopUp.class);
-                startActivity(popup);
-            }
-        });
-        Button mapInformationButton = (Button) findViewById(R.id.mapInfoButton);
-        mapInformationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editor.putString("mapJsonObject", String.valueOf(gridMap.getCreateJsonObject()));
-                editor.commit();
-                Intent popup = new Intent(MainActivity.this, MapInformation.class);
                 startActivity(popup);
             }
         });
@@ -135,8 +127,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Controller
+        upBtn = findViewById(R.id.upBtn);
+        downBtn = findViewById(R.id.downBtn);
+        leftBtn = findViewById(R.id.leftBtn);
+        rightBtn = findViewById(R.id.rightBtn);
+
         // Robot Status
-        robotStatusTextView = findViewById(R.id.robotStatusTextView);
+        robotStatusTextView = findViewById(R.id.robotStatus);
 
         myDialog = new ProgressDialog(MainActivity.this);
         myDialog.setMessage("Waiting for other device to reconnect...");
@@ -183,15 +181,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        reconfigure.setOnClickListener(new View.OnClickListener() {
+        /*reconfigure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showLog("Clicked reconfigureBtn");
                 reconfigureFragment.show(getFragmentManager(), "Reconfigure Fragment");
                 showLog("Exiting reconfigureBtn");
             }
-        });
+        });*/
     }
+
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.appbar_menu, menu);
+        return true;
+    }*/
 
     public static Button getF1() { return f1; }
 
@@ -202,6 +207,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static TextView getRobotStatusTextView() {  return robotStatusTextView; }
+
+    public static Button getUpBtn() { return upBtn; }
+    public static Button getDownBtn() { return downBtn; }
+    public static Button getLeftBtn() { return leftBtn; }
+    public static Button getRightBtn() { return rightBtn; }
 
     public static void sharedPreferences() {
         sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
