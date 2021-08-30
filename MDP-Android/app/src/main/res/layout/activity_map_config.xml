@@ -6,53 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/startpointBtn"
-        android:layout_width="139dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="26dp"
-        android:layout_marginLeft="26dp"
-        android:layout_marginTop="13dp"
-        android:text="Set Startpoint"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/waypointBtn"
-        android:layout_width="139dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="288dp"
-        android:layout_marginRight="288dp"
-        android:text="Set Waypoint"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/changeDirectionBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="116dp"
         android:layout_marginLeft="116dp"
         android:layout_marginTop="12dp"
+        android:contentDescription="TODO"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startpointBtn"
-        app:srcCompat="@drawable/baseline_explore_24"
-        android:contentDescription="TODO" />
+        app:layout_constraintTop_toBottomOf="@+id/startpointToggleBtn"
+        app:srcCompat="@drawable/baseline_explore_24" />
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/addObstacleBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="13dp"
         android:layout_marginEnd="380dp"
         android:layout_marginRight="380dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/waypointBtn"
+        app:layout_constraintTop_toBottomOf="@+id/waypointToggleBtn"
         app:srcCompat="@drawable/baseline_dangerous_24" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/updateMapBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
@@ -60,17 +38,19 @@
         android:layout_marginTop="12dp"
         android:text="Update"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton" />
+        app:layout_constraintTop_toBottomOf="@+id/changeDirectionBtn" />
 
     <Switch
         android:id="@+id/autoManualSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginRight="96dp"
-        android:text="AUTO"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="72dp"
+        android:layout_marginRight="72dp"
+        android:text="MANUAL"
         android:textFontWeight="500"
+        android:textOff="@string/manual"
+        android:textOn="@string/auto"
         android:textSize="28px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -85,5 +65,29 @@
         android:text="Reset Map"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/autoManualSwitch" />
+
+    <ToggleButton
+        android:id="@+id/startpointToggleBtn"
+        android:layout_width="139dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="13dp"
+        android:textOff="SET STARTPOINT"
+        android:textOn="CANCEL"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/waypointToggleBtn"
+        android:layout_width="139dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="288dp"
+        android:layout_marginRight="288dp"
+        android:textOff="SET WAYPOINT"
+        android:textOn="CANCEL"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -42,7 +42,8 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     SharedPreferences.Editor editor;
 
     // Control Button
-    ImageButton moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn, exploreResetButton, fastestResetButton;
+    Button moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn;
+    ImageButton exploreResetButton, fastestResetButton;
     private static long exploreTimer, fastestTimer;
     ToggleButton exploreButton, fastestButton;
     TextView exploreTimeTextView, fastestTimeTextView, robotStatusTextView;
@@ -117,18 +118,18 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
 
         // variable initialization
-        moveForwardImageBtn = root.findViewById(R.id.forwardImageBtn);
-        turnRightImageBtn = root.findViewById(R.id.rightImageBtn);
-        moveBackImageBtn = root.findViewById(R.id.backImageBtn);
-        turnLeftImageBtn = root.findViewById(R.id.leftImageBtn);
-        exploreTimeTextView = root.findViewById(R.id.exploreTimeTextView);
-        fastestTimeTextView = root.findViewById(R.id.fastestTimeTextView);
-        exploreButton = root.findViewById(R.id.exploreToggleBtn);
-        fastestButton = root.findViewById(R.id.fastestToggleBtn);
-        exploreResetButton = root.findViewById(R.id.exploreResetImageBtn);
-        fastestResetButton = root.findViewById(R.id.fastestResetImageBtn);
-        phoneTiltSwitch = root.findViewById(R.id.phoneTiltSwitch);
-        calibrateButton = root.findViewById(R.id.calibrateButton);
+        moveForwardImageBtn = MainActivity.getUpBtn();
+        turnRightImageBtn = MainActivity.getRightBtn();
+        moveBackImageBtn = MainActivity.getDownBtn();
+        turnLeftImageBtn = MainActivity.getLeftBtn();
+        exploreTimeTextView = root.findViewById(R.id.exploreTimeTextView2);
+        fastestTimeTextView = root.findViewById(R.id.fastestTimeTextView2);
+        exploreButton = root.findViewById(R.id.exploreToggleBtn2);
+        fastestButton = root.findViewById(R.id.fastestToggleBtn2);
+        exploreResetButton = root.findViewById(R.id.exploreResetImageBtn2);
+        fastestResetButton = root.findViewById(R.id.fastestResetImageBtn2);
+        //phoneTiltSwitch = root.findViewById(R.id.phoneTiltSwitch);
+        //calibrateButton = root.findViewById(R.id.calibrateButton);
 
         robotStatusTextView = MainActivity.getRobotStatusTextView();
         fastestTimer = 0;
@@ -289,7 +290,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 showLog("Exiting fastestResetImageBtn");            }
         });
 
-        phoneTiltSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        /*phoneTiltSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (gridMap.getAutoUpdate()) {
@@ -334,7 +335,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 MapTabFragment.manualUpdateRequest = true;
                 showLog("Exiting Calibrate Button");
             }
-        });
+        });*/
 
         return root;
     }

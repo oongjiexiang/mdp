@@ -560,8 +560,8 @@ public class GridMap extends View {
         if (event.getAction() == MotionEvent.ACTION_DOWN && this.getAutoUpdate() == false) {
             int column = (int) (event.getX() / cellSize);
             int row = this.convertRow((int) (event.getY() / cellSize));
-            ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setStartPointToggleBtn);
-            ToggleButton setWaypointToggleBtn = ((Activity)this. getContext()).findViewById(R.id.setWaypointToggleBtn);
+            ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.startpointToggleBtn);
+            ToggleButton setWaypointToggleBtn = ((Activity)this. getContext()).findViewById(R.id.waypointToggleBtn);
 
             if (startCoordStatus) {
                 if (canDrawRobot) {
@@ -642,9 +642,9 @@ public class GridMap extends View {
     }
 
     public void toggleCheckedBtn(String buttonName) {
-        ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setStartPointToggleBtn);
-        ToggleButton setWaypointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setWaypointToggleBtn);
-        ImageButton obstacleImageBtn = ((Activity)this.getContext()).findViewById(R.id.obstacleImageBtn);
+        ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.startpointToggleBtn);
+        ToggleButton setWaypointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.waypointToggleBtn);
+        ImageButton obstacleImageBtn = ((Activity)this.getContext()).findViewById(R.id.addObstacleBtn);
         ImageButton exploredImageBtn = ((Activity)this.getContext()).findViewById(R.id.exploredImageBtn);
         ImageButton clearImageBtn = ((Activity)this.getContext()).findViewById(R.id.clearImageBtn);
 
@@ -658,23 +658,23 @@ public class GridMap extends View {
                 this.setWaypointStatus(false);
                 setWaypointToggleBtn.toggle();
             }
-        if (!buttonName.equals("exploredImageBtn"))
+       /* if (!buttonName.equals("exploredImageBtn"))
             if (exploredImageBtn.isEnabled())
-                this.setExploredStatus(false);
+                this.setExploredStatus(false);*/
         if (!buttonName.equals("obstacleImageBtn"))
             if (obstacleImageBtn.isEnabled())
                 this.setSetObstacleStatus(false);
-        if (!buttonName.equals("clearImageBtn"))
+        /*if (!buttonName.equals("clearImageBtn"))
             if (clearImageBtn.isEnabled())
-                this.setUnSetCellStatus(false);
+                this.setUnSetCellStatus(false);*/
     }
 
 
     public void resetMap() {
         showLog("Entering resetMap");
-        TextView robotStatusTextView =  ((Activity)this.getContext()).findViewById(R.id.robotStatusTextView);
-        Switch manualAutoToggleBtn = ((Activity)this.getContext()).findViewById(R.id.manualAutoToggleBtn);
-        Switch phoneTiltSwitch = ((Activity)this.getContext()).findViewById(R.id.phoneTiltSwitch);
+        TextView robotStatusTextView =  ((Activity)this.getContext()).findViewById(R.id.robotStatus);
+        Switch manualAutoToggleBtn = ((Activity)this.getContext()).findViewById(R.id.autoManualSwitch);
+        //Switch phoneTiltSwitch = ((Activity)this.getContext()).findViewById(R.id.phoneTiltSwitch);
         updateRobotAxis(1, 1, "None");
         robotStatusTextView.setText("Not Available");
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -686,10 +686,10 @@ public class GridMap extends View {
         }
         this.toggleCheckedBtn("None");
 
-        if (phoneTiltSwitch.isChecked()) {
+       /*if (phoneTiltSwitch.isChecked()) {
             phoneTiltSwitch.toggle();
             phoneTiltSwitch.setText("TILT OFF");
-        }
+        }*/
 
         receivedJsonObject = null;
         backupMapInformation = null;
@@ -1000,7 +1000,7 @@ public class GridMap extends View {
         List<int[]> obstacleCoord = new ArrayList<>(this.getObstacleCoord());
         List<String[]> arrowCoord = new ArrayList<>(this.getArrowCoord());
 
-        TextView robotStatusTextView =  ((Activity)this.getContext()).findViewById(R.id.robotStatusTextView);
+        TextView robotStatusTextView =  ((Activity)this.getContext()).findViewById(R.id.robotStatus);
 
         JSONObject map = new JSONObject();
         for (int y=ROW-1; y>=0; y--)
@@ -1131,7 +1131,7 @@ public class GridMap extends View {
     }
 
     public void printRobotStatus(String message) {
-        TextView robotStatusTextView = ((Activity)this.getContext()).findViewById(R.id.robotStatusTextView);
+        TextView robotStatusTextView = ((Activity)this.getContext()).findViewById(R.id.robotStatus);
         robotStatusTextView.setText(message);
     }
 

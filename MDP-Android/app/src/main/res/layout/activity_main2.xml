@@ -116,7 +116,7 @@
                     android:textSize="26px" />
 
                 <TextView
-                    android:id="@+id/direction"
+                    android:id="@+id/directionAxisTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
@@ -143,7 +143,7 @@
                     android:textSize="26px" />
 
                 <TextView
-                    android:id="@+id/xValue"
+                    android:id="@+id/xAxisTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -164,7 +164,7 @@
                     android:textSize="26px" />
 
                 <TextView
-                    android:id="@+id/yValue"
+                    android:id="@+id/yAxisTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"

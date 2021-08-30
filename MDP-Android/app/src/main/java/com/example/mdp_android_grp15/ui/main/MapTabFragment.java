@@ -61,20 +61,20 @@ public class MapTabFragment extends Fragment {
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.activity_map, container, false);
+        View root = inflater.inflate(R.layout.activity_map_config, container, false);
 
         gridMap = MainActivity.getGridMap();
         final DirectionFragment directionFragment = new DirectionFragment();
 
-        resetMapBtn = root.findViewById(R.id.resetMapBtn);
-        setStartPointToggleBtn = root.findViewById(R.id.setStartPointToggleBtn);
-        setWaypointToggleBtn = root.findViewById(R.id.setWaypointToggleBtn);
-        directionChangeImageBtn = root.findViewById(R.id.directionChangeImageBtn);
+        resetMapBtn = root.findViewById(R.id.resetBtn);
+        setStartPointToggleBtn = root.findViewById(R.id.startpointToggleBtn);
+        setWaypointToggleBtn = root.findViewById(R.id.waypointToggleBtn);
+        directionChangeImageBtn = root.findViewById(R.id.changeDirectionBtn);
         exploredImageBtn = root.findViewById(R.id.exploredImageBtn);
-        obstacleImageBtn = root.findViewById(R.id.obstacleImageBtn);
+        obstacleImageBtn = root.findViewById(R.id.addObstacleBtn);
         clearImageBtn = root.findViewById(R.id.clearImageBtn);
-        manualAutoToggleBtn = root.findViewById(R.id.manualAutoToggleBtn);
-        updateButton = root.findViewById(R.id.updateButton);
+        manualAutoToggleBtn = root.findViewById(R.id.autoManualSwitch);
+        updateButton = root.findViewById(R.id.updateMapBtn);
 
         resetMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +127,7 @@ public class MapTabFragment extends Fragment {
             }
         });
 
-        exploredImageBtn.setOnClickListener(new View.OnClickListener() {
+        /*exploredImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showLog("Clicked exploredImageBtn");
@@ -140,7 +140,7 @@ public class MapTabFragment extends Fragment {
                     gridMap.setSetObstacleStatus(false);
                 showLog("Exiting exploredImageBtn");
             }
-        });
+        });*/
 
         obstacleImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +157,7 @@ public class MapTabFragment extends Fragment {
             }
         });
 
-        clearImageBtn.setOnClickListener(new View.OnClickListener() {
+        /*clearImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showLog("Clicked clearImageBtn");
@@ -170,7 +170,7 @@ public class MapTabFragment extends Fragment {
                     gridMap.setUnSetCellStatus(false);
                 showLog("Exiting clearImageBtn");
             }
-        });
+        });*/
 
         manualAutoToggleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,8 +183,8 @@ public class MapTabFragment extends Fragment {
                         gridMap.toggleCheckedBtn("None");
                         updateButton.setClickable(false);
                         updateButton.setTextColor(Color.GRAY);
-                        ControlFragment.getCalibrateButton().setClickable(false);
-                        ControlFragment.getCalibrateButton().setTextColor(Color.GRAY);
+                        //ControlFragment.getCalibrateButton().setClickable(false);
+                        //ControlFragment.getCalibrateButton().setTextColor(Color.GRAY);
                         manualAutoToggleBtn.setText("AUTO");
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -198,8 +198,8 @@ public class MapTabFragment extends Fragment {
                         gridMap.toggleCheckedBtn("None");
                         updateButton.setClickable(true);
                         updateButton.setTextColor(Color.BLACK);
-                        ControlFragment.getCalibrateButton().setClickable(true);
-                        ControlFragment.getCalibrateButton().setTextColor(Color.BLACK);
+                        //ControlFragment.getCalibrateButton().setClickable(true);
+                        //ControlFragment.getCalibrateButton().setTextColor(Color.BLACK);
                         manualAutoToggleBtn.setText("MANUAL");
                     } catch (JSONException e) {
                         e.printStackTrace();
