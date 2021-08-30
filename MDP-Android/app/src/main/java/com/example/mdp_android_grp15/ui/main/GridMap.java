@@ -1,9 +1,7 @@
 package com.example.mdp_android_grp15.ui.main;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,16 +9,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +23,6 @@ import androidx.annotation.Nullable;
 
 import com.example.mdp_android_grp15.MainActivity;
 import com.example.mdp_android_grp15.R;
-import com.example.mdp_android_grp15.ui.main.MapTabFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,8 +85,6 @@ public class GridMap extends View {
     public static String publicMDFExploration;
     public static String publicMDFObstacle;
 
-    private int[] tempColPositions = new int[20];
-    private int[] tempRowPositions = new int[20];
     public ArrayList<String[]> ITEM_LIST = new ArrayList<>(Arrays.asList(
             new String[20], new String[20], new String[20], new String[20], new String[20],
             new String[20], new String[20], new String[20], new String[20], new String[20],
@@ -777,7 +767,7 @@ public class GridMap extends View {
                 this.invalidate();
                 return true;
             }
-            // TODO
+
             // added removing imageID and imageBearing
             if (unSetCellStatus) {
                 ArrayList<int[]> obstacleCoord = this.getObstacleCoord();
