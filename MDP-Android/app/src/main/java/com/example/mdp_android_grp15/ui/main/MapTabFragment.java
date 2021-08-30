@@ -6,8 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -34,9 +37,14 @@ public class MapTabFragment extends Fragment {
     ToggleButton setStartPointToggleBtn, setWaypointToggleBtn;
     Switch manualAutoToggleBtn;
     GridMap gridMap;
+
+    Spinner spinner_imageID;
+    Spinner spinner_imageBearing;
     private static boolean autoUpdate = false;
     public static boolean manualUpdateRequest = false;
 
+    static String imageID;
+    static String imageBearing;
     public static MapTabFragment newInstance(int index) {
         MapTabFragment fragment = new MapTabFragment();
         Bundle bundle = new Bundle();
@@ -75,6 +83,44 @@ public class MapTabFragment extends Fragment {
         clearImageBtn = root.findViewById(R.id.clearImageBtn);
         manualAutoToggleBtn = root.findViewById(R.id.autoManualSwitch);
         updateButton = root.findViewById(R.id.updateMapBtn);
+
+        spinner_imageID = root.findViewById(R.id.imageIDSpinner);
+        spinner_imageBearing = root.findViewById(R.id.bearingSpinner);
+        spinner_imageID.setEnabled(false);
+        spinner_imageBearing.setEnabled(false);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
+                R.array.imageID_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner_imageID.setAdapter(adapter);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this.getContext(),
+                R.array.imageBearing_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner_imageBearing.setAdapter(adapter2);
+
+        spinner_imageID.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> a, View v, int pos, long arg3) {
+                imageID = a.getItemAtPosition(pos).toString();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> a) { }
+        });
+
+        spinner_imageBearing.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> a, View v, int pos, long arg3) {
+                imageBearing = a.getItemAtPosition(pos).toString();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> a) { }
+        });
+
 
         resetMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,13 +192,20 @@ public class MapTabFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 showLog("Clicked obstacleImageBtn");
+
                 if (!gridMap.getSetObstacleStatus()) {
                     showToast("Please plot obstacles");
                     gridMap.setSetObstacleStatus(true);
+                    spinner_imageID.setEnabled(true);
+                    spinner_imageBearing.setEnabled(true);
                     gridMap.toggleCheckedBtn("obstacleImageBtn");
                 }
-                else if (gridMap.getSetObstacleStatus())
+                else if (gridMap.getSetObstacleStatus()) {
                     gridMap.setSetObstacleStatus(false);
+                    spinner_imageID.setEnabled(false);
+                    spinner_imageBearing.setEnabled(false);
+                }
+                showLog("obstacle status = " + gridMap.getSetObstacleStatus());
                 showLog("Exiting obstacleImageBtn");
             }
         });
@@ -210,23 +263,23 @@ public class MapTabFragment extends Fragment {
             }
         });
 
-        updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showLog("Clicked updateButton");
-                MainActivity.printMessage("sendArena");
-                manualUpdateRequest = true;
-                showLog("Exiting updateButton");
-                try {
-                    String message = "{\"map\":[{\"explored\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"length\":300,\"obstacle\":\"00000000000000000706180400080010001e000400000000200044438f840000000000000080\"}]}";
-
-                    gridMap.setReceivedJsonObject(new JSONObject(message));
-                    gridMap.updateMapInformation();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        updateButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showLog("Clicked updateButton");
+//                MainActivity.printMessage("sendArena");
+//                manualUpdateRequest = true;
+//                showLog("Exiting updateButton");
+//                try {
+//                    String message = "{\"map\":[{\"explored\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"length\":300,\"obstacle\":\"00000000000000000706180400080010001e000400000000200044438f840000000000000080\"}]}";
+//
+//                    gridMap.setReceivedJsonObject(new JSONObject(message));
+//                    gridMap.updateMapInformation();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
 
 

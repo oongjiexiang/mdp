@@ -138,4 +138,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualAutoToggleBtn" />
 
+    <TextView
+        android:id="@+id/tv_imageID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Image ID:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exploredImageBtn" />
+
+    <TextView
+        android:id="@+id/tv_imageBearing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Image Bearing:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_imageID" />
+
+    <Spinner
+        android:id="@+id/imageIDSpinner"
+        android:layout_width="89dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginLeft="44dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toEndOf="@+id/tv_imageID"
+        app:layout_constraintTop_toBottomOf="@+id/directionChangeImageBtn" />
+
+    <Spinner
+        android:id="@+id/bearingSpinner"
+        android:layout_width="89dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toEndOf="@+id/tv_imageBearing"
+        app:layout_constraintTop_toBottomOf="@+id/imageIDSpinner" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
