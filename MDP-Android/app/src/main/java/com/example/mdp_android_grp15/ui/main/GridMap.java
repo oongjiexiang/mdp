@@ -1,7 +1,9 @@
 package com.example.mdp_android_grp15.ui.main;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,11 +11,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +30,7 @@ import androidx.annotation.Nullable;
 
 import com.example.mdp_android_grp15.MainActivity;
 import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp15.ui.main.MapTabFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +38,7 @@ import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GridMap extends View {
@@ -42,6 +51,8 @@ public class GridMap extends View {
     SharedPreferences sharedPreferences;
 
     private Paint blackPaint = new Paint();
+    private Paint whitePaint = new Paint();
+    private Paint redPaint = new Paint();
     private Paint obstacleColor = new Paint();
     private Paint robotColor = new Paint();
     private Paint endColor = new Paint();
@@ -73,7 +84,7 @@ public class GridMap extends View {
     private Bitmap arrowBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_arrow_error);
 
     private static final String TAG = "GridMap";
-    private static final int COL = 15;
+    private static final int COL = 20;
     private static final int ROW = 20;
     private static float cellSize;
     private static Cell[][] cells;
@@ -82,11 +93,31 @@ public class GridMap extends View {
     public static String publicMDFExploration;
     public static String publicMDFObstacle;
 
+    private int[] tempColPositions = new int[20];
+    private int[] tempRowPositions = new int[20];
+    public ArrayList<String[]> ITEM_LIST = new ArrayList<>(Arrays.asList(
+            new String[20], new String[20], new String[20], new String[20], new String[20],
+            new String[20], new String[20], new String[20], new String[20], new String[20],
+            new String[20], new String[20], new String[20], new String[20], new String[20],
+            new String[20], new String[20], new String[20], new String[20], new String[20]
+    ));
+    public ArrayList<String[]> imageBearings = new ArrayList<>(Arrays.asList(
+            new String[20], new String[20], new String[20], new String[20], new String[20],
+            new String[20], new String[20], new String[20], new String[20], new String[20],
+            new String[20], new String[20], new String[20], new String[20], new String[20],
+            new String[20], new String[20], new String[20], new String[20], new String[20]
+    ));
+
 
     public GridMap(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initMap();
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        whitePaint.setColor(Color.WHITE);
+        whitePaint.setTextSize(25);
+        whitePaint.setTextAlign(Paint.Align.CENTER);
+        redPaint.setColor(Color.RED);
+        redPaint.setStrokeWidth(8);
         obstacleColor.setColor(Color.BLACK);
         robotColor.setColor(Color.GREEN);
         endColor.setColor(Color.RED);
@@ -99,6 +130,7 @@ public class GridMap extends View {
 
         // get shared preferences
         sharedPreferences = getContext().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
+
     }
 
     private void initMap() {
@@ -121,7 +153,7 @@ public class GridMap extends View {
             dummyArrowCoord[2] = "dummy";
             arrowCoord.add(dummyArrowCoord);
             this.createCell();
-            this.setEndCoord(14, 19);
+//            this.setEndCoord(14, 19);
             mapDrawn = true;
         }
 
@@ -132,9 +164,79 @@ public class GridMap extends View {
         if (getCanDrawRobot())
             drawRobot(canvas, curCoord);
         drawArrow(canvas, arrowCoord);
+        drawObstacles(canvas);
+
+//        showLog("ITEM_LIST size is " + ITEM_LIST.size());
 
         showLog("Exiting onDraw");
     }
+
+    // draws obstacle cells whenever map refreshes, pos/correct item selection is here
+    private void drawObstacles(Canvas canvas) {
+        showLog("Entering drawObstacles");
+
+        // draw image id
+        showLog("ITEM_LIST size = " + ITEM_LIST.size());
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                canvas.drawText(ITEM_LIST.get(19-i)[j], cells[j+1][20-i].startX + ((cells[1][1].endX - cells[1][1].startX) / 2),
+                        cells[j+1][i+1].startY + ((cells[1][1].endY - cells[1][1].startY) / 2) + 10, whitePaint);
+
+                switch (imageBearings.get(19-i)[j]) {
+                    case "North":
+                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i + 1].startY,
+                                cells[j + 1][20 - i].endX, cells[j + 1][i + 1].startY, redPaint);
+                        break;
+
+                    case "South":
+                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i + 1].startY + cellSize,
+                                cells[j + 1][20 - i].endX, cells[j + 1][i + 1].startY + cellSize, redPaint);
+                        break;
+
+                    case "East":
+                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i + 1].startY,
+                                cells[j + 1][20 - i].startX, cells[j + 1][i + 1].endY, redPaint);
+                        break;
+                    case "West":
+                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i + 1].startY,
+                                cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i + 1].endY, redPaint);
+                        break;
+                }
+            }
+        }
+
+        /*
+        // draw image bearing
+        showLog("imageBearings size = " + imageBearings.size());
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                switch (imageBearings.get(19-i)[j]) {
+                    case "North":
+                        canvas.drawLine(cells[j+1][20-i].startX, cells[j+1][i+1].startY,
+                                cells[j+1][20-i].endX, cells[j+1][i+1].startY, redPaint);
+                        break;
+
+                    case "South":
+                        canvas.drawLine(cells[j+1][20-i].startX, cells[j+1][i+1].startY + cellSize,
+                                cells[j+1][20-i].endX, cells[j+1][i+1].startY + cellSize, redPaint);
+                        break;
+
+                    case "East":
+                        canvas.drawLine(cells[j+1][20-i].startX, cells[j+1][i+1].startY,
+                                cells[j+1][20-i].startX, cells[j+1][i+1].endY, redPaint);
+                        break;
+                    case "West":
+                        canvas.drawLine(cells[j+1][20-i].startX + cellSize, cells[j+1][i+1].startY,
+                                cells[j+1][20-i].startX + cellSize, cells[j+1][i+1].endY, redPaint);
+                        break;
+                }
+            }
+        }
+
+         */
+        showLog("Exiting drawObstacles");
+    }
+
 
     private void drawIndividualCell(Canvas canvas) {
         showLog("Entering drawIndividualCell");
@@ -163,7 +265,7 @@ public class GridMap extends View {
 
     private void drawHorizontalLines(Canvas canvas) {
         for (int y = 0; y <= ROW; y++)
-            canvas.drawLine(cells[1][y].startX, cells[1][y].startY - (cellSize / 30), cells[15][y].endX, cells[15][y].startY - (cellSize / 30), blackPaint);
+            canvas.drawLine(cells[1][y].startX, cells[1][y].startY - (cellSize / 30), cells[20][y].endX, cells[20][y].startY - (cellSize / 30), blackPaint);
     }
 
     private void drawVerticalLines(Canvas canvas) {
@@ -171,6 +273,7 @@ public class GridMap extends View {
             canvas.drawLine(cells[x][0].startX - (cellSize / 30) + cellSize, cells[x][0].startY - (cellSize / 30), cells[x][0].startX - (cellSize / 30) + cellSize, cells[x][19].endY + (cellSize / 30), blackPaint);
     }
 
+    // this draws the axis numbers
     private void drawGridNumber(Canvas canvas) {
         showLog("Entering drawGridNumber");
         for (int x = 1; x <= COL; x++) {
@@ -554,6 +657,8 @@ public class GridMap extends View {
         }
     }
 
+    // TODO
+    // maybe here edit too, get the x and y then put in value and colour
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         showLog("Entering onTouchEvent");
@@ -562,6 +667,9 @@ public class GridMap extends View {
             int row = this.convertRow((int) (event.getY() / cellSize));
             ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setStartPointToggleBtn);
             ToggleButton setWaypointToggleBtn = ((Activity)this. getContext()).findViewById(R.id.setWaypointToggleBtn);
+            showLog("event.getX = " + event.getX() + ", event.getY = " + event.getY());
+
+
 
             if (startCoordStatus) {
                 if (canDrawRobot) {
@@ -617,7 +725,50 @@ public class GridMap extends View {
                 this.invalidate();
                 return true;
             }
+
+            // TODO
+            // edit this to add id and the bar, popup to ask for user input
             if (setObstacleStatus) {
+                // get user input from spinners in MapTabFragment static values
+                String imageID = MapTabFragment.imageID;
+                String imageBearing = MapTabFragment.imageBearing;
+
+                // after init, at stated column and row, add the id to use as ref to update the grid
+                ITEM_LIST.get(row)[column-1] = imageID;
+
+                /*
+                add border colour to grid on the side image is on (N,S,E or W)
+                 */
+                switch (imageBearing) {
+                    case "North":
+                        imageBearings.get(row)[column-1] = "North";
+                        break;
+                    case "South":
+                        imageBearings.get(row)[column-1] = "South";
+                        break;
+                    case "East":
+                        imageBearings.get(row)[column-1] = "East";
+                        break;
+                    case "West":
+                        imageBearings.get(row)[column-1] = "West";
+                        break;
+                }
+
+
+                /* test boundaries of cells
+                showLog("row = " + row + ", column = " + column);
+                showLog("ITEM_LIST(" + String.valueOf(19-(row-1)) + ")[" + String.valueOf(column-1) + "] = " + ITEM_LIST.get(19-(row-1))[column-1]);
+
+                showLog("startX = " + (cells[column][row].startX));
+                showLog("endX = " + (cells[column][row].endX));
+                showLog("startY = " + (cells[row][column].startY));
+                showLog("endY = " + (cells[row][column].endY));
+                showLog("endX - startX = " + (cells[column][row].endX + cells[column][row].startX));
+                showLog("endY - startY = " + (cells[column][row].endY + cells[column][row].startY));
+                showLog("(cells[col][row].endX - cells[col][row].startX) / 2 = " + (cells[column][row].endX - cells[column][row].startX) / 2);
+                */
+
+
                 this.setObstacleCoord(column, row);
                 this.invalidate();
                 return true;
@@ -627,12 +778,16 @@ public class GridMap extends View {
                 this.invalidate();
                 return true;
             }
+            // TODO
+            // added removing imageID and imageBearing
             if (unSetCellStatus) {
                 ArrayList<int[]> obstacleCoord = this.getObstacleCoord();
                 cells[column][20-row].setType("unexplored");
                 for (int i=0; i<obstacleCoord.size(); i++)
                     if (obstacleCoord.get(i)[0] == column && obstacleCoord.get(i)[1] == row)
                         obstacleCoord.remove(i);
+                ITEM_LIST.get(row)[column-1] = "";  // remove imageID
+                imageBearings.get(row)[column-1] = "";  // remove bearing
                 this.invalidate();
                 return true;
             }
@@ -705,6 +860,13 @@ public class GridMap extends View {
         canDrawRobot = false;
         validPosition = false;
         Bitmap arrowBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_arrow_error);
+
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                ITEM_LIST.get(i)[j] = "";
+                imageBearings.get(i)[j] = "";
+            }
+        }
 
         showLog("Exiting resetMap");
         this.invalidate();

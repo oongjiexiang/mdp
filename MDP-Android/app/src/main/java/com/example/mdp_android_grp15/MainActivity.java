@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("incomingMessage"));
 
+
         // Set up sharedPreferences
         MainActivity.context = getApplicationContext();
         this.sharedPreferences();
@@ -124,6 +126,14 @@ public class MainActivity extends AppCompatActivity {
         xAxisTextView = findViewById(R.id.xAxisTextView);
         yAxisTextView = findViewById(R.id.yAxisTextView);
         directionAxisTextView = findViewById(R.id.directionAxisTextView);
+
+        // initialize ITEM_LIST and imageBearings strings
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                gridMap.ITEM_LIST.get(i)[j] = "";
+                gridMap.imageBearings.get(i)[j] = "";
+            }
+        }
 
         // Robot Status
         robotStatusTextView = findViewById(R.id.robotStatusTextView);
