@@ -168,23 +168,28 @@ struct Vertex* a_star_search(struct Vertex* vertex_array, struct Vertex* adj_mat
     src_vertex->g_cost=0;
     enqueue(q,src_vertex);
     curr_vertex=src_vertex;
-
+    //while q to explore is not empty
     while(q->head!=NULL){
+        //visit head of sorted q
         curr_vertex=dequeue(q);
         curr_vertex->visited=true;
+        //for each neighbour in the adjacency matrix
         for(i=0;i<total_grid_count;i++){
             if(adj_matrix[curr_vertex->id][i]!=NULL){
                 neighbour_vertex=adj_matrix[curr_vertex->id][i];
                 if(neighbour_vertex->visited==false){
+                    //compare g costs of neighbour, if new g_cost is lower, replace the old g_cost and prev_vertex
                     temp_g_cost=calculate_g_cost(curr_vertex,neighbour_vertex);
                     if(temp_g_cost<neighbour_vertex->g_cost){
                         neighbour_vertex->g_cost=temp_g_cost;
                         neighbour_vertex->prev_vertex=curr_vertex;
+                        //add neighbour to exploration queue
                         enqueue(q,neighbour_vertex);
                     }
                 }
             }
         }
+        //move the lowest f_cost vertex to front of q
         sort_queue(q);
     }
     //print the path (backwards)
