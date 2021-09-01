@@ -105,7 +105,7 @@ int main()
     column_count=20;
     total_grid_count = row_count*column_count;
     src=0;
-    target=46;
+    target=13;
     //----test vertex fucntions----
     struct Vertex* vertex_array= (struct Vertex*)malloc(total_grid_count*sizeof(struct Vertex));
     initialize_vertex(vertex_array,row_count,column_count,unit_length,total_grid_count);
@@ -114,17 +114,19 @@ int main()
         printf("vertex values: %d, %d, %d, %f, %f, %f, %f\n",vertex_array[i].id,vertex_array[i].g_cost,vertex_array[i].h_cost,vertex_array[i].x_left,vertex_array[i].x_right,vertex_array[i].y_high,vertex_array[i].y_low);
     }
     struct Vertex* adj_matrix[total_grid_count][total_grid_count];
-    struct Obstacle obstacle_array[1] = {{0,55 ,15}};
+    struct Obstacle obstacle_array[1] = {{0,50 ,10}};
     add_obstacle(vertex_array, obstacle_array,1,obstacle_size,obstacle_boundary,total_grid_count);
 
     printf("index %d, obstacle = %d\n",vertex_array[25].id,vertex_array[25].is_obstacle);
     generate_adj_matrix(adj_matrix,vertex_array,row_count,column_count,total_grid_count);
     update_h_cost(vertex_array,&vertex_array[src],&vertex_array[target],total_grid_count);
     a_star_search(vertex_array,adj_matrix,&vertex_array[src],&vertex_array[target],total_grid_count);
+/*
     for(i=0;i<40;i++){
         if(vertex_array[i].prev_vertex!=NULL)
         printf("i: %d prev_vertex: %d\n",i,vertex_array[i].prev_vertex->id);
     }
+*/
     //----end of test vertex----
 
     free(vertex_array);
@@ -158,7 +160,7 @@ struct Vertex* a_star_search(struct Vertex* vertex_array, struct Vertex* adj_mat
         for(i=0;i<total_grid_count;i++){
             if(adj_matrix[curr_vertex->id][i]!=NULL){
                 neighbour_vertex=adj_matrix[curr_vertex->id][i];
-                if(neighbour_vertex->visited==false){
+                if(neighbour_vertex->visited==false && neighbour_vertex->is_border==false && neighbour_vertex->is_obstacle==false ){
                     //compare g costs of neighbour, if new g_cost is lower, replace the old g_cost and prev_vertex
                     temp_g_cost=calculate_g_cost(curr_vertex,neighbour_vertex);
                     if(temp_g_cost<neighbour_vertex->g_cost){
@@ -184,7 +186,8 @@ void print_path(struct Vertex* src_vertex, struct Vertex* target_vertex){
     print_vertex=target_vertex;
     printf("path to reach vertex %d from source %d\n",target_vertex->id, src_vertex->id);
     while(print_vertex->id!=src_vertex->id){
-        printf(" vertex %d\n",print_vertex->prev_vertex->id);
+        printf("Vertex: %d\n",print_vertex->prev_vertex->id);
+        printf("x_left: %f, y_low: %f\n",print_vertex->prev_vertex->x_left,print_vertex->prev_vertex->y_low);
         print_vertex=print_vertex->prev_vertex;
     }
 }
@@ -337,16 +340,17 @@ void generate_adj_matrix(struct Vertex* adj_matrix[total_grid_count][total_grid_
 //adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
 void add_obstacle(struct Vertex* vertex_array, struct Obstacle* obstacle_array, int no_of_obstacles, double obstacle_length,double boundary_size, int total_count){
     int i,j;
-    double obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, half_obstacle_length, border_x_left, border_x_right, border_y_high, border_y_low;
-    half_obstacle_length=obstacle_length/2;
+    double obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, border_x_left, border_x_right, border_y_high, border_y_low;
+    obstacle_length=obstacle_length/2;
+    boundary_size= boundary_size*2;
 
     //loop through the obstacle array
     for(i=0;i<no_of_obstacles;i++){
         //find the 4 points of the obstacle
-        obstacle_x_left = obstacle_array[i].x_coor-half_obstacle_length;
-        obstacle_x_right = obstacle_array[i].x_coor+half_obstacle_length;
-        obstacle_y_high = obstacle_array[i].y_coor+half_obstacle_length;
-        obstacle_y_low = obstacle_array[i].y_coor-half_obstacle_length;
+        obstacle_x_left = obstacle_array[i].x_coor-obstacle_length;
+        obstacle_x_right = obstacle_array[i].x_coor+obstacle_length;
+        obstacle_y_high = obstacle_array[i].y_coor+obstacle_length;
+        obstacle_y_low = obstacle_array[i].y_coor-obstacle_length;
         printf("obs x and y : %f, %f, %f, %f",obstacle_x_left,obstacle_x_right,obstacle_y_high,obstacle_y_low);
 
         //find the 4 points of the border
@@ -361,12 +365,12 @@ void add_obstacle(struct Vertex* vertex_array, struct Obstacle* obstacle_array, 
             // x3-------x4
             if(vertex_array[j].x_left <= obstacle_x_right && vertex_array[j].x_right >=obstacle_x_left && vertex_array[j].y_low <= obstacle_y_high && vertex_array[j].y_high >=obstacle_y_low){
                 vertex_array[j].is_obstacle = true;
-                printf("obstacle set\n");
+                //printf("obstacle: %d\n",j);
             }
             //if a vertex falls within the x and y coordinates of the border and the vertex is not an obstacle, set it as the border
             if(vertex_array[j].x_left <= border_x_right && vertex_array[j].x_right >=border_x_left && vertex_array[j].y_low <= border_y_high && vertex_array[j].y_high >=border_y_low && vertex_array[j].is_obstacle==false){
                 vertex_array[j].is_border=true;
-                printf("border set\n");
+                //printf("border: %d\n",j);
             }
         }
     }
