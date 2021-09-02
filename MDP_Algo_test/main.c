@@ -2,674 +2,500 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <float.h>
 
-//constant variables
-double UNIT_LENGTH = 10;
-double ROBOT_LENGTH = 30;
-//robot takes up 3 cells
+//----constants----
+//double UNIT_LENGTH = 10;     // cm
+//double ROBOT_LENGTH = 30;
+//double OBSTACLE_BOUNDARY = 15; //how to do this one?
+int row_count,column_count,total_grid_count;
+double unit_length, obstacle_size,robot_length,obstacle_boundary;
 
-//structure of a single vertex
-struct Vertex{
-    int vertex_number;  //vertex number starts from 0
-    double x_start;    //starts from 0
-    double x_end;      //ends at vertex length -1
-    double y_start;    //starts from 0
-    double y_end;      // ends at vertex height -1
-    bool is_obstacle;
-    bool is_goal;
-    bool visited;
-    int g_cost;         //cost of distance from the starting vertex costs are multiplied by 10 to make them whole numbers which will be easier to work with
-    int h_cost;         //cost of distance from current vertex to the final vertex
-};
-
-struct AdjListNode{
-    struct Vertex* vertex_addr;
-    struct AdjListNode* next;
-};
-
-//first vertex of the list
-struct AdjList{
-    struct AdjListNode *head;
-};
-
-//struct of the graph, an array of adjacency list
-struct Grid{
-    int grid_size;
-    struct AdjList* array;
-};
-
-struct QNode{
-    struct Vertex* vertex;
-    struct QNode* next;
-};
-//structure for q
-struct Queue{
-    struct QNode* head;
-    struct QNode* tail;
-};
-
-
-//function prototypes
-//----queue functions----
-void initialize_queue(struct Queue* q);
-bool enqueue(struct Queue* q, struct Vertex* vertex);
-int dequeue(struct Queue* q);
-bool move_closest_node_to_front_q(struct Queue* q,double* distance_array);
-//----graph generation----
-struct AdjListNode* new_adj_list_node(struct Vertex* vertex_addr);
-struct Grid* create_grid(int grid_size);
-void add_edge(struct Grid* grid, int src_vertex, int dest_vertex,struct Vertex* src_vertex_addr, struct Vertex* dest_vertex_addr);
-void initialize_vertex(int grid_length, int grid_height, int total_length, int total_height, struct Vertex* vertexArray);
-void connect_grid(struct Grid* grid, struct Vertex* vertex_array, int grid_length, int grid_height, int total_length, int total_height);
-//----search----
-bool plan_path_2(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, int src_vertex_number,int grid_size,int number_of_goals, double* distance_array, int* prev_array);
-bool plan_path(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, struct Vertex* src_vertex_addr,int grid_size,int number_of_goals);
-struct Vertex* find_closest_vertex(struct Vertex* vertex_array, int src_vertex, bool* visited, int no_of_vertex);
-//void distance_to_goals(struct Vertex* vertex_array,double* distance_array,int* vertex_number_array,bool* visited, int src_vertex, int number_of_goals, int no_of_vertex);
-
-
-//swap function to go through all possible permutations of order to visit each goal
-
-//find_shortest_path to iterate through all possible paths and return shortest path
-
-int main(){
-    //testing function
-    int total_grid_count, grid_length, grid_height, total_length, total_height,goals,i,j;
-    total_grid_count = 25;
-    grid_length=10;
-    grid_height=10;
-    total_length=50;
-    total_height=50;
-    goals=4;
-    //possible to put these into grid struct instead so we do not pass as many variables into the functions
-
-    struct Vertex* vertex_array = (struct Vertex*) malloc(total_grid_count*sizeof(struct Vertex));
-    struct Grid* grid = create_grid(total_grid_count);
-    struct Vertex* goals_order = (struct Vertex*)malloc(goals*sizeof(struct Vertex));
-    double* distance_array = (double*)malloc(total_grid_count*sizeof(double));
-    for(j=0;j<total_grid_count;j++){
-        distance_array[j]=100000;
-    }
-    int* prev_array = (int*)malloc(total_grid_count*sizeof(int));
-
-    //---print vertex and neighbours----
-    struct AdjList* ptr = (struct AdjList*)malloc(sizeof(struct AdjList));
-    struct AdjListNode* ptr2 = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
-    initialize_vertex(grid_length,grid_height,total_length,total_height,vertex_array);
-    connect_grid(grid,vertex_array,grid_length,grid_height,total_length,total_height);
-    /*
-    for(i=0;i<grid->grid_size;i++){
-        ptr = &grid->array[i];
-        ptr2=ptr->head;
-        while(ptr2->next!=NULL){
-
-        printf("vertex %d neighbours %d\n",vertex_array[i].vertex_number,ptr2->vertex_addr->vertex_number);
-
-        ptr2=ptr2->next;
-        }
-    }*/
-
-    //setting obstacles and goals
-    vertex_array[12].is_goal=true;
-    vertex_array[9].is_goal=true;
-    vertex_array[13].is_goal=true;
-    vertex_array[24].is_goal=true;
-
-    vertex_array[21].is_obstacle=true;
-    vertex_array[16].is_obstacle=true;
-
-
-    plan_path_2(grid,vertex_array,goals_order,22,total_grid_count,goals,distance_array,prev_array);
-    printf("Starting location: 22\n");
-
-    for(i=0;i<grid->grid_size;i++){
-        printf("%d distance %f\n",i, distance_array[i]);
-        printf("prev %d\n",prev_array[i]);
-    }
 /*
-    for(i=0;i<grid->grid_size;i++){
-        printf("distance: %f, prev: %d \n",distance_array[i],prev_array[i]);
+    theta refers to the direction
+    theta: between 0 to 360, or -pi to pi
+    direction:  0:   forward
+                90:  left
+                180: back
+                270: right
+                359: forward
+*/
+//----struct----
+//used for obstacle avoidance
+struct Vertex{
+    int id;
+    int g_cost; //distance from source to current vertex
+    int h_cost;
+    double x_right;
+    double x_left;
+    double y_high;
+    double y_low;
+    bool is_obstacle;
+    bool is_border;
+    bool visited;
+    struct Vertex* prev_vertex; //reset each time
+};
+//used to read the obstacles
+struct Obstacle{
+    int id;
+    double x_coor;
+    double y_coor;
+};
+struct Goal{
+    double x_right;
+    double x_left;
+    double y_high;
+    double y_low;
+    double theta;
+};
+//used to track the robot's simulated location
+struct Robot{
+    double x_right;
+    double x_left;
+    double y_high;
+    double y_low;
+    double theta;
+};
+//used in the search
+struct Sorted_Queue{
+    struct Queue_Node* head;
+    struct Queue_Node* tail;
+    int current_size;
+};
+//leave as int for now, once the sort function works, change int id to struct Vertex* vertex -> hcost+gcost
+struct Queue_Node{
+    struct Vertex* q_vertex;
+    struct Queue_Node* next;
+};
+
+//trip planning functions
+//----done----
+double calculate_g_cost(struct Vertex* prev_vertex, struct Vertex* current_vertex);
+void update_h_cost(struct Vertex* vertex_array, struct Vertex* src_vertex, struct Vertex* target_vertex, int total_grid_count);//caculates the hcost, gcost+heuristic value, distance from source and estimated distance from target, distance from source
+void print_path(struct Vertex* src_vertex, struct Vertex* target_vertex);
+
+//----not done----
+struct Vertex* a_star_search(struct Vertex* vertex_array, struct Vertex* adj_matrix[total_grid_count][total_grid_count], struct Vertex* src_vertex, struct Vertex* target_vertex, int total_grid_count);
+double* trip_planning(struct Vertex* obstacle_array, struct Vertex* vertex_array, struct Robot* robot);//a*search with obstacle avoidance, returns the path and direction(theta)
+bool obstacle_avoidance(struct Vertex* obstacle_array, struct Robot* robot);//obstacle avoidance checking and redirection, returns true if obstacle found, false if no obstacle
+int check_turn_condition(struct Vertex* start_loc, struct Vertex* end_loc);//calculates which of the 3 scenarios the source and vertex falls under and returns 1, 2, or 3
+void update_robot(struct Robot* robot);//update the robot's coordinates
+//----vertex functions----
+void initialize_vertex(struct Vertex* vertex_array,int row_count, int column_count,int unit_length,int total_count);//initialize all the vertex variables
+void reset_vertex(struct Vertex* vertex_array,int row_count, int column_count,int unit_length,int total_count);//reset the cost, obstacle, border, visited, and prev_vertex for all vertices, use this every time after 1 path has been found
+void generate_adj_matrix(struct Vertex* adj_matrix[total_grid_count][total_grid_count],struct Vertex* vertex_array, int row_count, int column_count, int total_count);
+struct Vertex* find_vertex(struct Vertex* vertex_array, double x_coor, double y_coor, int total_count);//assumes the x and y coordinates given refer to the middle of the object
+void add_obstacle(struct Vertex* vertex_array, struct Obstacle* obstacle_array, int no_of_obstacles, double obstacle_length,double boundary_size, int total_count);//add obstacles and borders
+//----queue functions----
+void create_empty_queue(struct Sorted_Queue* q);
+void enqueue(struct Sorted_Queue* q, struct Vertex* vertex);
+struct Vertex* dequeue(struct Sorted_Queue* q);
+void sort_queue(struct Sorted_Queue* q);
+//----test functions----
+void test_queue();
+
+int main()
+{
+    int i, src,target;
+    unit_length=10;//set to 5 so that obstacle boundary can be calculated more easily
+    robot_length=30;
+    obstacle_boundary=15;// + to each side of the obstacle
+    obstacle_size=10;//total length of an obstacle, the obstacle is a square
+    row_count=20;
+    column_count=20;
+    total_grid_count = row_count*column_count;
+    src=0;
+    target=13;
+    //----test vertex fucntions----
+    struct Vertex* vertex_array= (struct Vertex*)malloc(total_grid_count*sizeof(struct Vertex));
+    initialize_vertex(vertex_array,row_count,column_count,unit_length,total_grid_count);
+    for(i=0;i<5;i++){
+            printf("%d\n",i);
+        printf("vertex values: %d, %d, %d, %f, %f, %f, %f\n",vertex_array[i].id,vertex_array[i].g_cost,vertex_array[i].h_cost,vertex_array[i].x_left,vertex_array[i].x_right,vertex_array[i].y_high,vertex_array[i].y_low);
     }
+    struct Vertex* adj_matrix[total_grid_count][total_grid_count];
+    struct Obstacle obstacle_array[1] = {{0,50 ,10}};
+    add_obstacle(vertex_array, obstacle_array,1,obstacle_size,obstacle_boundary,total_grid_count);
 
-    plan_path(grid,vertex_array,goals_order,&vertex_array[22],total_grid_count,goals);
-    printf("Starting location: 22\n");
-    printf("Order of goals closest to you are: \n");
+    printf("index %d, obstacle = %d\n",vertex_array[25].id,vertex_array[25].is_obstacle);
+    generate_adj_matrix(adj_matrix,vertex_array,row_count,column_count,total_grid_count);
+    update_h_cost(vertex_array,&vertex_array[src],&vertex_array[target],total_grid_count);
+    a_star_search(vertex_array,adj_matrix,&vertex_array[src],&vertex_array[target],total_grid_count);
+/*
+    for(i=0;i<40;i++){
+        if(vertex_array[i].prev_vertex!=NULL)
+        printf("i: %d prev_vertex: %d\n",i,vertex_array[i].prev_vertex->id);
+    }
+*/
+    //----end of test vertex----
 
-
-
-    for(i=0;i<goals;i++){
-        printf("%d gcost: %d \n", goals_order[i].vertex_number,goals_order[i].g_cost);
-    }*/
-
-    free(goals_order);
-    free(grid);
     free(vertex_array);
-
+    //test_queue();
     return 0;
 }
 
-//----queue functions----
-void initialize_queue(struct Queue* q){
+//----Search functions
+//add obstacle avoidance and stop search once the goal has been found
+struct Vertex* a_star_search(struct Vertex* vertex_array, struct Vertex* adj_matrix[total_grid_count][total_grid_count], struct Vertex* src_vertex, struct Vertex* target_vertex, int total_grid_count){
+    int i, temp_g_cost;
+    struct Vertex* curr_vertex;
+    struct Vertex* neighbour_vertex;
+    struct Sorted_Queue* q = (struct Sorted_Queue*)malloc(sizeof(struct Sorted_Queue*));
+    create_empty_queue(q);
+    src_vertex->g_cost=0;
+    enqueue(q,src_vertex);
+    curr_vertex=src_vertex;
+    //while q to explore is not empty
+    while(q->head!=NULL){
+        //visit head of sorted q
+        curr_vertex=dequeue(q);
+        curr_vertex->visited=true;
+        if(curr_vertex->id==target_vertex->id){
+            print_path(src_vertex,target_vertex);
+            free(q);
+            q=NULL;
+            return target_vertex;
+        }
+        //for each neighbour in the adjacency matrix
+        for(i=0;i<total_grid_count;i++){
+            if(adj_matrix[curr_vertex->id][i]!=NULL){
+                neighbour_vertex=adj_matrix[curr_vertex->id][i];
+                if(neighbour_vertex->visited==false && neighbour_vertex->is_border==false && neighbour_vertex->is_obstacle==false ){
+                    //compare g costs of neighbour, if new g_cost is lower, replace the old g_cost and prev_vertex
+                    temp_g_cost=calculate_g_cost(curr_vertex,neighbour_vertex);
+                    if(temp_g_cost<neighbour_vertex->g_cost){
+                        neighbour_vertex->g_cost=temp_g_cost;
+                        neighbour_vertex->prev_vertex=curr_vertex;
+                        //add neighbour to exploration queue
+                        enqueue(q,neighbour_vertex);
+                    }
+                }
+            }
+        }
+        //move the lowest f_cost vertex to front of q
+        sort_queue(q);
+    }
+    print_path(src_vertex,target_vertex);
+    free(q);
+    q=NULL;
+    return target_vertex;
+}
+//prints the path from a star search backwards, to implement forward, save the id into an array starting from the last element or use a stack
+void print_path(struct Vertex* src_vertex, struct Vertex* target_vertex){
+    struct Vertex* print_vertex;
+    print_vertex=target_vertex;
+    printf("path to reach vertex %d from source %d\n",target_vertex->id, src_vertex->id);
+    while(print_vertex->id!=src_vertex->id){
+        printf("Vertex: %d\n",print_vertex->prev_vertex->id);
+        printf("x_left: %f, y_low: %f\n",print_vertex->prev_vertex->x_left,print_vertex->prev_vertex->y_low);
+        print_vertex=print_vertex->prev_vertex;
+    }
+}
+//updates the h_cost for every vertex using Euclidean distance from previous vertex
+double calculate_g_cost(struct Vertex* prev_vertex, struct Vertex* current_vertex){
+    int x1, x2, y1, y2;
+    x1 = prev_vertex->x_left;
+    y1 = prev_vertex->y_low;
+    x2 = current_vertex->x_left;
+    y2 = current_vertex->y_low;
+    return sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))+prev_vertex->g_cost;
+}
+//updates the h_cost for every vertex using Euclidean distance from target
+void update_h_cost(struct Vertex* vertex_array, struct Vertex* src_vertex, struct Vertex* target_vertex, int total_grid_count){
+    int i, x1, x2, y1, y2;
+    src_vertex->h_cost=0;
+    x2 = target_vertex->x_left;
+    y2 = target_vertex->y_low;
+    for(i=0;i<total_grid_count;i++){
+        x1 = vertex_array[i].x_left;
+        y1 = vertex_array[i].y_low;
+        vertex_array->h_cost= sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1));
+    }
+}
+
+//----Vertex functions----
+//initialize all the variables for all vertices of the graph
+void initialize_vertex(struct Vertex* vertex_array,int row_count, int column_count,int unit_length,int total_count){
+    int i,j,start_cost,current_index;
+    start_cost = INT_MAX;
+    for(i=0;i<row_count;i++){
+        for(j=0;j<column_count;j++){
+            current_index = i*row_count+j;
+            vertex_array[current_index].id = current_index;
+            vertex_array[current_index].g_cost = start_cost;
+            vertex_array[current_index].h_cost = start_cost;
+            vertex_array[current_index].x_right =((j+1)*unit_length)-1;
+            vertex_array[current_index].x_left =j*unit_length;
+            vertex_array[current_index].y_high =((i+1)*unit_length)-1;
+            vertex_array[current_index].y_low =i*unit_length;
+            vertex_array[current_index].is_obstacle = false;
+            vertex_array[current_index].is_border = false;
+            vertex_array[current_index].visited = false;
+            vertex_array[current_index].prev_vertex = NULL;
+        }
+    }
+}
+//reset the cost, obstacle, border, visited, and prev_vertex for all vertices, use this every time after 1 path has been found
+void reset_vertex(struct Vertex* vertex_array,int row_count, int column_count,int unit_length,int total_count){
+    int i,j,start_cost,current_index;
+    start_cost = INT_MAX;
+    for(i=0;i<row_count;i++){
+        for(j=0;j<column_count;j++){
+            current_index = i*row_count+j;
+            vertex_array[current_index].g_cost = start_cost;
+            vertex_array[current_index].h_cost = start_cost;
+            vertex_array[current_index].is_obstacle = false;
+            vertex_array[current_index].is_border = false;
+            vertex_array[current_index].visited = false;
+            vertex_array[current_index].prev_vertex = NULL;
+        }
+    }
+}
+//generates the grid structure in the adjacency matrix
+void generate_adj_matrix(struct Vertex* adj_matrix[total_grid_count][total_grid_count],struct Vertex* vertex_array, int row_count, int column_count, int total_count){
+    int i,j, mod_result;
+    //          top bot left right topleft topright botleft botright
+    //offset x  0   0   -1      1   -1      1       -1      1
+    //offset y  c   -c  0       0   c       c       -c      -c
+
+    //set all as NULL for now
+    for(i=0;i<total_count;i++){ //row
+        for(j=0;j<total_count;j++){ //col
+            adj_matrix[i][j]=NULL;
+        }
+    }
+    for(i=0;i<total_count;i++){ //row
+            adj_matrix[i][j]=NULL;
+            mod_result = (i+1)%column_count;
+            //if vertex not in the top row && not in the bot row && not the last column && not the first column
+            if(i<(total_count-row_count) && i>row_count && mod_result!=0 && mod_result!=1){
+                adj_matrix[i][i+1]=&vertex_array[i+1]; // right
+                adj_matrix[i][i-1]=&vertex_array[i-1]; // left
+                adj_matrix[i][i+column_count]=&vertex_array[i+column_count]; // top
+                adj_matrix[i][i-column_count]=&vertex_array[i-column_count]; // bot
+                adj_matrix[i][i+1+column_count]=&vertex_array[i+1+column_count]; // top right
+                adj_matrix[i][i+1-column_count]=&vertex_array[i+1-column_count]; // bot right
+                adj_matrix[i][i-1+column_count]=&vertex_array[i-1+column_count]; // top left
+                adj_matrix[i][i-1-column_count]=&vertex_array[i-1-column_count]; // bot left
+            }
+            //if vertex in the first column and first row
+            else if(mod_result==1 && i<row_count){
+                adj_matrix[i][i+1]=&vertex_array[i+1]; //right
+                adj_matrix[i][i+column_count]=&vertex_array[i+column_count]; //top
+                adj_matrix[i][i+1+column_count]=&vertex_array[i+1+column_count]; //top right
+            }
+            //if vertex in first column last row
+            else if(mod_result==1 && i>=(total_count-row_count)){
+                adj_matrix[i][i+1]=&vertex_array[i+1];// right
+                adj_matrix[i][i-column_count]=&vertex_array[i-column_count]; // bot
+                adj_matrix[i][i+1-column_count]=&vertex_array[i+1-column_count]; // bot right
+            }
+            //if vertex in last column first row
+            else if(mod_result==0 && i<row_count){
+                adj_matrix[i][i-1]=&vertex_array[i-1]; // left
+                adj_matrix[i][i+column_count]=&vertex_array[i+column_count]; // top
+                adj_matrix[i][i-1+column_count]=&vertex_array[i-1+column_count]; // top left
+            }
+            //if vertex in last column last row
+            else if(mod_result==0 && i>=(total_count-row_count)){
+                adj_matrix[i][i-1]=&vertex_array[i-1]; // left
+                adj_matrix[i][i-column_count]=&vertex_array[i-column_count]; // bot
+                adj_matrix[i][i-1-column_count]=&vertex_array[i-1-column_count]; // bot left
+            }
+            //first column
+            else if(mod_result==1){
+                adj_matrix[i][i+1]=&vertex_array[i+1]; //right
+                adj_matrix[i][i+column_count]=&vertex_array[i+column_count]; // top
+                adj_matrix[i][i-column_count]=&vertex_array[i-column_count]; // bot
+                adj_matrix[i][i+1+column_count]=&vertex_array[i+1+column_count]; //top right
+                adj_matrix[i][i+1-column_count]=&vertex_array[i+1-column_count]; // bot right
+            }
+            //last column
+            else if(mod_result==0){
+                adj_matrix[i][i-1]=&vertex_array[i-1]; // left
+                adj_matrix[i][i+column_count]=&vertex_array[i+column_count]; // top
+                adj_matrix[i][i-column_count]=&vertex_array[i-column_count]; // bot
+                adj_matrix[i][i-1+column_count]=&vertex_array[i-1+column_count]; // top left
+                adj_matrix[i][i-1-column_count]=&vertex_array[i-1-column_count]; // bot left
+            }
+            //first row
+            else if(i<row_count){
+                adj_matrix[i][i+1]=&vertex_array[i+1]; //right
+                adj_matrix[i][i-1]=&vertex_array[i-1]; // left
+                adj_matrix[i][i+column_count]=&vertex_array[i+column_count]; // top
+                adj_matrix[i][i+1+column_count]=&vertex_array[i+1+column_count]; //top right
+                adj_matrix[i][i-1+column_count]=&vertex_array[i-1+column_count]; // top left
+            }
+            //last row
+            else if(i>=(total_count-row_count)){
+                adj_matrix[i][i+1]=&vertex_array[i+1]; //right
+                adj_matrix[i][i-1]=&vertex_array[i-1]; // left
+                adj_matrix[i][i-column_count]=&vertex_array[i-column_count]; // bot
+                adj_matrix[i][i+1-column_count]=&vertex_array[i+1-column_count]; // bot right
+                adj_matrix[i][i-1-column_count]=&vertex_array[i-1-column_count]; // bot left
+        }
+    }
+}
+
+//adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
+void add_obstacle(struct Vertex* vertex_array, struct Obstacle* obstacle_array, int no_of_obstacles, double obstacle_length,double boundary_size, int total_count){
+    int i,j;
+    double obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, border_x_left, border_x_right, border_y_high, border_y_low;
+    obstacle_length=obstacle_length/2;
+    boundary_size= boundary_size*2;
+
+    //loop through the obstacle array
+    for(i=0;i<no_of_obstacles;i++){
+        //find the 4 points of the obstacle
+        obstacle_x_left = obstacle_array[i].x_coor-obstacle_length;
+        obstacle_x_right = obstacle_array[i].x_coor+obstacle_length;
+        obstacle_y_high = obstacle_array[i].y_coor+obstacle_length;
+        obstacle_y_low = obstacle_array[i].y_coor-obstacle_length;
+        printf("obs x and y : %f, %f, %f, %f",obstacle_x_left,obstacle_x_right,obstacle_y_high,obstacle_y_low);
+
+        //find the 4 points of the border
+        border_x_left = obstacle_array[i].x_coor-boundary_size;
+        border_x_right = obstacle_array[i].x_coor+boundary_size;
+        border_y_high = obstacle_array[i].y_coor+boundary_size;
+        border_y_low = obstacle_array[i].y_coor-boundary_size;
+        //check every vertex
+        for(j=0;j<total_count;j++){
+            // check if a vertex overlaps with an obstacle, if it does set it as an obstacle
+            // x1-------x2 x1<=x4, x2>=x3
+            // x3-------x4
+            if(vertex_array[j].x_left <= obstacle_x_right && vertex_array[j].x_right >=obstacle_x_left && vertex_array[j].y_low <= obstacle_y_high && vertex_array[j].y_high >=obstacle_y_low){
+                vertex_array[j].is_obstacle = true;
+                //printf("obstacle: %d\n",j);
+            }
+            //if a vertex falls within the x and y coordinates of the border and the vertex is not an obstacle, set it as the border
+            if(vertex_array[j].x_left <= border_x_right && vertex_array[j].x_right >=border_x_left && vertex_array[j].y_low <= border_y_high && vertex_array[j].y_high >=border_y_low && vertex_array[j].is_obstacle==false){
+                vertex_array[j].is_border=true;
+                //printf("border: %d\n",j);
+            }
+        }
+    }
+}
+
+//search for a vertex given the x and y coordinates and returns a pointer to the vertex
+struct Vertex* find_vertex(struct Vertex* vertex_array, double x_coor, double y_coor, int total_count){
+    int i;
+    struct Vertex* result=NULL;
+    for(i=0;i<total_count;i++){
+        //check if x and y coordinates are within the vertex x and y coordinates
+        if(x_coor >= vertex_array[i].x_left && x_coor <=vertex_array[i].x_right && y_coor >= vertex_array[i].y_low && y_coor <= vertex_array[i].y_high){
+            result = &vertex_array[i];
+        }
+    }
+    if(result==NULL){
+        printf("vertex could not be found.");
+    }
+    return result;
+};
+
+//----Queue functions----
+ void create_empty_queue(struct Sorted_Queue* q){
     q->head=NULL;
     q->tail=NULL;
+    q->current_size=0;
 }
-//enqueues a vertex
-bool enqueue(struct Queue* q, struct Vertex* vertex){
-    //create the new node
-    struct QNode* new_node = (struct QNode*)malloc(sizeof(struct QNode));
-    if(new_node==NULL)
-        return false;
-
-    new_node->vertex = vertex;
-    new_node->next = NULL;
-
-    //if q is not empty connect new node to the end of q
+//add new node to queue
+void enqueue(struct Sorted_Queue* q, struct Vertex* vertex){
+    struct Queue_Node* new_node = (struct Queue_Node*)malloc(sizeof(struct Queue_Node));
+    if(new_node==NULL){
+        printf("not enough memory");
+    }
+    new_node->q_vertex=vertex;
+    new_node->next=NULL;
+    //q empty
+    if(q->head==NULL){
+        q->head = new_node;
+    }
+    //q not empty
     if(q->tail!=NULL){
         q->tail->next = new_node;
     }
-    //if q is empty add new node to head of q
-    if(q->head == NULL){
-        q->head = new_node;
-    }
-    //update the q tail
-    q->tail=new_node;
-    return true;
+    //update tail and size regardless since queue is FIFO
+    q->tail = new_node;
+    q->current_size++;
 }
-//dequeues a node in the q and returns the vertex number
-int dequeue(struct Queue* q){
-    int vertex_removed;
-    //return if head is empty
-    if(q->head == NULL){
-        printf("Queue is empty!");
-        return -1;
-    }
-    vertex_removed = q->head->vertex->vertex_number;
-
-    q->head=q->head->next;
-    //q the q becomes empty, set tail = null
+//remove a node from the head of queue and return the vertex pointer of the node that was removed
+struct Vertex* dequeue(struct Sorted_Queue* q){
+    struct Vertex* result = (struct Vertex*)malloc(sizeof(struct Vertex));
+    //q is empty
     if(q->head==NULL){
-        q->tail=NULL;
+        return NULL;
     }
-    return vertex_removed;
+    result = q->head->q_vertex;
+    q->head = q->head->next;
+    q->current_size--;
+    //if q is now empty
+    if(q->head==NULL){
+        q->tail = NULL;
+    }
+    return result;
 }
-//move the highest priority(shortest distance, gcost) node to the front of q (only moves the first node with highest priority) if 2 nodes have equal priority, move only the first one
-bool move_closest_node_to_front_q(struct Queue* q,double* distance_array){
-    if(q->head==NULL){
-        return false;
-    }
-    if(q->head==q->tail){
-        return true;
-    }
-    //pointers to keep track of locations
-    struct QNode* prev=q->head;
-    struct QNode* curr=q->head;
-    struct QNode* smallest =q->head;
-    struct QNode* temp = NULL;
-    double shortest_distance;
-    //assume shortest distance is head for now
-    shortest_distance=distance_array[q->head->vertex->vertex_number];
+//sorts the queue according in ascending order of g_cost
+void sort_queue(struct Sorted_Queue* q){
 
-    //if shortest distance is the first node, no need to move
-    while(curr->next!=NULL){
-        //move curr pointer forward
-        curr=curr->next;
-
-        //if current node has a smaller gcost(shorter distance)
-        if(distance_array[curr->vertex->vertex_number] < shortest_distance){
-            shortest_distance=distance_array[curr->vertex->vertex_number];
-            //save the node just before the smallest node
-            temp = prev;
-            smallest=curr;
+    int i, j, k, min_index, size, min_cost, curr_cost;
+    struct Vertex* min = (struct Vertex*)malloc(sizeof(struct Vertex));
+    struct Vertex* temp = (struct Vertex*)malloc(sizeof(struct Vertex));
+    struct Queue_Node* curr = (struct Queue_Node*)malloc(sizeof(struct Queue_Node));
+    if(q->head!=NULL){
+        size=q->current_size;
+        //loops through the whole queue
+        for(i=0;i<size;i++){
+            curr= q->head;
+            min = q->head->q_vertex; //just a large number
+            min_index =0;
+            //find the index and min value for the first size-i elements in the queue
+            for(j=0;j<size-i;j++){
+                min_cost = min->g_cost+ min->h_cost;
+                curr_cost = curr->q_vertex->g_cost + curr->q_vertex->h_cost;
+                if(min_cost > curr_cost){
+                    min = curr->q_vertex;
+                    min_index = j;
+                }
+                curr=curr->next;
+            }
+            //dequeue all elements and enqueue them in order, except for the min value
+            for(k=0;k<size;k++){
+                temp = dequeue(q);
+                if(k!=min_index){
+                    enqueue(q,temp);
+                }
+            }
+            //enqueue min value at the end
+            enqueue(q,min);
         }
-        //move prev pointer forward
-        prev=curr;
     }
-
-    //first element is the smallest and no sorting is needed
-    if(temp==NULL){
-        return false;
-    }
-    //after the loop the smallest node and the node before it is saved in smallest and temp respectively
-    //if smallest is the head, q in the right order
-    if(smallest!=q->head){
-    temp->next=smallest->next;
-    smallest->next=q->head;
-    q->head=smallest;
-    }
-
-    return true;
 }
 
-//create a new adjacency list node
-struct AdjListNode* new_adj_list_node(struct Vertex* vertex){
-    struct AdjListNode* newNode = (struct AdjListNode*) malloc(sizeof(struct AdjListNode));
-    newNode->vertex_addr = vertex;
-    newNode->next = NULL;
-    return newNode;
-}
-
-
-//create an area in memory to store the grid/graph of grid_size number of vertices
-struct Grid* create_grid(int grid_size){
+//----test functions----
+void test_queue(){
     int i;
-    //memory allocation for the grid/graph
-    struct Grid* grid = (struct Grid*) malloc(sizeof(struct Grid));
-    if(grid == NULL){
-        printf("Error allocating memory");
-        return NULL;
+    struct Vertex qv[5]={
+    { 0,10},{ 1,15},{ 2,5},{ 3,25},{ 4,20}
+    };
+    struct Vertex* qptr;
+    struct Sorted_Queue* q = (struct Sorted_Queue*)malloc(sizeof(struct Sorted_Queue));
+    create_empty_queue(q);
+    for(i=0;i<5;i++){
+        qptr=&qv[i];
+        enqueue(q,qptr);
     }
-    grid->grid_size = grid_size;
-
-    //create an array of adjacency lists headers
-    grid->array = (struct AdjList*) malloc(grid_size*sizeof(struct AdjList));
-    if(grid->array == NULL){
-        printf("Error allocating memory");
-        return NULL;
+    struct Queue_Node* curr=q->head;
+    for(i=0;i<q->current_size;i++){
+        printf("%d ",curr->q_vertex->g_cost);
+        curr=curr->next;
     }
-
-    //set the head to be equal to null for now
-    for(i=0;i<grid_size;i++)
-        grid->array[i].head=NULL;
-
-    return grid;
-}
-
-
-//pass in a pointer to an array of empty vertices to generate vertices with it's variables populated
-void initialize_vertex(int grid_length, int grid_height, int total_length, int total_height, struct Vertex* vertex_array){
-    int i,j,vertex_index, no_of_grids_length, no_of_grids_height;
-    //find number of grids
-    no_of_grids_length = total_length/grid_length;
-    no_of_grids_height = total_height/grid_height;
-
-
-    for(i=0;i<no_of_grids_height;i++){
-        for(j=0;j<no_of_grids_length;j++){
-                //vertex index starts from 0
-            vertex_index = i*no_of_grids_length+j;
-            vertex_array[vertex_index].vertex_number = vertex_index;
-            vertex_array[vertex_index].x_start =  (double)(j*grid_length);
-            vertex_array[vertex_index].x_end =  (double)((j+1)*grid_length-1);
-            vertex_array[vertex_index].y_start =  (double)(i*grid_height);
-            vertex_array[vertex_index].y_end =  (double)((i+1)*grid_height-1);
-            vertex_array[vertex_index].is_obstacle = false;
-            vertex_array[vertex_index].is_goal=false;
-            vertex_array[vertex_index].visited=false;
-            //initialise to 0 until we get the starting locations and target locations
-            vertex_array[vertex_index].g_cost = 10000; //very large number
-            vertex_array[vertex_index].h_cost = 0;
-        }
+    printf("\n");
+    sort_queue(q);
+    curr=q->head;
+    for(i=0;i<q->current_size;i++){
+        printf("%d ",curr->q_vertex->g_cost);
+        curr=curr->next;
     }
-
-}
-
-
-//add a single direct edge from source vertex to destination vertex and store it into the grid
-//note that vertex number is +1 of the vertex index, eg. vertex 1 implies vertex[0] in the array
-//insert the node to the back of the linked list
-//after creating the new node, traverse through linked list  of grid->array[src_vertex].head to the end of the list
-//after reaching the end, set node->next of the last node = the new node that we want to insert
-void add_edge(struct Grid* grid, int src_vertex, int dest_vertex,struct Vertex* src_vertex_addr, struct Vertex* dest_vertex_addr){
-    src_vertex = src_vertex-1;
-    dest_vertex = dest_vertex-1;
-
-    //only create a new node if head is not initialised
-    if(grid->array[src_vertex].head == NULL){
-    grid->array[src_vertex].head = new_adj_list_node(src_vertex_addr);
-    }
-
-    //traverse to the end of the list
-    struct AdjListNode *traversal_ptr = grid->array[src_vertex].head;
-    struct AdjListNode *prev_ptr = traversal_ptr;
-    while(traversal_ptr!=NULL){
-        prev_ptr = traversal_ptr;
-        traversal_ptr = traversal_ptr->next;
-    }
-    //add new node to the end of the list
-    prev_ptr->next = new_adj_list_node(dest_vertex_addr);
-    //printf("src vertex: %d connected to: %d\n", src_vertex,dest_vertex);
-}
-
-/*adds all necessary edges to the graph
-    Vertex and grid here is used interchangeably
-    Edges are added to the vertices following these rules(all edges added are undirected, 2 way edges):
-    5 cases:
-    1. Vertex not located at the border: Connect with right, left, top, bot, top left, top right, bot left, bot right (connect to all neighbors)
-    2. Vertex in last column: Connect with left, top, bot, top left, bot left (do not connect with anything from the right)
-    3. Vertex in first column: Connect with right, top, bot, top right, bot right (do not connect with anything from the left)
-    4. Vertex in top row: Connect with right, left, bot, bot right, bot left (do not connect with anything from the top)
-    5. Vertex in the bot row: Connect with right, left, top, top right, top left (do not connect with anything from the bot)
-    If a vertex first in more than one case, take the intersect of the 2 cases
-    eg. vertex is the first vertex (first column, bot row): right, top, top right
-*/
-void connect_grid(struct Grid* grid, struct Vertex* vertex_array, int grid_length, int grid_height, int total_length, int total_height){
-    int i, j, current_vertex_number, next_vertex_number, prev_vertex_number, no_of_grids_length, no_of_grids_height,
-    mod_result_length, height_threshold ,prev_index_number, current_index_number, next_index_number;
-
-    no_of_grids_length = total_length/grid_length;
-    no_of_grids_height = total_height/grid_height;
-    //printf("grid length, grid height: %d , %d \n",no_of_grids_length, no_of_grids_height);
-    height_threshold = (no_of_grids_height-1)*no_of_grids_length; //if the vertex number is greater than height threshold, it is a vertex on the top row
-
-   //row
-    for(i=0;i<no_of_grids_height;i++){
-        //column
-        for(j=0;j<no_of_grids_length;j++){
-            //current vertex number starts from 1
-            prev_vertex_number = i*no_of_grids_length+(j);
-            current_vertex_number = prev_vertex_number+1;
-            next_vertex_number = current_vertex_number+1;
-
-            prev_index_number = prev_vertex_number-1;
-            current_index_number = current_vertex_number-1;
-            next_index_number = next_vertex_number-1;
-
-            mod_result_length = current_vertex_number%no_of_grids_length; //if mod value == 0 it is the last vertex of the row, if value == 1, it is the first vertex of the row
-
-            //if vertex not in the top row && not in the bot row && not the last column && not the first column
-            if((current_vertex_number<=height_threshold) && (current_vertex_number>no_of_grids_length) && !(mod_result_length==0) && !(mod_result_length ==1)){
-                    //perform connection with all neighbors
-                    //adds an edge with the top vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number+no_of_grids_length]);
-                    //adds an edge with the top right vertex
-                    add_edge(grid,current_vertex_number,next_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number+no_of_grids_length]);
-                    //adds and edge with the top left vertex
-                    add_edge(grid,current_vertex_number,prev_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number+no_of_grids_length]);
-                    //adds an edge with the vertex on the right
-                    add_edge(grid,current_vertex_number,next_vertex_number,&vertex_array[current_index_number],&vertex_array[next_index_number]);
-                    //adds an edge with the vertex on the left
-                    add_edge(grid,current_vertex_number,prev_vertex_number,&vertex_array[current_index_number],&vertex_array[prev_index_number]);
-                    //adds an edge with the bot vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number-no_of_grids_length]);
-                    //adds an edge with the bot right vertex
-                    add_edge(grid,current_vertex_number,next_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number-no_of_grids_length]);
-                    //adds and edge with the bot left vertex
-                    add_edge(grid,current_vertex_number,prev_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number-no_of_grids_length]);
-            }
-            //if vertex in the first column but not the top row or bot row
-            else if(mod_result_length ==1 && !(current_vertex_number>height_threshold) && !(current_vertex_number<=no_of_grids_length)){
-                //connect with top, bot ,top right, bot right, right
-                //adds an edge with the top vertex
-                add_edge(grid,current_vertex_number,current_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number+no_of_grids_length]);
-                //adds an edge with the top right vertex
-                add_edge(grid,current_vertex_number,next_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number+no_of_grids_length]);
-                //adds an edge with the vertex on the right
-                add_edge(grid,current_vertex_number,next_vertex_number,&vertex_array[current_index_number],&vertex_array[next_index_number]);
-                //adds an edge with the bot vertex
-                add_edge(grid,current_vertex_number,current_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number-no_of_grids_length]);
-                //adds an edge with the bot right vertex
-                add_edge(grid,current_vertex_number,next_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number-no_of_grids_length]);
-            }
-            //if vertex in the last column but not the top row or bot row
-            else if(mod_result_length ==0 && !(current_vertex_number>height_threshold) && !(current_vertex_number<=no_of_grids_length)){
-                //connect with top, bot, top left, bot left, left
-                //adds an edge with the top vertex
-                add_edge(grid,current_vertex_number,current_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number+no_of_grids_length]);
-                //adds and edge with the top left vertex
-                add_edge(grid,current_vertex_number,prev_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number+no_of_grids_length]);
-                //adds an edge with the vertex on the left
-                add_edge(grid,current_vertex_number,prev_vertex_number,&vertex_array[current_index_number],&vertex_array[prev_index_number]);
-                //adds an edge with the bot vertex
-                add_edge(grid,current_vertex_number,current_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number-no_of_grids_length]);
-                //adds and edge with the bot left vertex
-                add_edge(grid,current_vertex_number,prev_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number-no_of_grids_length]);
-            }
-            //if vertex in top row
-            else if(current_vertex_number>height_threshold){
-                //if vertex in first column
-                if(mod_result_length ==1){
-                    //connect with bot, bot right, bot ,right
-                    //adds an edge with the bot vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number-no_of_grids_length]);
-                    //adds an edge with the bot right vertex
-                    add_edge(grid,current_vertex_number,next_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number-no_of_grids_length]);
-                    //adds an edge with the vertex on the right
-                    add_edge(grid,current_vertex_number,next_vertex_number,&vertex_array[current_index_number],&vertex_array[next_index_number]);
-                }
-                //if vertex in last column
-                else if(mod_result_length==0){
-                    //connect with bot, bot left, left
-                    //adds an edge with the bot vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number-no_of_grids_length]);
-                    //adds and edge with the bot left vertex
-                    add_edge(grid,current_vertex_number,prev_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number-no_of_grids_length]);
-                    //adds an edge with the vertex on the left
-                    add_edge(grid,current_vertex_number,prev_vertex_number,&vertex_array[current_index_number],&vertex_array[prev_index_number]);
-                }
-                //if vertex in top row but not in the first column or last column
-                else{
-                    //connect with bot, bot left, bot right, right, left
-                    //adds an edge with the bot vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number-no_of_grids_length]);
-                    //adds and edge with the bot left vertex
-                    add_edge(grid,current_vertex_number,prev_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number-no_of_grids_length]);
-                    //adds an edge with the bot right vertex
-                    add_edge(grid,current_vertex_number,next_vertex_number-no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number-no_of_grids_length]);
-                    //adds an edge with the vertex on the right
-                    add_edge(grid,current_vertex_number,next_vertex_number,&vertex_array[current_index_number],&vertex_array[next_index_number]);
-                    //adds an edge with the vertex on the left
-                    add_edge(grid,current_vertex_number,prev_vertex_number,&vertex_array[current_index_number],&vertex_array[prev_index_number]);
-                }
-            }
-            //if vertex in bot row
-            else if(current_vertex_number<=no_of_grids_length){
-                //if vertex in first column
-                if(mod_result_length ==1){
-                    //connect with top, top right, right
-                    //adds an edge with the top vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number+no_of_grids_length]);
-                    //adds an edge with the top right vertex
-                    add_edge(grid,current_vertex_number,next_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number+no_of_grids_length]);
-                    //adds an edge with the vertex on the right
-                    add_edge(grid,current_vertex_number,next_vertex_number,&vertex_array[current_index_number],&vertex_array[next_index_number]);
-                }
-                //if vertex in last column
-                else if(mod_result_length==0){
-                    //connect with top, top left, left
-                    //adds an edge with the top vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number+no_of_grids_length]);
-                    //adds and edge with the top left vertex
-                    add_edge(grid,current_vertex_number,prev_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number+no_of_grids_length]);
-                    //adds an edge with the vertex on the left
-                    add_edge(grid,current_vertex_number,prev_vertex_number,&vertex_array[current_index_number],&vertex_array[prev_index_number]);
-                }
-                //if vertex in bot row but not in the first column or last column
-                else{
-                    //connect with top, top left, top right, right, left
-                    //adds an edge with the top vertex
-                    add_edge(grid,current_vertex_number,current_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[current_index_number+no_of_grids_length]);
-                    //adds and edge with the top left vertex
-                    add_edge(grid,current_vertex_number,prev_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[prev_index_number+no_of_grids_length]);
-                    //adds an edge with the top right vertex
-                    add_edge(grid,current_vertex_number,next_vertex_number+no_of_grids_length,&vertex_array[current_index_number],&vertex_array[next_index_number+no_of_grids_length]);
-                    //adds an edge with the vertex on the right
-                    add_edge(grid,current_vertex_number,next_vertex_number,&vertex_array[current_index_number],&vertex_array[next_index_number]);
-                    //adds an edge with the vertex on the left
-                    add_edge(grid,current_vertex_number,prev_vertex_number,&vertex_array[current_index_number],&vertex_array[prev_index_number]);
-                }
-            }
-
-        }
-
-    }
-}
-
-
-//-------------------------Search algorithm-----------------------------------
-//Puts the goals in order of shortest distance from source into the goal array
-//needs to be changed, some parts are still not correct
-//add a distance array and a previous node array
-/*
-bool plan_path(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, struct Vertex* src_vertex_addr,int grid_size,int number_of_goals){
-    int i,goals_found,current_vertex_number;
-    double x1,x2,y1,y2,temp;
-    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
-    struct Vertex* current_vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
-    struct AdjListNode* list_ptr = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
-
-    goals_found=0;
-    for(i=0;i<grid_size;i++){
-        enqueue(q,&vertex_array[i]);
-    }
-    //set src distance to 0
-    src_vertex_addr->g_cost=0;
-    x1 = src_vertex_addr->x_start;
-    y1 = src_vertex_addr->y_start;
-
-    //move src to the front of the q
-    move_closest_node_to_front_q(q);
-
-    //while there are still vertices unvisited
-    while(q->head!=NULL){
-        current_vertex_number=dequeue(q);
-        current_vertex=&vertex_array[current_vertex_number];
-
-        current_vertex->visited=true;
-        if(current_vertex->is_goal==true){
-            //add vertex to array
-            goal_array[goals_found]=*current_vertex;
-            goals_found++;
-            if(goals_found==number_of_goals){
-            return true;
-            }
-        }
-
-        list_ptr=grid->array[current_vertex_number].head;
-
-        //look through all the neighbours
-        while(list_ptr->next!=NULL){
-            //if vertex has not been visited
-            if(list_ptr->vertex_addr->visited==false){
-                x2 = list_ptr->vertex_addr->x_start;
-                y2 = list_ptr->vertex_addr->y_start;
-                temp = sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1));
-                //check if new distance is minimum distance
-                if(temp<list_ptr->vertex_addr->g_cost){
-                    //update new cost
-                    list_ptr->vertex_addr->g_cost=temp;
-                }
-            }
-            list_ptr=list_ptr->next;
-        }
-        //move closest vertex to the front of the q, it will be explored next
-        move_closest_node_to_front_q(q);
-    }
-
     free(q);
-    free(current_vertex);
-    free(list_ptr);
-    return false;
-}*/
-
-
-bool plan_path_2(struct Grid* grid, struct Vertex* vertex_array, struct Vertex* goal_array, int src_vertex_number,int grid_size,int number_of_goals, double* distance_array, int* prev_array){
-    int i,goals_found,current_vertex_number,prev,neighbour_number;
-    double x1,x2,y1,y2,temp;
-    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
-    struct Vertex* current_vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
-    struct AdjListNode* list_ptr = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
-
-    goals_found=0;
-    for(i=0;i<grid_size;i++){
-        enqueue(q,&vertex_array[i]);
-    }
-    current_vertex_number = src_vertex_number;
-    //set src distance to 0
-    vertex_array[src_vertex_number].g_cost=0;
-    distance_array[current_vertex_number]=0;
-    prev_array[current_vertex_number]=-1;
-
-
-    //move src to the front of the q
-    move_closest_node_to_front_q(q,distance_array);
-
-    //while there are still vertices unvisited
-    while(q->head!=NULL){
-        prev = current_vertex_number;
-        current_vertex_number=dequeue(q);
-        current_vertex=&vertex_array[current_vertex_number];
-
-        current_vertex->visited=true;
-        prev_array[current_vertex_number]=prev;
-        if(current_vertex->is_goal==true){
-            //add vertex to array
-            goal_array[goals_found]=*current_vertex;
-            goals_found++;
-            if(goals_found==number_of_goals){
-                return true;
-            }
-        }
-
-
-        list_ptr=grid->array[current_vertex_number].head;
-
-        //look through all the neighbours
-        while(list_ptr->next!=NULL){
-            //if vertex has not been visited
-            if(list_ptr->vertex_addr->visited==false){
-                neighbour_number = list_ptr->next->vertex_addr->vertex_number;
-                //if current vertex is src
-                if(neighbour_number==src_vertex_number){
-                    x1 = vertex_array[src_vertex_number].x_start;
-                    y1 = vertex_array[src_vertex_number].y_start;
-                }
-                else{
-                    x1=vertex_array[current_vertex_number].x_start;
-                    y1=vertex_array[current_vertex_number].y_start;
-                }
-                x2 = list_ptr->vertex_addr->x_start;
-                y2 = list_ptr->vertex_addr->y_start;
-                temp = sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1))+distance_array[current_vertex_number];
-
-                //check if new distance is minimum distance
-                if(temp<distance_array[neighbour_number]){
-                    //update new cost
-                    list_ptr->vertex_addr->g_cost=temp;
-
-                    distance_array[neighbour_number]=temp;
-                }
-            }
-            list_ptr=list_ptr->next;
-        }
-
-        //move closest vertex to the front of the q, it will be explored next
-
-        move_closest_node_to_front_q(q,distance_array);
-        printf("qhead %d \n",q->head->vertex->vertex_number);
-    }
-
-    //free(q);
-    //free(current_vertex);
-    //free(list_ptr);
-    return false;
+    q=NULL;
 }
-/*
-//brute force method to find nearest goals
-void distance_to_goals(struct Vertex* vertex_array,double* distance_array,int* vertex_number_array,bool* visited, int src_vertex, int number_of_goals, int no_of_vertex){
-    //find closest vertex
-    //check if it is an obstacle
-    //if it is an obstacle save the distance into an array
-    //exit once number of goals have been reached
-    int i,j,closest_distance,closest_vertex_number;
-    closest_vertex_number=-1;
-    double x1,x2,y1,y2;
-    x1=vertex_array[src_vertex].x_start;
-    y1=vertex_array[src_vertex].y_start;
-    closest_distance=100000; //just a very large number
-    j=0;
-
-    for(i=0;i<no_of_vertex;i++){
-        if(vertex_array[i].is_obstacle && i!=src_vertex){
-            //calculate distance to source
-            x2 = vertex_array[i].x_start;
-            y2 = vertex_array[i].y_start;
-            distance_array[j]=sqrt((x2-x1)*(x2-x1) + (y2-y1) * (y2-y1));
-            vertex_number_array[j]=i;
-            j++;
-        }
-    }
-
-}
-*/
-
-
