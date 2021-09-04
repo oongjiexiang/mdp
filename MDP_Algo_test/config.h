@@ -1,80 +1,27 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#include <float.h>
+#include <vector>
+#include "tripPlan.h"
+#include "component.h"
 
-//----struct----
-//used for obstacle avoidance
-class Vertex{
-    public: 
-        int id;
-        int g_cost; //distance from source to current vertex
-        int h_cost;
-        double x_right;
-        double x_left;
-        double y_high;
-        double y_low;
-        bool is_obstacle;
-        bool is_border;
-        bool visited;
-        Vertex* prev_vertex; //reset each time
-};
-
-
-//used to read the obstacles
-class Obstacle{
+class Map{
     public:
-        int id;
-        double x_coor;
-        double y_coor;
-        bool is_seen;
-        Obstacle(int id, double x_coor, double y_coor);
-};
+        Map();
+        //initialize all the variables for all vertices of the graph
+        void initialize_vertex(int ROW_COUNT, int COLUMN_COUNT,int UNIT_LENGTH,int total_count);
 
+        //reset the cost, obstacle, border, visited, and prev_vertex for all vertices, use this every time after 1 path has been found
+        void reset_vertex(int ROW_COUNT, int COLUMN_COUNT,int UNIT_LENGTH,int total_count);
 
-class Goal{
-    public:
-        double x_right;
-        double x_left;
-        double y_high;
-        double y_low;
-        double theta;
-};
+        //adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
+        void add_obstacle(vector<Obstacle> obstacle_array, double obstacle_length,double boundary_size, int total_count);
 
-//used to track the robot's simulated location
-class Robot{
-    public:
-        double x_right;
-        double x_left;
-        double y_high;
-        double y_low;
-        double theta;
-};
+        //search for a vertex given the x and y coordinates and returns a pointer to the vertex
+        Vertex find_vertex(double x_coor, double y_coor, int total_count);
 
-//leave as int for now, once the sort function works, change int id to struct Vertex* vertex -> hcost+gcost
-class QueueNode{
-    public:
-        Vertex* q_vertex;
-        QueueNode* next;
-};
-
-//used in the search
-class SortedQueue{
-    public:
-        QueueNode* head;
-        QueueNode* tail;
-        int current_size;
-        SortedQueue();
-        //----Queue functions----
-        //add new node to queue
-        void enqueue(Vertex* vertex);
-        //remove a node from the head of queue and return the vertex pointer of the node that was removed
-        Vertex* dequeue();
-        //sorts the queue according in ascending order of g_cost
-        void sort_queue();
+        // // get vertex array
+        vector<vector<Vertex>> getVertexArray();
 };
 
 #endif
