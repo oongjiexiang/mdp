@@ -1,152 +1,37 @@
-#include <stdio.h>
 #include "component.h"
-//----struct----
-//used for obstacle avoidance
-class Vertex{
-    public: 
-        int id;
-        int g_cost; //distance from source to current vertex
-        int h_cost;
-        int row;
-        int column;
-        double x_right;
-        double x_left;
-        double y_high;
-        double y_low;
-        bool is_obstacle;
-        bool is_border;
-        bool visited;
-        Vertex* prev_vertex; //reset each time
-        Vertex();
-        void printVertex(){
-            printf("vertex values: %d, %d, %d, %f, %f, %f, %f\n", id, g_cost, h_cost, x_left, x_right, y_high, y_low);
-        }
-};
 
+Vertex::Vertex(){   // to indicate invalid vertex
+    row = column = -1;
+}
+Vertex::Vertex(int row, int column): row(row), column(column){
+    g_cost = h_cost = START_COST;
+    x_right = ((column+1)*UNIT_LENGTH)-1;  // -1 because eg cell[0][0] spans from 0 to 9, not 10
+    x_left = column*UNIT_LENGTH;
+    y_high = ((row+1)*UNIT_LENGTH)-1;   // -1 for the same reason
+    y_low = row*UNIT_LENGTH;
+    is_obstacle = false;
+    is_border = false;
+    visited = false;
+    prev_vertex = NULL;
+}
+void Vertex::reset(){
+    g_cost = h_cost = START_COST;
+    is_obstacle = is_border = visited = false;
+    prev_vertex = NULL;
+}
+void Vertex::printVertex(){
+    printf("Vertex (%d, %d) with (%.1f, %.1f) to (%.1f, %.1f):\n", row, column, x_left, y_low, x_right, y_high);
+    printf("\tg = %.1f, h = %.1f. %s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
+}
 
-//used to read the obstacles
-class Obstacle{
-    public:
-        int id;
-        double x_coor;
-        double y_coor;
-        bool is_seen;
-        Obstacle(int id, double x_coor, double y_coor){
-            this->x_coor = x_coor;
-            this->y_coor = y_coor;
-            this->id = id;
-        }
-};
+Obstacle::Obstacle(int id, double x_center, double y_center, double face_direction): id(id), x_center(x_center), y_center(y_center), face_direction(face_direction){}
 
+void Obstacle::printObstacle(){
+    printf("Obstacle: %d: (%.1f, %.1f), %s\n", id, x_center, y_center, is_seen? "seen": "not seen");
+}
 
-class Goal{
-    public:
-        double x_right;
-        double x_left;
-        double y_high;
-        double y_low;
-        double theta;
-};
+void Robot::printRobot(){
+    printf("Robot: (%.1f, %.1f) facing %.1f | bottom left (%.1f, %.1f) to top right (%.1f, %.1f)\n", x_center, y_center, face_direction,\
+    x_left, y_low, x_right, y_high);
+}
 
-//used to track the robot's simulated location
-class Robot{
-    public:
-        double x_right;
-        double x_left;
-        double y_high;
-        double y_low;
-        double theta;
-};
-
-//leave as int for now, once the sort function works, change int id to struct Vertex* vertex -> hcost+gcost
-class QueueNode{
-    public:
-        Vertex* q_vertex;
-        QueueNode* next;
-};
-
-//used in the search
-class SortedQueue{
-    QueueNode* head;
-    QueueNode* tail;
-    int current_size;
-    public:
-        //----Queue functions----
-        SortedQueue(){
-            head= 0;
-            tail= 0;
-            current_size=0;
-        }
-        //add new node to queue
-        void enqueue(Vertex* vertex){
-            QueueNode* new_node = new QueueNode;
-            if(new_node == NULL){
-                printf("not enough memory\n");
-            }
-            new_node->q_vertex=vertex;
-            new_node->next=NULL;
-            //q empty
-            if(head==NULL){
-                head = new_node;
-            }
-            //q not empty
-            if(tail!=NULL){
-                tail->next = new_node;
-            }
-            //update tail and size regardless since queue is FIFO
-            tail = new_node;
-            current_size++;
-        }
-        //remove a node from the head of queue and return the vertex pointer of the node that was removed
-        Vertex* dequeue(){
-            Vertex* result = new Vertex;
-            //q is empty
-            if(head==NULL){
-                return NULL;
-            }
-            result = head->q_vertex;
-            head = head->next;
-            current_size--;
-            //if q is now empty
-            if(head==NULL){
-                tail = NULL;
-            }
-            return result;
-        }
-        //sorts the queue according in ascending order of g_cost
-        void sort_queue(){
-
-            int i, j, k, min_index, size, min_cost, curr_cost;
-            Vertex* min = new Vertex;
-            Vertex* temp = new Vertex;
-            QueueNode* curr = new QueueNode;
-            if(head!=NULL){
-                size = current_size;
-                //loops through the whole queue
-                for(i=0;i<size;i++){
-                    curr= head;
-                    min = head->q_vertex; //just a large number
-                    min_index =0;
-                    //find the index and min value for the first size-i elements in the queue
-                    for(j=0;j<size-i;j++){
-                        min_cost = min->g_cost+ min->h_cost;
-                        curr_cost = curr->q_vertex->g_cost + curr->q_vertex->h_cost;
-                        if(min_cost > curr_cost){
-                            min = curr->q_vertex;
-                            min_index = j;
-                        }
-                        curr=curr->next;
-                    }
-                    //dequeue all elements and enqueue them in order, except for the min value
-                    for(k=0;k<size;k++){
-                        temp = dequeue();
-                        if(k!=min_index){
-                            enqueue(temp);
-                        }
-                    }
-                    //enqueue min value at the end
-                    enqueue(min);
-                }
-            }
-        }
-};
