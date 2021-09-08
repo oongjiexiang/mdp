@@ -44,6 +44,8 @@ animator mtrl_fab_hide_motion_spec
 animator mtrl_fab_show_motion_spec
 animator mtrl_fab_transformation_sheet_collapse_spec
 animator mtrl_fab_transformation_sheet_expand_spec
+array imageBearing_array
+array imageID_array
 array planets_array
 attr actionBarDivider
 attr actionBarItemBackground
@@ -1252,7 +1254,9 @@ id async
 id auto
 id autoManualSwitch
 id backBtn
+id backButton
 id barrier
+id bearingSpinner
 id beginning
 id blocking
 id bluetoothButton
@@ -1271,6 +1275,7 @@ id center_vertical
 id chains
 id changeDirectionBtn
 id chatButton
+id chatTitleTextview
 id checkbox
 id checked
 id chronometer
@@ -1310,6 +1315,7 @@ id directionLabel
 id directionTitleTextView
 id disableHome
 id downBtn
+id dragSwitch
 id edit_query
 id end
 id enterAlways
@@ -1356,6 +1362,7 @@ id icon_group
 id icon_only
 id ifRoom
 id image
+id imageIDSpinner
 id info
 id invisible
 id italic
@@ -1377,7 +1384,7 @@ id mapView
 id masked
 id message
 id messageButton
-id messageReceivedTextView
+id messageReceivedTextVie
 id messageReceivedTitleTextView
 id middle
 id mini
@@ -1488,6 +1495,7 @@ id text2
 id textSpacerNoButtons
 id textSpacerNoTitle
 id textStart
+id textView_drag
 id text_input_password_toggle
 id textinput_counter
 id textinput_error
@@ -1505,6 +1513,10 @@ id transition_layout_save
 id transition_position
 id transition_scene_layoutid_cache
 id transition_transform
+id tv_imageBearing
+id tv_imageBearing2
+id tv_imageID
+id tv_imageID2
 id typeBoxEditText
 id unchecked
 id uniform
@@ -1580,6 +1592,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_chat
 layout activity_comms
 layout activity_control
 layout activity_direction

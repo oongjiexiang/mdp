@@ -301,20 +301,20 @@ public class GridMap extends View {
             // horizontal lines
             for (int y = androidRowCoord - 2; y <= androidRowCoord; y++) {
                 canvas.drawLine(
-                    cells[curCoord[0] - 1][21 - y - 2].startX,
-                    cells[curCoord[0]][21 - y - 2].startY,
-                    cells[curCoord[0]][21 - y - 2].endX,
-                    cells[curCoord[0]][21 - y - 2].startY,
-                    robotColor);
+                        cells[curCoord[0] - 1][21 - y - 2].startX,
+                        cells[curCoord[0]][21 - y - 2].startY,
+                        cells[curCoord[0]][21 - y - 2].endX,
+                        cells[curCoord[0]][21 - y - 2].startY,
+                        robotColor);
             }
             // vertical lines
             for (int x = curCoord[0] - 2; x <= curCoord[0]; x++) {
                 canvas.drawLine(
-                    cells[x][21 - androidRowCoord - 1].endX,
-                    cells[x][21 - androidRowCoord - 1].endY,
-                    cells[x][21 - androidRowCoord - 1].endX,
-                    cells[x][21 - androidRowCoord - 2].startY,
-                    robotColor);
+                        cells[x][21 - androidRowCoord - 1].endX,
+                        cells[x][21 - androidRowCoord - 1].endY,
+                        cells[x][21 - androidRowCoord - 1].endX,
+                        cells[x][21 - androidRowCoord - 2].startY,
+                        robotColor);
             }
 
 
@@ -755,7 +755,7 @@ public class GridMap extends View {
         showLog("dragEvent.getResult() is " + dragEvent.getResult());
 
         if ((dragEvent.getAction() == DragEvent.ACTION_DRAG_ENDED) && (endColumn == -999 || endRow == -999)
-            && dragEvent.getResult() == false) {
+                && dragEvent.getResult() == false) {
             obstacleCoord.remove(new int[]{initialColumn, initialRow});
             cells[initialColumn][20-initialRow].setType("unexplored");
             ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
@@ -917,7 +917,6 @@ public class GridMap extends View {
                 /* test boundaries of cells
                 showLog("row = " + row + ", column = " + column);
                 showLog("ITEM_LIST(" + String.valueOf(19-(row-1)) + ")[" + String.valueOf(column-1) + "] = " + ITEM_LIST.get(19-(row-1))[column-1]);
-
                 showLog("startX = " + (cells[column][row].startX));
                 showLog("endX = " + (cells[column][row].endX));
                 showLog("startY = " + (cells[row][column].startY));
