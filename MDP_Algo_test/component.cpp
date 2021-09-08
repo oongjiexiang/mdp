@@ -1,4 +1,6 @@
 #include "component.h"
+#include <iostream>
+using namespace std;
 
 Vertex::Vertex(){   // to indicate invalid vertex
     row = column = -1;
@@ -21,7 +23,7 @@ void Vertex::reset(){
 }
 void Vertex::printVertex(){
     printf("Vertex (%d, %d) with (%.1f, %.1f) to (%.1f, %.1f):\n", row, column, x_left, y_low, x_right, y_high);
-    printf("\tg = %.1f, h = %.1f. %s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
+    printf("\tg = %.1f, \n\th = %.1f. \n\t%s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
 }
 
 Obstacle::Obstacle(int id, double x_center, double y_center, double face_direction): id(id), x_center(x_center), y_center(y_center), face_direction(face_direction){}
@@ -34,4 +36,3 @@ void Robot::printRobot(){
     printf("Robot: (%.1f, %.1f) facing %.1f | bottom left (%.1f, %.1f) to top right (%.1f, %.1f)\n", x_center, y_center, face_direction,\
     x_left, y_low, x_right, y_high);
 }
-

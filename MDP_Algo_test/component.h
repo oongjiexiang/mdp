@@ -1,7 +1,6 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
-#include <stdio.h>
 #include <float.h>
 
 const double START_COST = DBL_MAX;
