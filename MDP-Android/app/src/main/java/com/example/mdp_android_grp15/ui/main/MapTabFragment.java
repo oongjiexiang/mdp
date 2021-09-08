@@ -1,7 +1,6 @@
 package com.example.mdp_android_grp15.ui.main;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,14 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -27,7 +24,6 @@ import com.example.mdp_android_grp15.MainActivity;
 import com.example.mdp_android_grp15.R;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MapTabFragment extends Fragment {
 
@@ -141,7 +137,6 @@ public class MapTabFragment extends Fragment {
             }
         });
 
-        // TODO
         // switch for dragging
         dragSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -155,18 +150,6 @@ public class MapTabFragment extends Fragment {
                 dragStatus = isChecked;
             }
         });
-        // TODO
-//        startDragBtn.setOnClickListener(new View.OnClickListener() {
-//            @RequiresApi(api = Build.VERSION_CODES.N)
-//            @Override
-//            public void onClick(View view) {
-//                showLog("Clicked startDragBtn");
-//                dragShadowBuilder = new View.DragShadowBuilder(gridMap);
-//                boolean b = gridMap.startDragAndDrop(gridMap.clipData, dragShadowBuilder,
-//                        gridMap.localState, 0);
-//            }
-//        });
-
 
         setStartPointToggleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -330,11 +313,4 @@ public class MapTabFragment extends Fragment {
     private void showToast(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
-
-//    // TODO
-//    // what to do when switch changes state
-//    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//        showToast("Dragging is " + (isChecked ? "on" : "off"));
-//        dragStatus = isChecked;
-//    }
 }
