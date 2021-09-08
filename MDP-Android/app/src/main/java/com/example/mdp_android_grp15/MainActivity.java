@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.mdp_android_grp15.ui.main.BluetoothChat;
 import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
 import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
 import com.example.mdp_android_grp15.ui.main.CommsFragment;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static GridMap gridMap;
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
-    static TextView robotStatusTextView;
+    static TextView robotStatusTextView, bluetoothStatus;
     static Button f1, f2;
     static Button upBtn, downBtn, leftBtn, rightBtn;
     Button reconfigure;
@@ -110,6 +111,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(popup);
             }
         });
+        Button chatButton = findViewById(R.id.chatButton);
+        chatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent chat = new Intent(MainActivity.this, BluetoothChat.class);
+                startActivity(chat);
+            }
+        });
+
+        // Bluetooth Status
+        bluetoothStatus = findViewById(R.id.bluetoothStatus);
+        //bluetoothStatus.setText("Not Connected");
 
 
         // Map
@@ -212,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
     public static Button getDownBtn() { return downBtn; }
     public static Button getLeftBtn() { return leftBtn; }
     public static Button getRightBtn() { return rightBtn; }
+
+    public static TextView getbluetoothStatus() { return bluetoothStatus; }
 
     public static void sharedPreferences() {
         sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);

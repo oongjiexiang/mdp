@@ -1254,6 +1254,7 @@ id async
 id auto
 id autoManualSwitch
 id backBtn
+id backButton
 id barrier
 id bearingSpinner
 id beginning
@@ -1274,6 +1275,7 @@ id center_vertical
 id chains
 id changeDirectionBtn
 id chatButton
+id chatTitleTextview
 id checkbox
 id checked
 id chronometer
@@ -1590,6 +1592,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_chat
 layout activity_comms
 layout activity_control
 layout activity_direction

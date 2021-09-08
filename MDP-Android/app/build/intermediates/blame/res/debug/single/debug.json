@@ -1340,6 +1340,10 @@
         "source": "C:\\Users\\Xin Yi Loh\\.gradle\\caches\\transforms-2\\files-2.1\\6119d746697059b7e1b74aab4d181f56\\appcompat-1.1.0\\res\\drawable-xhdpi-v4\\abc_btn_check_to_on_mtrl_015.png"
     },
     {
+        "merged": "C:\\Users\\Xin Yi Loh\\OneDrive\\Documents\\GitHub\\mdp\\MDP-Android\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_chat.xml.flat",
+        "source": "C:\\Users\\Xin Yi Loh\\OneDrive\\Documents\\GitHub\\mdp\\MDP-Android\\app\\src\\main\\res\\layout\\activity_chat.xml"
+    },
+    {
         "merged": "C:\\Users\\Xin Yi Loh\\OneDrive\\Documents\\GitHub\\mdp\\MDP-Android\\app\\build\\intermediates\\res\\merged\\debug\\layout_select_dialog_multichoice_material.xml.flat",
         "source": "C:\\Users\\Xin Yi Loh\\.gradle\\caches\\transforms-2\\files-2.1\\6119d746697059b7e1b74aab4d181f56\\appcompat-1.1.0\\res\\layout\\select_dialog_multichoice_material.xml"
     },
