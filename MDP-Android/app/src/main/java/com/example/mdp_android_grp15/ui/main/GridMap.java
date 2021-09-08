@@ -1107,8 +1107,13 @@ public class GridMap extends View {
                         break;
                     case "right":
                         robotDirection = "right";
+                        if (curCoord[0] != 19) {
+                            curCoord[0] += 1;
+                            validPosition = true;
+                        }
                         break;
                     case "back":
+                        robotDirection = "down";
                         if (curCoord[1] != 2) {
                             curCoord[1] -= 1;
                             validPosition = true;
@@ -1116,6 +1121,10 @@ public class GridMap extends View {
                         break;
                     case "left":
                         robotDirection = "left";
+                        if (curCoord[0] != 19) {
+                            curCoord[0] -= 1;
+                            validPosition = true;
+                        }
                         break;
                     default:
                         robotDirection = "error up";
@@ -1125,22 +1134,31 @@ public class GridMap extends View {
             case "right":
                 switch (direction) {
                     case "forward":
-                        if (curCoord[0] != 14) {
-                            curCoord[0] += 1;
+                        robotDirection = "up";
+                        if (curCoord[1] != 19) {
+                            curCoord[1] += 1;
                             validPosition = true;
                         }
                         break;
                     case "right":
-                        robotDirection = "down";
+                        if (curCoord[0] != 19) {
+                            curCoord[0] += 1;
+                            validPosition = true;
+                        }
                         break;
                     case "back":
-                        if (curCoord[0] != 2) {
-                            curCoord[0] -= 1;
+                        robotDirection = "down";
+                        if (curCoord[1] != 2) {
+                            curCoord[1] -= 1;
                             validPosition = true;
                         }
                         break;
                     case "left":
-                        robotDirection = "up";
+                        robotDirection = "left";
+                        if (curCoord[0] != 19) {
+                            curCoord[0] -= 1;
+                            validPosition = true;
+                        }
                         break;
                     default:
                         robotDirection = "error right";
@@ -1149,22 +1167,31 @@ public class GridMap extends View {
             case "down":
                 switch (direction) {
                     case "forward":
-                        if (curCoord[1] != 2) {
-                            curCoord[1] -= 1;
-                            validPosition = true;
-                        }
-                        break;
-                    case "right":
-                        robotDirection = "left";
-                        break;
-                    case "back":
+                        robotDirection = "up";
                         if (curCoord[1] != 19) {
                             curCoord[1] += 1;
                             validPosition = true;
                         }
                         break;
-                    case "left":
+                    case "right":
                         robotDirection = "right";
+                        if (curCoord[0] != 19) {
+                            curCoord[0] += 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "back":
+                        if (curCoord[1] != 2) {
+                            curCoord[1] -= 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "left":
+                        robotDirection = "left";
+                        if (curCoord[0] != 19) {
+                            curCoord[0] -= 1;
+                            validPosition = true;
+                        }
                         break;
                     default:
                         robotDirection = "error down";
@@ -1173,22 +1200,31 @@ public class GridMap extends View {
             case "left":
                 switch (direction) {
                     case "forward":
-                        if (curCoord[0] != 2) {
-                            curCoord[0] -= 1;
+                        robotDirection = "up";
+                        if (curCoord[1] != 19) {
+                            curCoord[1] += 1;
                             validPosition = true;
                         }
                         break;
                     case "right":
-                        robotDirection = "up";
-                        break;
-                    case "back":
-                        if (curCoord[0] != 14) {
+                        robotDirection = "right";
+                        if (curCoord[0] != 19) {
                             curCoord[0] += 1;
                             validPosition = true;
                         }
                         break;
-                    case "left":
+                    case "back":
                         robotDirection = "down";
+                        if (curCoord[1] != 2) {
+                            curCoord[1] -= 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "left":
+                        if (curCoord[0] != 2) {
+                            curCoord[0] -= 1;
+                            validPosition = true;
+                        }
                         break;
                     default:
                         robotDirection = "error left";

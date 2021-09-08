@@ -52,6 +52,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.example.mdp_android_grp15.ui.main.BluetoothPopUp" />
+        <activity android:name="com.example.mdp_android_grp15.ui.main.BluetoothChat" />
         <activity android:name="com.example.mdp_android_grp15.ui.main.MapInformation" />
         <!-- Needs to be explicitly declared on P+ -->
         <uses-library
