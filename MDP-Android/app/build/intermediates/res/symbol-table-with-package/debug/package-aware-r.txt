@@ -1384,7 +1384,7 @@ id mapView
 id masked
 id message
 id messageButton
-id messageReceivedTextView
+id messageReceivedTextVie
 id messageReceivedTitleTextView
 id middle
 id mini

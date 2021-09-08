@@ -1383,7 +1383,7 @@ int id mapView 0x7f0900c7
 int id masked 0x7f0900c8
 int id message 0x7f0900c9
 int id messageButton 0x7f0900ca
-int id messageReceivedTextView 0x7f0900cb
+int id messageReceivedTextVie 0x7f0900cb
 int id messageReceivedTitleTextView 0x7f0900cc
 int id middle 0x7f0900cd
 int id mini 0x7f0900ce

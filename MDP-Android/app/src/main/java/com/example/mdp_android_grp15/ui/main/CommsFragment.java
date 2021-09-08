@@ -68,7 +68,7 @@ public class CommsFragment extends Fragment {
         send = (FloatingActionButton) root.findViewById(R.id.messageButton);
 
         // Message Box
-        messageReceivedTextView = (TextView) root.findViewById(R.id.messageReceivedTextView);
+        messageReceivedTextView = (TextView) root.findViewById(R.id.messageReceivedTextVie);
         messageReceivedTextView.setMovementMethod(new ScrollingMovementMethod());
         typeBoxEditText = (EditText) root.findViewById(R.id.typeBoxEditText);
 

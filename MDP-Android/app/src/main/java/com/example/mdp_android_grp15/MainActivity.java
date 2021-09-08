@@ -25,9 +25,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.mdp_android_grp15.ui.main.BluetoothChat;
 import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
 import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
-import com.example.mdp_android_grp15.ui.main.CommsFragment;
 import com.example.mdp_android_grp15.ui.main.GridMap;
-import com.example.mdp_android_grp15.ui.main.MapInformation;
 import com.example.mdp_android_grp15.ui.main.MapTabFragment;
 import com.example.mdp_android_grp15.ui.main.ReconfigureFragment;
 import com.example.mdp_android_grp15.ui.main.SectionsPagerAdapter;
@@ -243,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnectionService.write(bytes);
         }
         showLog(message);
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message", BluetoothChat.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
         showLog("Exiting printMessage");
@@ -268,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 message = "Unexpected default for printMessage: " + name;
                 break;
         }
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message", BluetoothChat.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
@@ -278,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void refreshMessageReceived() {
-        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+        BluetoothChat.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
     }
 
 
