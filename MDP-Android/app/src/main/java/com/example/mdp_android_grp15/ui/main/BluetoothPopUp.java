@@ -28,7 +28,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.mdp_android_grp15.MainActivity;
 import com.example.mdp_android_grp15.R;
 
 import java.util.ArrayList;
@@ -205,7 +204,7 @@ public class BluetoothPopUp extends AppCompatActivity {
         });
 
 
-        Button backBtn = findViewById(R.id.backBtn);
+        ImageButton backBtn = findViewById(R.id.backBtn);
 
         connStatusTextView = (TextView) findViewById(R.id.connStatusTextView);
         connStatus ="Disconnected";
@@ -221,9 +220,6 @@ public class BluetoothPopUp extends AppCompatActivity {
                 editor = sharedPreferences.edit();
                 editor.putString("connStatus", connStatusTextView.getText().toString());
                 editor.commit();
-                TextView status = MainActivity.getbluetoothStatus();
-                String s = connStatusTextView.getText().toString();
-                //status.setText(s);
                 finish();
             }
         });
@@ -432,7 +428,6 @@ public class BluetoothPopUp extends AppCompatActivity {
         Log.d(TAG, "startBTConnection: Initializing RFCOM Bluetooth Connection");
 
         mBluetoothConnection.startClientThread(device, uuid);
-
     }
 
     @Override

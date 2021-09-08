@@ -7,16 +7,19 @@
     android:layout_height="match_parent">
 
 
-    <Button
+    <ImageButton
         android:id="@+id/backBtn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:foreground="@drawable/outline_arrow_back_24"
-        android:foregroundTint="@color/colorBlack"
-        android:background="?android:attr/selectableItemBackground"
+        android:layout_width="80dp"
+        android:layout_height="27dp"
+        android:layout_marginTop="4dp"
+        android:adjustViewBounds="false"
+        android:background="@color/colorBlack"
+        android:cropToPadding="false"
+        android:elevation="14dp"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toTopOf="@+id/bluetoothTitleTextView"
+        app:layout_constraintEnd_toStartOf="@+id/connStatusTextView"
+        app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,14 +77,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="500dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:splitTrack="false"
         android:text="OFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteY="33dp" />
 
     <Button
         android:id="@+id/searchBtn"
