@@ -4,7 +4,6 @@
 
 class aStar{
     public:
-        //----Search functions
         //add obstacle avoidance and stop search once the goal has been found
         Vertex* a_star_search(vector<vector<Vertex>> vertex_array, Vertex* src_vertex, Vertex* target_vertex, int TOTAL_GRID_COUNT){
             SortedQueue q;

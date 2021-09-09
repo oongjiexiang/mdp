@@ -14,7 +14,11 @@ Vertex::Vertex(int row, int column): row(row), column(column){
     is_obstacle = false;
     is_border = false;
     visited = false;
-    prev_vertex = NULL;
+    prev_vertex = this;
+}
+bool Vertex::valid(Vertex target){
+    if(target.row == -1) return false;
+    return true;
 }
 void Vertex::reset(){
     g_cost = h_cost = START_COST;
@@ -22,8 +26,9 @@ void Vertex::reset(){
     prev_vertex = NULL;
 }
 void Vertex::printVertex(){
-    printf("Vertex (%d, %d) with (%.1f, %.1f) to (%.1f, %.1f):\n", row, column, x_left, y_low, x_right, y_high);
-    printf("\tg = %.1f, \n\th = %.1f. \n\t%s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
+    // printf("Vertex (%d, %d) with (%.1f, %.1f) to (%.1f, %.1f):\n", row, column, x_left, y_low, x_right, y_high);
+    // printf("\tg = %.1f, \n\th = %.1f. \n\t%s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
+    printf("Vertex (%d, %d) - %d %d\n", row, column, is_border, is_obstacle);
 }
 
 Obstacle::Obstacle(int id, double x_center, double y_center, double face_direction): id(id), x_center(x_center), y_center(y_center), face_direction(face_direction){}

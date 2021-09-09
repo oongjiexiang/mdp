@@ -18,6 +18,7 @@ class Vertex{
         Vertex* prev_vertex; //reset each time
         Vertex();
         Vertex(int row, int column);
+        bool valid(Vertex target);
         void reset();
         void printVertex();
 };
