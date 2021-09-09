@@ -9,6 +9,7 @@
                 "component.cpp",
                 "config.cpp",
                 "asearch.cpp",
+                "hamiltonian.cpp",
                 "main.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"

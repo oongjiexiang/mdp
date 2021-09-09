@@ -76,7 +76,7 @@ aStar::aStar(vector<vector<int>> fullMap, vector<Obstacle> obstacles){
     grid->setMap(fullMap);
     grid->add_obstacle(obstacles);
 }
-void aStar::search(Vertex& src, Vertex& dest, SearchResult& searchResult){
+void aStar::search(Vertex& src, Obstacle& dest, SearchResult& searchResult){
     // If the source is out of range
     if (!grid->validVertex(src)) {
         printf("Source is invalid\n");
@@ -84,19 +84,20 @@ void aStar::search(Vertex& src, Vertex& dest, SearchResult& searchResult){
     }
 
     // If the destination is out of range
-    if (!grid->validVertex(dest)) {
+    Vertex destVertex(dest.row, dest.column);
+    if (!grid->validVertex(destVertex)) {
         printf("Destination is invalid\n");
         return;
     }
 
     // Either the source or the destination is blocked
-    if (!isUnBlocked(src) || !isUnBlocked(dest)) {
+    if (!isUnBlocked(src) || !isUnBlocked(destVertex)) {
         printf("Source or the destination is blocked\n");
         return;
     }
 
     // If the destination cell is the same as source cell
-    if (isDestination(src, dest)) {
+    if (isDestination(src, destVertex)) {
         printf("We are already at the destination\n");
         return;
     }
@@ -137,17 +138,17 @@ void aStar::search(Vertex& src, Vertex& dest, SearchResult& searchResult){
                 if (grid->validVertex(neighbour)) {
 
                     // If the destination cell is the same as the current successor
-                    if (isDestination(neighbour, dest)) { // Set the Parent of the destination cell
+                    if (isDestination(neighbour, destVertex)) { // Set the Parent of the destination cell
                         cellDetails[neighbour.row][neighbour.column].prev_vertex = &cellDetails[i][j];
                         printf("The destination cell is found\n");
-                        tracePath(cellDetails, dest, searchResult);
+                        tracePath(cellDetails, destVertex, searchResult);
                         return;
                     }
                     // If the successor is already on the closed list or if it is blocked, then ignore it
                     else if (!closedList[neighbour.row][neighbour.column] && isUnBlocked(neighbour)) {
                         double gNew, hNew, fNew;
                         gNew = calculateGValue(cellDetails[i][j]);
-                        hNew = calculateHValue(neighbour, dest);
+                        hNew = calculateHValue(neighbour, destVertex);
                         fNew = gNew + hNew;
 
                         // if it is not in open list and this path has shorter f

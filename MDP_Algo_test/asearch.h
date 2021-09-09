@@ -31,7 +31,7 @@ class aStar{
     public:
         aStar();
         aStar(vector<vector<int>> fullMap, vector<Obstacle> obstacles);
-        void search(Vertex& src, Vertex& dest, SearchResult& searchResult);
+        void search(Vertex& src, Obstacle& dest, SearchResult& searchResult);
 };
 
 #endif
