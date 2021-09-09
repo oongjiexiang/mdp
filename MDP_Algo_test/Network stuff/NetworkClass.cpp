@@ -12,27 +12,30 @@
 #include <NetworkClass.h>
 
 using namespace std;
-
-char receiveBuffer[5000];
+/*
 string serverIP = "192.168.1.8"; //ip address of the server
 int portNumber= 17; //listening port on the server
 int checker;
-string message = u8"test message";//u8 encodes the string us utf-8 format
-int bufferLength = 5000; //change this later
-//char receiveBuffer[5000];
+string message = "test message";//u8 encodes the string us utf-8 format
+*/
+char receiveBuffer[4096];
 
 //create wsaData and socket
 WSADATA wsaData;
 SOCKET ConnectSocket = INVALID_SOCKET;
+sockaddr_in hint;
 
 //constructor to set the server ip address and port number
-void Network(string ipAddr, int portNo){
-    serverIP = ipAddr;
-    portNumber = portNo;
+Network::Network(string ipAddr, int portNo){
+    Network::serverIP = ipAddr;
+    Network::portNumber = portNo;
+    Network::checker =0;
+    Network::message = "test message";
+    Network::bufferLength = 4096; //change this later
     //create wsadata
 }
 //call this to initialize the network
-int initializeConnection(){
+int Network::initializeConnection(){
     //initialize WSAData as version 2.2
     checker = WSAStartup(MAKEWORD(2,2),&wsaData);
     if(checker!=0){
@@ -40,8 +43,7 @@ int initializeConnection(){
         return 1;
     }
 
-            //initialize values for hint data
-    sockaddr_in hint;
+    //initialize values for hint data
     hint.sin_family = AF_INET; //can be either ipv4 or ipv6
     hint.sin_port = htons(portNumber); //converts port_number
     inet_pton(AF_INET,serverIP.c_str(),&hint.sin_addr); //converts the string ip address to code
@@ -64,7 +66,7 @@ int initializeConnection(){
     return 0;
 }
 //target device 1 for android, 2 for stm, assumes the unformatted message is correct
-string encodeMessage(int targetDevice, string unformattedMessage){
+string Network::encodeMessage(int targetDevice, string unformattedMessage){
     string formattedMessage;
     if(targetDevice==1){
         formattedMessage = "AND|"+unformattedMessage+"\n";
@@ -80,15 +82,15 @@ string encodeMessage(int targetDevice, string unformattedMessage){
 }
 
 //sends message to the server and receives data that is input into the receiveBuffer
-int sendMessage(string formattedMessage){
+int Network::sendMessage(string formattedMessage){
     //set current message to formatted message
-    if(formattedMessage.compare("ERROR")){
+    message = formattedMessage;
+    if(formattedMessage.compare("ERROR")==0){
         printf("Error, message is not properly formatted!");
         closesocket(ConnectSocket);
         WSACleanup();
         return 1;
     }
-    message = formattedMessage;
     //send the message to the server
     checker = send(ConnectSocket, message.c_str(), message.length(),0);
     if (checker == SOCKET_ERROR) {
@@ -102,28 +104,30 @@ int sendMessage(string formattedMessage){
         checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
         if(checker>0) //bytes are being received
             printf("Bytes received: %d\n", checker);
-        else if (checker == 0) //no more bytes received
+        else if (checker == 0){ //no more bytes received
             printf("Connection closed\n");
-        else //something went wrong
+        }
+        else{ //something went wrong{
             printf("receive failed: %d\n", WSAGetLastError());
+            break;
+        }
     }while(checker!=0);
+
     return 0;
 }
 
-string decodeMessage(string receivedMessage){
+string Network::decodeMessage(){
     int i=0;
-    string retMessage="";
     char temp='a';
+    string retMessage="";
     while(temp!='|'){
         temp=receiveBuffer[i];
         i++;
         if(temp=='\n'){
             printf("Message format was not as expected!");
-            return "";
+            break;
         }
     }
-
-
     while(temp!='\n'){
         temp = receiveBuffer[i];
         retMessage = retMessage+temp;
@@ -133,7 +137,7 @@ string decodeMessage(string receivedMessage){
 }
 
 //call this once you are done sending and receiving messages from the server
-void endConnection(){
+void Network::endConnection(){
 //cleanup and close all
 closesocket(ConnectSocket);
 WSACleanup();
