@@ -38,11 +38,11 @@ void Map::resetMap(){
 }
 
 //adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
-void Map::add_obstacle(vector<Obstacle> obstacleList, double obstacle_length,double boundary_size, int total_count){
+void Map::add_obstacle(vector<Obstacle> obstacleList){
     int i,j;
     double obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, border_x_left, border_x_right, border_y_high, border_y_low;
-    obstacle_length=obstacle_length/2;      // JX: var here means half of obstacle length to find the left, right, high, low coordinates (for loop below)
-    boundary_size= boundary_size;
+    double obstacle_length=obstacle_length/2;      // JX: var here means half of obstacle length to find the left, right, high, low coordinates (for loop below)
+    double boundary_size= boundary_size;
 
     // 1. register the list of obstacles into this grid map
     obstacles.insert(obstacleList.end(), obstacleList.begin(), obstacleList.end());

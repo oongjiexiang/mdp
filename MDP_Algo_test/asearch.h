@@ -9,6 +9,7 @@
 
 // Creating a shortcut for tuple<int, Vertex> type
 typedef tuple<double, int, int> Tuple;
+typedef pair<double, vector<Action>> SearchResult;
 
 class aStar{
     Map* grid;
@@ -25,12 +26,12 @@ class aStar{
     double calculateGValue(Vertex& cur);
     
     // A Utility Function to trace the path from the source to destination
-    void tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest);
+    void tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest, SearchResult& searchResult);
     
     public:
         aStar();
-        aStar(vector<vector<int>> fullMap);
-        void search(Vertex& src, Vertex& dest);
+        aStar(vector<vector<int>> fullMap, vector<Obstacle> obstacles);
+        void search(Vertex& src, Vertex& dest, SearchResult& searchResult);
 };
 
 #endif

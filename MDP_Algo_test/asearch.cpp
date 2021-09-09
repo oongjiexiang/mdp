@@ -35,12 +35,13 @@ double aStar::calculateGValue(Vertex& cur){    // to change
     return cur.g_cost + 1.0; 
 }
 // A Utility Function to trace the path from the source to destination
-void aStar::tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest){
+void aStar::tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest, SearchResult& searchResult){
     stack<Vertex> Path;
     int row = dest.row;
     int col = dest.column;
-    
-    Vertex* next_node = &dest;// = cellDetails[row][col].prev_vertex;
+    Vertex* next_node = &dest;
+    vector<Action> actions;
+
     // trace from destination back to source
     do {
         Path.push(*next_node);
@@ -49,22 +50,33 @@ void aStar::tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest){
         col = next_node->column;
     } while (cellDetails[row][col].prev_vertex != next_node);   // at source, prev_vertex/parent = next_node
     Path.emplace(*next_node);
-    printf("\nThe Path is ");
-    while (!Path.empty()) {
+
+    // Package into <distance: double, actions: vector<Action>> and modify the memory
+    while(!Path.empty()){
         Vertex p = Path.top();
         Path.pop();
-        printf("-> (%d,%d) ", p.row, p.column);
+        Action a(p.row, p.column, 0);   // need to change 3rd param -- face_direction when permutation is done
+        actions.push_back(a);
     }
+    searchResult = SearchResult(next_node->g_cost, actions);
+
+    // printf("\nThe Path is ");    // for printing the full path
+    // while (!Path.empty()) {
+    //     Vertex p = Path.top();
+    //     Path.pop();
+    //     printf("-> (%d,%d) ", p.row, p.column);
+    // }
 }
 
 aStar::aStar(){
     grid = new Map();
 }
-aStar::aStar(vector<vector<int>> fullMap){
+aStar::aStar(vector<vector<int>> fullMap, vector<Obstacle> obstacles){
     grid = new Map();
     grid->setMap(fullMap);
+    grid->add_obstacle(obstacles);
 }
-void aStar::search(Vertex& src, Vertex& dest){
+void aStar::search(Vertex& src, Vertex& dest, SearchResult& searchResult){
     // If the source is out of range
     if (!grid->validVertex(src)) {
         printf("Source is invalid\n");
@@ -128,7 +140,7 @@ void aStar::search(Vertex& src, Vertex& dest){
                     if (isDestination(neighbour, dest)) { // Set the Parent of the destination cell
                         cellDetails[neighbour.row][neighbour.column].prev_vertex = &cellDetails[i][j];
                         printf("The destination cell is found\n");
-                        tracePath(cellDetails, dest);
+                        tracePath(cellDetails, dest, searchResult);
                         return;
                     }
                     // If the successor is already on the closed list or if it is blocked, then ignore it

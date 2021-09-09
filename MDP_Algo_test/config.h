@@ -19,7 +19,7 @@ class Map{
         void resetMap();
 
         //adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
-        void add_obstacle(vector<Obstacle> obstacleList, double obstacle_length,double boundary_size, int total_count);
+        void add_obstacle(vector<Obstacle> obstacleList);
 
         //search for a vertex given the x and y coordinates and returns a pointer to the vertex
         Vertex findVertexByCoor(double x_center, double y_center);

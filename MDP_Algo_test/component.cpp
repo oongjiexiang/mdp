@@ -31,7 +31,11 @@ void Vertex::printVertex(){
     // printf("Vertex (%d, %d) - %d %d\n", row, column, is_border, is_obstacle);    // uncomment if see vital (RELEVANT) debug info
 }
 
-Obstacle::Obstacle(int id, double x_center, double y_center, double face_direction): id(id), x_center(x_center), y_center(y_center), face_direction(face_direction){}
+Action::Action(int row, int column, double face_direction):
+    row(row), column(column), face_direction(face_direction){}
+    
+Obstacle::Obstacle(int id, double x_center, double y_center, int row, int column, double face_direction): 
+    id(id), x_center(x_center), y_center(y_center), row(row), column(column), face_direction(face_direction){}
 
 void Obstacle::printObstacle(){
     printf("Obstacle: %d: (%.1f, %.1f), %s\n", id, x_center, y_center, is_seen? "seen": "not seen");
