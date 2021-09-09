@@ -31,21 +31,20 @@ class aStar{
     // A Utility Function to calculate the 'h' heuristics.
     double calculateHValue(const Vertex& src, const Vertex& dest){  // tochange
         // h is estimated with the two points distance formula
-        return sqrt(pow((src.x_left - dest.x_left), 2.0) + pow((src.y_low - dest.y_low), 2.0));
+        return sqrt(pow((src.row - dest.row), 2.0) + pow((src.column - dest.column), 2.0));
     }
 
     // Encapsulate g cost calculation
     double calculateGValue(Vertex& cur){    // to change
-        cur.g_cost+=1.0;
-        return cur.g_cost; 
+        return cur.g_cost + 1.0; 
     }
     // A Utility Function to trace the path from the source to destination
-    void tracePath(const vector<vector<Vertex>>& cellDetails, const Vertex& dest){
+    void tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest){
         stack<Vertex> Path;
         int row = dest.row;
         int col = dest.column;
         
-        Vertex* next_node = cellDetails[row][col].prev_vertex;
+        Vertex* next_node = &dest;// = cellDetails[row][col].prev_vertex;
         // trace from destination back to source
         do {
             Path.push(*next_node);
@@ -144,7 +143,6 @@ class aStar{
                         if(!grid->vertexInRange(i + add_x, j + add_y)) continue;
                         Vertex neighbour = cellDetails[i + add_x][j + add_y];
                         cout << "i + add_x is " << i + add_x << endl;
-                        cout << "neighbour_row is " << neighbour.row << endl;
                         // Only process this cell if this is a valid one
                         if (grid->validVertex(neighbour)) {
                             neighbour.printVertex();    // test
@@ -215,10 +213,10 @@ int main()
     };
  
     // Source is the left-most bottom-most corner
-    Vertex src(8, 6);
+    Vertex src(8, 9);
  
     // Destination is the left-most top-most corner
-    Vertex dest(0, 0);
+    Vertex dest(0, 7);
     aStar astar(grid);
     astar.search(src, dest);
  
