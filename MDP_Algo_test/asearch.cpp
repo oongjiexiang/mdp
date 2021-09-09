@@ -18,7 +18,6 @@ class aStar{
         int row = vertex.row;
         int column = vertex.column;
         Vertex v = grid->findVertexByGrid(row, column);
-        printf("(%d, %d): %d %d\n", v.row, v.column, v.is_border, v.is_obstacle);
         return (!v.is_border && !v.is_obstacle);
     }
 
@@ -52,7 +51,6 @@ class aStar{
             row = next_node->row;
             col = next_node->column;
         } while (cellDetails[row][col].prev_vertex != next_node);   // at source, prev_vertex/parent = next_node
-        cout << "not this anymore "; cellDetails[row][col].prev_vertex->printVertex(); cout << endl;
         Path.emplace(*next_node);
         printf("\nThe Path is ");
         while (!Path.empty()) {
@@ -131,21 +129,16 @@ class aStar{
                 // Add this vertex to the closed list
                 i = get<1>(p); // column element of tuple
                 j = get<2>(p); // third element of tuple
-
-                cout << "popping out (" << i << ", " << j << ")" << endl; // test
         
                 // Remove this vertex from the open list
                 openList.pop();
                 closedList[i][j] = true;
-                cout << "start looking at neighbours" << endl;
                 for (int add_x = -1; add_x <= 1; add_x++) {
                     for (int add_y = -1; add_y <= 1; add_y++) {
                         if(!grid->vertexInRange(i + add_x, j + add_y)) continue;
                         Vertex neighbour = cellDetails[i + add_x][j + add_y];
-                        cout << "i + add_x is " << i + add_x << endl;
                         // Only process this cell if this is a valid one
                         if (grid->validVertex(neighbour)) {
-                            neighbour.printVertex();    // test
 
                             // If the destination cell is the same as the current successor
                             if (isDestination(neighbour, dest)) { // Set the Parent of the destination cell
@@ -171,12 +164,8 @@ class aStar{
                                 // already, check to see if this
                                 // path to that square is better,
                                 // using 'f' cost as the measure.
-                                // Vertex neighbour = cellDetails[neighbour.row][neighbour.column];
-                                cout << "neighbour info "; neighbour.printVertex(); cout << endl;
-                                // cout << "neighbour_a info"; neighbour_a.printVertex(); cout << endl;
                                 
                                 if ((neighbour.g_cost == START_COST && neighbour.h_cost == START_COST) || neighbour.g_cost + neighbour.h_cost > fNew){
-                                    cout << "queuing (" << neighbour.row << ", " << neighbour.column << ") with f=" << fNew << endl; // test
                                     openList.emplace(fNew, neighbour.row, neighbour.column);
         
                                     // Update the details of this cell

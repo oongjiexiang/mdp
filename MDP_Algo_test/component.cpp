@@ -26,9 +26,9 @@ void Vertex::reset(){
     prev_vertex = NULL;
 }
 void Vertex::printVertex(){
-    // printf("Vertex (%d, %d) with (%.1f, %.1f) to (%.1f, %.1f):\n", row, column, x_left, y_low, x_right, y_high);
-    // printf("\tg = %.1f, \n\th = %.1f. \n\t%s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
-    printf("Vertex (%d, %d) - %d %d\n", row, column, is_border, is_obstacle);
+    printf("Vertex (%d, %d) with (%.1f, %.1f) to (%.1f, %.1f):\n", row, column, x_left, y_low, x_right, y_high);
+    printf("\tg = %.1f, \n\th = %.1f. \n\t%s %s %s\n", g_cost, h_cost, is_border? "border": "!border", is_obstacle? "obstacle": "!obstacle", visited? "visited": "!visited");
+    // printf("Vertex (%d, %d) - %d %d\n", row, column, is_border, is_obstacle);    // uncomment if see vital (RELEVANT) debug info
 }
 
 Obstacle::Obstacle(int id, double x_center, double y_center, double face_direction): id(id), x_center(x_center), y_center(y_center), face_direction(face_direction){}

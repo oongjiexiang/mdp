@@ -21,12 +21,10 @@ Map::Map(){
 void Map::setMap(vector<vector<int>> fullMap){
     for(int i = 0; i < fullMap.size(); i++){
         for(int j = 0; j < fullMap[i].size(); j++){
-            cout << fullMap[i][j] << " ";
             if(fullMap[i][j] == 0){
                 grids[i][j].is_obstacle = true;
             }
         }
-        cout << endl;
     }
 }
 
