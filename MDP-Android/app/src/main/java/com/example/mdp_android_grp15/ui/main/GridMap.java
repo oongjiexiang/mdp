@@ -186,12 +186,18 @@ public class GridMap extends View {
                                 cells[j + 1][20 - i].endX, cells[j + 1][i].startY, redPaint);
                         break;
                     case "South":
-                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY + cellSize,
-                                cells[j + 1][20 - i].endX, cells[j + 1][i].startY + cellSize, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX,
+                                cells[j + 1][i].startY + cellSize,
+                                cells[j + 1][20 - i].endX,
+                                cells[j + 1][i].startY + cellSize,
+                                redPaint);
                         break;
                     case "East":
-                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i].startY,
-                                cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i].endY, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize,
+                                cells[j + 1][i].startY,
+                                cells[j + 1][20 - i].startX + cellSize,
+                                cells[j + 1][i].endY,
+                                redPaint);
                         break;
                     case "West":
                         canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY,
@@ -211,14 +217,19 @@ public class GridMap extends View {
             for (int y = 0; y < ROW; y++)
                 for (int i = 0; i < this.getArrowCoord().size(); i++)
                     if (!cells[x][y].type.equals("image") && cells[x][y].getId() == -1) {
-                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
+                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX,
+                                cells[x][y].endY, cells[x][y].paint);
                     } else {
                         Paint textPaint = new Paint();
                         textPaint.setTextSize(20);
                         textPaint.setColor(Color.WHITE);
                         textPaint.setTextAlign(Paint.Align.CENTER);
-                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
-                        canvas.drawText(String.valueOf(cells[x][y].getId()),(cells[x][y].startX+cells[x][y].endX)/2, cells[x][y].endY + (cells[x][y].startY-cells[x][y].endY)/4, textPaint);
+                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX,
+                                cells[x][y].endY, cells[x][y].paint);
+                        canvas.drawText(String.valueOf(cells[x][y].getId()),
+                                (cells[x][y].startX+cells[x][y].endX)/2,
+                                cells[x][y].endY + (cells[x][y].startY-cells[x][y].endY)/4,
+                                textPaint);
                     }
 
         showLog("Exiting drawIndividualCell");
@@ -565,7 +576,7 @@ public class GridMap extends View {
         oldCoord[0] = oldCol;
         oldCoord[1] = oldRow;
         oldRow = this.convertRow(oldRow);
-        showLog("oldRow = " + oldRow + ", oldCol = " + oldCol);
+//        showLog("oldRow = " + oldRow + ", oldCol = " + oldCol);
         if (oldRow == 0) {
             showLog("oldRow has gone out of grid.");
             return;
@@ -634,6 +645,8 @@ public class GridMap extends View {
         showLog("Entering setObstacleCoord");
         int[] obstacleCoord = new int[]{col, row};
         GridMap.obstacleCoord.add(obstacleCoord);
+        col++;
+        row++;
         row = this.convertRow(row);
         cells[col][row].setType("obstacle");
         showLog("Exiting setObstacleCoord");
@@ -799,6 +812,7 @@ public class GridMap extends View {
         return true;
     }
 
+    // TODO: get rid of robotcolor if change startpoint and cant set robot if obstacle there
     // added in obstacle id and direction
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -829,6 +843,16 @@ public class GridMap extends View {
             // change robot size and make sure its within the grid
             if (startCoordStatus) {
                 if (canDrawRobot) {
+                    // removes green grids when user changes robot startpoint
+                    for (int i = 0; i < 21; i++) {
+                        for (int j = 0; j < 21; j++) {
+                            if (cells[i][j].type == "robot") {
+                                cells[i][j].setType("explored");
+                            }
+                        }
+                    }
+                    // don't set robot if obstacles are there
+
                     int[] startCoord = this.getStartCoord();
 
                     if (startCoord[0] >= 2 && startCoord[1] >= 2) {
@@ -841,6 +865,8 @@ public class GridMap extends View {
                 }
                 else
                     canDrawRobot = true;
+                showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
+                showLog("");
                 this.setStartCoord(column, row);
                 startCoordStatus = false;
                 String direction = getRobotDirection();
@@ -858,7 +884,8 @@ public class GridMap extends View {
                     } else if(direction.equals("down")) {
                         directionInt = 2;
                     }
-                    MainActivity.printMessage("starting " + "(" + String.valueOf(row-1) + "," + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
+                    MainActivity.printMessage("starting " + "(" + String.valueOf(row-1) + ","
+                            + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -927,7 +954,7 @@ public class GridMap extends View {
                 */
 
 
-                    this.setObstacleCoord(column, row);
+                    this.setObstacleCoord(column - 1, row - 1);
                 }
                 this.invalidate();
                 return true;
@@ -1030,6 +1057,7 @@ public class GridMap extends View {
         showLog("Exiting resetMap");
         this.invalidate();
     }
+
 
     public void updateMapInformation() throws JSONException {
         showLog("Entering updateMapInformation");
@@ -1168,7 +1196,7 @@ public class GridMap extends View {
         this.invalidate();
     }
 
-    // TODO: debug turnings, so far working fine...
+    // TODO: obstacle and turning seems to be fixed, need more testing
     public void moveRobot(String direction) {
         showLog("Entering moveRobot");
         setValidPosition(false);
@@ -1321,15 +1349,20 @@ public class GridMap extends View {
                 robotDirection = "error moveCurCoord";
                 break;
         }
+        showLog("Enter checking for obstacles");
         if (getValidPosition())
             for (int x = curCoord[0] - 1; x <= curCoord[0]; x++) {
                 for (int y = curCoord[1] - 1; y <= curCoord[1]; y++) {
                     for (int i = 0; i < obstacleCoord.size(); i++) {
-                        if (obstacleCoord.get(i)[0] != x || obstacleCoord.get(i)[1] != y)
-                            setValidPosition(true);
-                        else {
+                        showLog("x-1 = " + (x-1) + ", y = " + y);
+                        showLog("obstacleCoord.get(" + i + ")[0] - 1 = " + obstacleCoord.get(i)[0]
+                                + ", obstacleCoord.get(" + i + ")[1] = " + obstacleCoord.get(i)[1]);
+                        if (obstacleCoord.get(i)[0] == (x - 1) && obstacleCoord.get(i)[1] == y) {
                             setValidPosition(false);
+                            robotDirection = backupDirection;
                             break;
+                        } else {
+//                            setValidPosition(true);
                         }
                     }
                     if (!getValidPosition())
@@ -1338,6 +1371,7 @@ public class GridMap extends View {
                 if (!getValidPosition())
                     break;
             }
+        showLog("Exit checking for obstacles");
         if (getValidPosition())
             this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
         else {
@@ -1557,4 +1591,7 @@ public class GridMap extends View {
         }
 
     }
+
+    // TODO: add function to feed ITEM_LIST and imageBearing the messages received from bluetooth (for the roaming)
+    // TODO: add command messages to be sent when adding and removing obstacles from map
 }
