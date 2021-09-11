@@ -1,6 +1,7 @@
 package com.example.mdp_android_grp15.ui.main;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -8,11 +9,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -98,6 +102,9 @@ public class GridMap extends View {
             new String[20], new String[20], new String[20], new String[20], new String[20]
     ));
 
+    static ClipData clipData;
+    static Object localState;
+    int initialColumn, initialRow;
 
     public GridMap(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -161,6 +168,7 @@ public class GridMap extends View {
         showLog("Exiting onDraw");
     }
 
+    // TODO: fix obstacle so it draws correctly
     // draws obstacle cells whenever map refreshes, pos/correct item selection is here
     private void drawObstacles(Canvas canvas) {
         showLog("Entering drawObstacles");
@@ -169,27 +177,25 @@ public class GridMap extends View {
         showLog("ITEM_LIST size = " + ITEM_LIST.size());
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
-                canvas.drawText(ITEM_LIST.get(19-i)[j], cells[j+1][20-i].startX + ((cells[1][1].endX - cells[1][1].startX) / 2),
-                        cells[j+1][i+1].startY + ((cells[1][1].endY - cells[1][1].startY) / 2) + 10, whitePaint);
+                canvas.drawText(ITEM_LIST.get(19-i)[j], cells[j+1][19-i].startX + ((cells[1][1].endX - cells[1][1].startX) / 2),
+                        cells[j+1][i].startY + ((cells[1][1].endY - cells[1][1].startY) / 2) + 10, whitePaint);
 
                 switch (imageBearings.get(19-i)[j]) {
                     case "North":
-                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i + 1].startY,
-                                cells[j + 1][20 - i].endX, cells[j + 1][i + 1].startY, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY,
+                                cells[j + 1][20 - i].endX, cells[j + 1][i].startY, redPaint);
                         break;
-
                     case "South":
-                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i + 1].startY + cellSize,
-                                cells[j + 1][20 - i].endX, cells[j + 1][i + 1].startY + cellSize, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY + cellSize,
+                                cells[j + 1][20 - i].endX, cells[j + 1][i].startY + cellSize, redPaint);
                         break;
-
                     case "East":
-                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i + 1].startY,
-                                cells[j + 1][20 - i].startX, cells[j + 1][i + 1].endY, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i].startY,
+                                cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i].endY, redPaint);
                         break;
                     case "West":
-                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i + 1].startY,
-                                cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i + 1].endY, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY,
+                                cells[j + 1][20 - i].startX, cells[j + 1][i].endY, redPaint);
                         break;
                 }
             }
@@ -407,7 +413,10 @@ public class GridMap extends View {
 
         for (int x = 0; x <= COL; x++)
             for (int y = 0; y <= ROW; y++)
-                cells[x][y] = new Cell(x * cellSize + (cellSize / 30), y * cellSize + (cellSize / 30), (x + 1) * cellSize, (y + 1) * cellSize, unexploredColor, "unexplored");
+                cells[x][y] = new Cell(x * cellSize + (cellSize / 30),
+                        y * cellSize + (cellSize / 30), (x + 1) * cellSize,
+                        (y + 1) * cellSize, unexploredColor,
+                        "unexplored");
         showLog("Exiting createCell");
     }
 
@@ -584,7 +593,7 @@ public class GridMap extends View {
         }
     }
 
-
+    // TODO
     private class Cell {
         float startX, startY, endX, endY;
         Paint paint;
@@ -633,7 +642,7 @@ public class GridMap extends View {
                 case "image":
                     this.paint = obstacleColor;
                 default:
-                    showLog("setTtype default: " + type);
+                    showLog("setType default: " + type);
                     break;
             }
         }
@@ -648,17 +657,93 @@ public class GridMap extends View {
     }
 
     // TODO
-    // maybe here edit too, get the x and y then put in value and colour
+    // drag event to move obstacle
+    @Override
+    public boolean onDragEvent(DragEvent dragEvent) {
+        showLog("Entering onDragEvent");
+        clipData = dragEvent.getClipData();
+        localState = dragEvent.getLocalState();
+
+        int endColumn, endRow;
+        String tempID, tempBearing;
+        tempID = tempBearing = "";
+        endColumn = endRow = -999;
+        showLog("dragEvent.getAction() == " + dragEvent.getAction());
+        showLog("dragEvent.getResult() is " + dragEvent.getResult());
+
+        if ((dragEvent.getAction() == DragEvent.ACTION_DRAG_ENDED) && (endColumn == -999 || endRow == -999)
+            && dragEvent.getResult() == false) {
+            obstacleCoord.remove(new int[]{initialColumn, initialRow});
+            cells[initialColumn][20-initialRow].setType("unexplored");
+            ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
+            imageBearings.get(initialRow-1)[initialColumn-1] = "";
+        } else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
+            endColumn = (int) (dragEvent.getX() / cellSize);
+            endRow = this.convertRow((int) (dragEvent.getY() / cellSize));
+
+            if (ITEM_LIST.get(initialRow-1)[initialColumn-1] == "" || imageBearings.get(initialRow-1)[initialColumn-1] == "") {
+                showLog("Cell is empty");
+            } else if (endColumn < 0 || endRow < 0) {
+                obstacleCoord.remove(new int[]{initialColumn, initialRow});
+                cells[initialColumn][20-initialRow].setType("unexplored");
+                ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
+                imageBearings.get(initialRow-1)[initialColumn-1] = "";
+            } else if ((1 <= initialColumn && initialColumn <= 20) && (1 <= initialRow && initialRow <= 20)
+                    && (1 <= endColumn && endColumn <= 20) && (1 <= endRow && endRow <= 20)) {
+                tempID = ITEM_LIST.get(initialRow-1)[initialColumn-1];
+                tempBearing = imageBearings.get(initialRow-1)[initialColumn-1];
+                if (ITEM_LIST.get(endRow-1)[endColumn-1] != "" || imageBearings.get(endRow-1)[endColumn-1] != "") {
+                    showLog("An obstacle is already at drop location");
+                } else {
+                    ITEM_LIST.get(initialRow - 1)[initialColumn - 1] = "";
+                    imageBearings.get(initialRow - 1)[initialColumn - 1] = "";
+                    ITEM_LIST.get(endRow - 1)[endColumn - 1] = tempID;
+                    imageBearings.get(endRow - 1)[endColumn - 1] = tempBearing;
+
+                    setObstacleCoord(endColumn, endRow);
+                    obstacleCoord.remove(new int[]{initialColumn, initialRow});
+                    cells[initialColumn][20 - initialRow].setType("unexplored");
+                }
+            } else {
+                showLog("Drag event failed.");
+            }
+        }
+        showLog("initialColumn = " + initialColumn
+                + "\ninitialRow = " + initialRow
+                + "\nendColumn = " + endColumn
+                + "\nendRow = " + endRow);
+        this.invalidate();
+        return true;
+    }
+
+    // TODO
+    // add in obstacle id and direction
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         showLog("Entering onTouchEvent");
         if (event.getAction() == MotionEvent.ACTION_DOWN && this.getAutoUpdate() == false) {
             int column = (int) (event.getX() / cellSize);
             int row = this.convertRow((int) (event.getY() / cellSize));
+            initialColumn = column;
+            initialRow = row;
 
             ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setStartPointToggleBtn);
             ToggleButton setWaypointToggleBtn = ((Activity)this. getContext()).findViewById(R.id.setWaypointToggleBtn);
             showLog("event.getX = " + event.getX() + ", event.getY = " + event.getY());
+            showLog("row = " + row + ", column = " + column);
+
+            // TODO
+            // start drag
+            if (MapTabFragment.dragStatus) {
+                if (!((1 <= initialColumn && initialColumn <= 20)
+                        && (1 <= initialRow && initialRow <= 20))) {
+                    return false;
+                } else if (ITEM_LIST.get(row - 1)[column - 1] == "") {
+                    return false;
+                }
+                DragShadowBuilder dragShadowBuilder = new MyDragShadowBuilder(this);
+                this.startDrag(null, dragShadowBuilder, null, 0);
+            }
 
             if (startCoordStatus) {
                 if (canDrawRobot) {
@@ -718,30 +803,32 @@ public class GridMap extends View {
             // TODO
             // edit this to add id and the bar, popup to ask for user input
             if (setObstacleStatus) {
-                // get user input from spinners in MapTabFragment static values
-                String imageID = MapTabFragment.imageID;
-                String imageBearing = MapTabFragment.imageBearing;
+                if ((1 <= row && row <= 20) && (1 <= column && column < 20)) {
+                    // get user input from spinners in MapTabFragment static values
+                    String imageID = MapTabFragment.imageID;
+                    String imageBearing = MapTabFragment.imageBearing;
 
-                // after init, at stated column and row, add the id to use as ref to update the grid
-                ITEM_LIST.get(row)[column-1] = imageID;
+                    // after init, at stated column and row, add the id to use as ref to update the grid
+                    ITEM_LIST.get(row - 1)[column - 1] = imageID;
+
 
                 /*
                 add border colour to grid on the side image is on (N,S,E or W)
                  */
-                switch (imageBearing) {
-                    case "North":
-                        imageBearings.get(row)[column-1] = "North";
-                        break;
-                    case "South":
-                        imageBearings.get(row)[column-1] = "South";
-                        break;
-                    case "East":
-                        imageBearings.get(row)[column-1] = "East";
-                        break;
-                    case "West":
-                        imageBearings.get(row)[column-1] = "West";
-                        break;
-                }
+                    switch (imageBearing) {
+                        case "North":
+                            imageBearings.get(row - 1)[column - 1] = "North";
+                            break;
+                        case "South":
+                            imageBearings.get(row - 1)[column - 1] = "South";
+                            break;
+                        case "East":
+                            imageBearings.get(row - 1)[column - 1] = "East";
+                            break;
+                        case "West":
+                            imageBearings.get(row - 1)[column - 1] = "West";
+                            break;
+                    }
 
 
                 /* test boundaries of cells
@@ -758,7 +845,8 @@ public class GridMap extends View {
                 */
 
 
-                this.setObstacleCoord(column, row);
+                    this.setObstacleCoord(column, row);
+                }
                 this.invalidate();
                 return true;
             }
@@ -1302,4 +1390,49 @@ public class GridMap extends View {
         return publicMDFObstacle;
     }
 
+    private static class MyDragShadowBuilder extends View.DragShadowBuilder {
+
+        private Point mScaleFactor;
+        // Defines the constructor for myDragShadowBuilder
+        public MyDragShadowBuilder(View v) {
+
+            // Stores the View parameter passed to myDragShadowBuilder.
+            super(v);
+
+        }
+
+        // TODO
+        // Defines a callback that sends the drag shadow dimensions and touch point back to the
+        // system.
+        @Override
+        public void onProvideShadowMetrics (Point size, Point touch) {
+            // Defines local variables
+            int width;
+            int height;
+
+            // Sets the width of the shadow to half the width of the original View
+            width = (int) (cells[1][1].endX - cells[1][1].startX);
+
+            // Sets the height of the shadow to half the height of the original View
+            height = (int) (cells[1][1].endY - cells[1][1].startY);
+
+            // Sets the size parameter's width and height values. These get back to the system
+            // through the size parameter.
+            size.set(width, height);
+            // Sets size parameter to member that will be used for scaling shadow image.
+            mScaleFactor = size;
+
+            // Sets the touch point's position to be in the middle of the drag shadow
+            touch.set(width / 2, height / 2);
+        }
+
+        @Override
+        public void onDrawShadow(Canvas canvas) {
+
+            // Draws the ColorDrawable in the Canvas passed in from the system.
+            canvas.scale(mScaleFactor.x/(float)getView().getWidth(), mScaleFactor.y/(float)getView().getHeight());
+            getView().draw(canvas);
+        }
+
+    }
 }

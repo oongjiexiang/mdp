@@ -1,0 +1,103 @@
+# depslib dependency file v1.0
+1630817538 source:c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\main.cpp
+	<stdio.h>
+	<iostream>
+	<vector>
+	<stdexcept>
+	"component.h"
+	"tripPlan.h"
+	"config.h"
+	"search.h"
+
+1630828896 c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\component.h
+	<stdlib.h>
+	<stdbool.h>
+	<math.h>
+	<float.h>
+
+1630817538 c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\tripplan.h
+	<vector>
+	<string>
+
+1630825929 c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\config.h
+	<vector>
+	"tripPlan.h"
+	"component.h"
+
+1630817538 c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\search.h
+	"tripPlan.h"
+	"component.h"
+	"config.h"
+
+1630828915 source:c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\component.cpp
+	<stdio.h>
+	"component.h"
+
+1630828772 source:c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\config.cpp
+	<vector>
+	<cmath>
+	<stdexcept>
+	"tripPlan.h"
+	"component.h"
+
+1630828772 source:c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\search.cpp
+	"search.h"
+	<iostream>
+
+1630817538 source:c:\users\zhi yu\desktop\y3s1\cz3004 - mdp\codes\mdp_algo_test_2\tripplan.cpp
+	<stdio.h>
+	<string>
+	<vector>
+	"tripPlan.h"
+
+1630825121 source:d:\mdp_algo_test_2\component.cpp
+	<stdio.h>
+	"component.h"
+
+1630825673 d:\mdp_algo_test_2\component.h
+	<stdlib.h>
+	<stdbool.h>
+	<math.h>
+	<float.h>
+
+1630825388 source:d:\mdp_algo_test_2\config.cpp
+	<vector>
+	<cmath>
+	<stdexcept>
+	"tripPlan.h"
+	"component.h"
+
+1630824804 d:\mdp_algo_test_2\tripplan.h
+	<vector>
+	<string>
+
+1630824001 source:d:\mdp_algo_test_2\main.cpp
+	<stdio.h>
+	<iostream>
+	<vector>
+	<stdexcept>
+	"component.h"
+	"tripPlan.h"
+	"config.h"
+	"search.h"
+
+1630817538 d:\mdp_algo_test_2\config.h
+	<vector>
+	"tripPlan.h"
+	"component.h"
+
+1630817538 d:\mdp_algo_test_2\search.h
+	"tripPlan.h"
+	"component.h"
+	"config.h"
+
+1630824796 source:d:\mdp_algo_test_2\search.cpp
+	"search.h"
+	<iostream>
+
+1630824796 source:d:\mdp_algo_test_2\tripplan.cpp
+	<stdio.h>
+	<string>
+	<vector>
+	"tripPlan.h"
+
