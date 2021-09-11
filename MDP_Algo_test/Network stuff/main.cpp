@@ -6,8 +6,8 @@ using namespace std;
 
 int main()
 {
-    string ipAddr = "192.168.1.8";
-    int port =17;
+    string ipAddr = "192.168.25.1";
+    int port =5180;
     int checker=0;
     string message="abc";
     string retMessage="";

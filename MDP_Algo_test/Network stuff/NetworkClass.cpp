@@ -120,14 +120,6 @@ string Network::decodeMessage(){
     int i=0;
     char temp='a';
     string retMessage="";
-    while(temp!='|'){
-        temp=receiveBuffer[i];
-        i++;
-        if(temp=='\n'){
-            printf("Message format was not as expected!");
-            break;
-        }
-    }
     while(temp!='\n'){
         temp = receiveBuffer[i];
         retMessage = retMessage+temp;

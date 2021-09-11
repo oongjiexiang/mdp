@@ -5,7 +5,6 @@
 //makes it so that the code compiled only works for windows vista and above(required in order to use inet_pton function)
 #define NTDDI_VERSION NTDDI_VISTA
 #define WINVER _WIN32_WINNT_VISTA
-#define _WIN32_WINNT _WIN32_WINNT_VISTA
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
