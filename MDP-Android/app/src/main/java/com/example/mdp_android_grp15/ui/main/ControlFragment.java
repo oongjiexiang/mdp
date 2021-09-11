@@ -140,6 +140,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
         gridMap = MainActivity.getGridMap();
 
+        // TODO: maybe change the message sent over bluetooth to robot
         // Button Listener
         moveForwardImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override

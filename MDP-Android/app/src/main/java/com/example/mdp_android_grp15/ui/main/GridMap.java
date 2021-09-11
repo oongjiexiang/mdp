@@ -170,16 +170,17 @@ public class GridMap extends View {
     private void drawObstacles(Canvas canvas) {
         showLog("Entering drawObstacles");
 
-        // draw image id
-        showLog("ITEM_LIST size = " + ITEM_LIST.size());
+//        showLog("ITEM_LIST size = " + ITEM_LIST.size());
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
+                // draw image id
                 canvas.drawText(
                         ITEM_LIST.get(19-i)[j],
                         cells[j+1][19-i].startX + ((cells[1][1].endX - cells[1][1].startX) / 2),
                         cells[j+1][i].startY + ((cells[1][1].endY - cells[1][1].startY) / 2) + 10,
                         whitePaint);
 
+                // color the face direction
                 switch (imageBearings.get(19-i)[j]) {
                     case "North":
                         canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY,
@@ -643,10 +644,10 @@ public class GridMap extends View {
 
     private void setObstacleCoord(int col, int row) {
         showLog("Entering setObstacleCoord");
-        int[] obstacleCoord = new int[]{col, row};
+        int[] obstacleCoord = new int[]{col - 1, row - 1};
         GridMap.obstacleCoord.add(obstacleCoord);
-        col++;
-        row++;
+//        col++;
+//        row++;
         row = this.convertRow(row);
         cells[col][row].setType("obstacle");
         showLog("Exiting setObstacleCoord");
@@ -753,6 +754,8 @@ public class GridMap extends View {
         }
     }
 
+    int endColumn, endRow;
+    String oldItem;
     // drag event to move obstacle
     @Override
     public boolean onDragEvent(DragEvent dragEvent) {
@@ -760,34 +763,49 @@ public class GridMap extends View {
         clipData = dragEvent.getClipData();
         localState = dragEvent.getLocalState();
 
-        int endColumn, endRow;
+//        int endColumn, endRow;
         String tempID, tempBearing;
         tempID = tempBearing = "";
         endColumn = endRow = -999;
+        oldItem = ITEM_LIST.get(initialRow - 1)[initialColumn - 1];
         showLog("dragEvent.getAction() == " + dragEvent.getAction());
         showLog("dragEvent.getResult() is " + dragEvent.getResult());
 
-        if ((dragEvent.getAction() == DragEvent.ACTION_DRAG_ENDED) && (endColumn == -999 || endRow == -999)
-                && dragEvent.getResult() == false) {
+        // drag and drop out of gridmap
+        if ((dragEvent.getAction() == DragEvent.ACTION_DRAG_ENDED)
+                && (endColumn == -999 || endRow == -999) && dragEvent.getResult() == false) {
             obstacleCoord.remove(new int[]{initialColumn, initialRow});
             cells[initialColumn][20-initialRow].setType("unexplored");
             ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
             imageBearings.get(initialRow-1)[initialColumn-1] = "";
-        } else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
+            showLog(commandMsgGenerator(REMOVE_OBSTACLE));
+        }
+        // drop within gridmap
+        else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
             endColumn = (int) (dragEvent.getX() / cellSize);
             endRow = this.convertRow((int) (dragEvent.getY() / cellSize));
 
+            // if the currently dragged cell is empty, do nothing
             if (ITEM_LIST.get(initialRow-1)[initialColumn-1] == "" || imageBearings.get(initialRow-1)[initialColumn-1] == "") {
                 showLog("Cell is empty");
-            } else if (endColumn < 0 || endRow < 0) {
+            }
+            // if dropped within gridmap but outside drawn grids, remove obstacle from lists
+            else if (endColumn <= 0 || endRow <= 0) {
                 obstacleCoord.remove(new int[]{initialColumn, initialRow});
                 cells[initialColumn][20-initialRow].setType("unexplored");
                 ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
                 imageBearings.get(initialRow-1)[initialColumn-1] = "";
-            } else if ((1 <= initialColumn && initialColumn <= 20) && (1 <= initialRow && initialRow <= 20)
-                    && (1 <= endColumn && endColumn <= 20) && (1 <= endRow && endRow <= 20)) {
+                showLog(commandMsgGenerator(REMOVE_OBSTACLE));
+            }
+            // if dropped within gridmap, shift it to new position unless already got existing
+            else if ((1 <= initialColumn && initialColumn <= 20)
+                    && (1 <= initialRow && initialRow <= 20)
+                    && (1 <= endColumn && endColumn <= 20)
+                    && (1 <= endRow && endRow <= 20)) {
                 tempID = ITEM_LIST.get(initialRow-1)[initialColumn-1];
                 tempBearing = imageBearings.get(initialRow-1)[initialColumn-1];
+
+                // check if got existing obstacle at drop location
                 if (ITEM_LIST.get(endRow-1)[endColumn-1] != "" || imageBearings.get(endRow-1)[endColumn-1] != "") {
                     showLog("An obstacle is already at drop location");
                 } else {
@@ -799,6 +817,7 @@ public class GridMap extends View {
                     setObstacleCoord(endColumn, endRow);
                     obstacleCoord.remove(new int[]{initialColumn, initialRow});
                     cells[initialColumn][20 - initialRow].setType("unexplored");
+                    showLog(commandMsgGenerator(MOVE_OBSTACLE));
                 }
             } else {
                 showLog("Drag event failed.");
@@ -913,7 +932,7 @@ public class GridMap extends View {
 
             // add id and the image bearing, popup to ask for user input
             if (setObstacleStatus) {
-                if ((1 <= row && row <= 20) && (1 <= column && column < 20)) {
+                if ((1 <= row && row <= 20) && (1 <= column && column <= 20)) {
                     // get user input from spinners in MapTabFragment static values
                     String imageID = MapTabFragment.imageID;
                     String imageBearing = MapTabFragment.imageBearing;
@@ -953,8 +972,9 @@ public class GridMap extends View {
                 showLog("(cells[col][row].endX - cells[col][row].startX) / 2 = " + (cells[column][row].endX - cells[column][row].startX) / 2);
                 */
 
-
-                    this.setObstacleCoord(column - 1, row - 1);
+                    // this function affects obstacle turning too
+                    this.setObstacleCoord(column, row);
+                    showLog(commandMsgGenerator(ADD_OBSTACLE));
                 }
                 this.invalidate();
                 return true;
@@ -1196,7 +1216,8 @@ public class GridMap extends View {
         this.invalidate();
     }
 
-    // TODO: obstacle and turning seems to be fixed, need more testing
+    // TODO: obstacle and turning still have slight problem, can turn left even tho obstacle is in the path
+    // e.g obstacle is on right side of 2x2 and can turn left and vice versa
     public void moveRobot(String direction) {
         showLog("Entering moveRobot");
         setValidPosition(false);
@@ -1206,6 +1227,7 @@ public class GridMap extends View {
         int[] oldCoord = this.getOldRobotCoord();
         String robotDirection = getRobotDirection();
         String backupDirection = robotDirection;
+        int[] temp = curCoord;
 
         switch (robotDirection) {
             case "up":
@@ -1351,12 +1373,13 @@ public class GridMap extends View {
         }
         showLog("Enter checking for obstacles");
         if (getValidPosition())
+            // check obstacle for new position
             for (int x = curCoord[0] - 1; x <= curCoord[0]; x++) {
                 for (int y = curCoord[1] - 1; y <= curCoord[1]; y++) {
                     for (int i = 0; i < obstacleCoord.size(); i++) {
-                        showLog("x-1 = " + (x-1) + ", y = " + y);
-                        showLog("obstacleCoord.get(" + i + ")[0] - 1 = " + obstacleCoord.get(i)[0]
-                                + ", obstacleCoord.get(" + i + ")[1] = " + obstacleCoord.get(i)[1]);
+//                        showLog("x-1 = " + (x-1) + ", y = " + y);
+//                        showLog("obstacleCoord.get(" + i + ")[0] - 1 = " + obstacleCoord.get(i)[0]
+//                                + ", obstacleCoord.get(" + i + ")[1] = " + obstacleCoord.get(i)[1]);
                         if (obstacleCoord.get(i)[0] == (x - 1) && obstacleCoord.get(i)[1] == y) {
                             setValidPosition(false);
                             robotDirection = backupDirection;
@@ -1371,6 +1394,45 @@ public class GridMap extends View {
                 if (!getValidPosition())
                     break;
             }
+        // check for obstacle against oldcoord when robot move forward as the first move
+//        if (getValidPosition()) {
+//            showLog("robotDirection = " + robotDirection);
+//            showLog("backupDirection = " + backupDirection);
+//            for (int x = temp[0] - 1; x <= temp[0]; x++) {
+//                for (int y = temp[1] - 1; y <= temp[1]; y++) {
+//                    for (int i = 0; i < obstacleCoord.size(); i++) {
+//                        showLog("x-1 = " + (x-1) + ", y = " + y);
+//                        showLog("obstacleCoord.get(" + i + ")[0] = " + obstacleCoord.get(i)[0]
+//                                + ", obstacleCoord.get(" + i + ")[1] = " + obstacleCoord.get(i)[1]);
+//
+//                        switch (backupDirection) {
+//                            case "up":
+//                                if (obstacleCoord.get(i)[1] == (y - 1) + 1) {
+//                                    setValidPosition(false);
+////                                    robotDirection = backupDirection;
+//                                }
+//                                break;
+//                            case "right":
+//                                if (obstacleCoord.get(i)[0] == (x - 1) + 1) {
+//                                    setValidPosition(false);
+//                                }
+//                                break;
+//                            case "left":
+//                                if (obstacleCoord.get(i)[0] == (x - 1) - 1) {
+//                                    setValidPosition(false);
+//                                    robotDirection = backupDirection;
+//                                }
+//                                break;
+//                            case "down":
+//                                if (obstacleCoord.get(i)[1] == (y - 1) - 1) {
+//                                    setValidPosition(false);
+//                                }
+//                                break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
         showLog("Exit checking for obstacles");
         if (getValidPosition())
             this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
@@ -1593,5 +1655,78 @@ public class GridMap extends View {
     }
 
     // TODO: add function to feed ITEM_LIST and imageBearing the messages received from bluetooth (for the roaming)
-    // TODO: add command messages to be sent when adding and removing obstacles from map
+    // received bluetooth constants (start with 8001)
+    public static final int IMAGE_ID_UPDATE = 8001;
+    public static final int IMAGE_DIRECTION_UPDATE = 8002;
+    public static final int IMAGE_ID_DIRECTION_UPDATE = 8003;
+    public static final int ROBOT_LOC_UPDATE = 8004;
+
+
+    // algo communicates with stm alr, so android only needs the coords from algo to update position
+    // Algo : [(<x coordinate in cm>, <y coordinate in cm>, <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
+    // performs commands received from algo/rpi/stm via bluetooth
+    public static boolean performBluetoothCommand(int command) {
+        boolean bool = false;
+        switch (command) {
+            case IMAGE_ID_UPDATE:   // rpi image recog
+                break;
+            case IMAGE_DIRECTION_UPDATE:    // rpi image recog
+                break;
+            case IMAGE_ID_DIRECTION_UPDATE:     // rpi image recog
+                break;
+            case ROBOT_LOC_UPDATE:  // algo
+                break;
+        }
+        return bool;
+    }
+
+    // android app constants (start with 9000)
+    public static final int ADD_OBSTACLE = 9001;
+    public static final int REMOVE_OBSTACLE = 9002;
+    public static final int MOVE_OBSTACLE = 9003;
+    public static final int ROBOT_MOVING = 9004;
+    public static final int START_AUTO_MOVE = 9005;
+    public static final int START_FASTEST_CAR = 9006;
+
+    // use initialRow initialCol bah..
+    // return true/false to algo
+    // not sure whose part.. algo
+
+    public String commandMsgGenerator (int command) {
+        String msg = "";
+        switch (command) {
+            // inform STM bout all?
+            case ADD_OBSTACLE:
+                // format: <target component>|<command>,<image id>,<obstacle coord>,<face direction>
+                msg = "STM|ADD_OBSTACLE,"
+                    + ITEM_LIST.get(initialRow - 1)[initialColumn - 1] + ","
+                    + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
+                    + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0);
+                break;
+            case REMOVE_OBSTACLE:
+                // format: <target component>|<command>,<image id>,<obstacle coord>
+                msg = "STM|REMOVE_OBSTACLE,"
+                    + oldItem + ","
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + ")";
+                break;
+            case MOVE_OBSTACLE:
+                // format: <target component>|<command>,<old coord>,<new coord>
+                msg = "STM|MOVE_OBSTACLE,"
+                    + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
+                    + "(" + (endColumn - 1) + "," + (endRow - 1) + ")";
+                break;
+            case ROBOT_MOVING:
+                // format: <target component>|<command>,<string>
+                msg = "STM|MSG," + "Move robot";
+                break;
+            case START_AUTO_MOVE:
+                // format: <target component>|<command>,<string>
+                msg = "STM|MSG," + "Start auto movement.";
+                break;
+            case START_FASTEST_CAR:
+                // format: <target component>|<command>,<string>
+                msg = "STM|MSG," + "Start fastest car.";
+        }
+        return msg;
+    }
 }
