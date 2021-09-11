@@ -75,6 +75,15 @@ aStar::aStar(vector<vector<int>> fullMap, vector<Obstacle> obstacles){
     grid = new Map();
     grid->setMap(fullMap);
     grid->add_obstacle(obstacles);
+
+    // test
+    vector<vector<Vertex>> vertexArray = *grid->getVertexArray();
+    for(int i = 0; i < vertexArray.size(); i++){
+        for(int j = 0; j < vertexArray[i].size(); j++){
+            cout << (vertexArray[i][j].is_obstacle | vertexArray[i][j].is_border) << " ";
+        }
+        cout << endl;
+    }
 }
 void aStar::search(Vertex& src, Obstacle& dest, SearchResult& searchResult){
     // If the source is out of range

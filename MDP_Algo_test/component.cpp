@@ -34,13 +34,13 @@ void Vertex::printVertex(){
 Action::Action(int row, int column, double face_direction):
     row(row), column(column), face_direction(face_direction){}
     
-Obstacle::Obstacle(int id, double x_center, double y_center, int row, int column, double face_direction): 
-    id(id), x_center(x_center), y_center(y_center), row(row), column(column), face_direction(face_direction){}
+Obstacle::Obstacle(int id, int row, int column, double face_direction):   // should we not feed row and column, since we can mathematically calculate it?
+    id(id), row(row), column(column), face_direction(face_direction){}
 
 void Obstacle::printObstacle(){
-    printf("Obstacle: %d: (%.1f, %.1f), %s\n", id, x_center, y_center, is_seen? "seen": "not seen");
+    printf("Obstacle: %d: (%d, %d), %s\n", id, row, column, is_seen? "seen": "not seen");
 }
-
+Robot::Robot(int row, int column, double face_direction): row(row), column(column), face_direction(face_direction){}
 void Robot::printRobot(){
     printf("Robot: (%.1f, %.1f) facing %.1f | bottom left (%.1f, %.1f) to top right (%.1f, %.1f)\n", x_center, y_center, face_direction,\
     x_left, y_low, x_right, y_high);

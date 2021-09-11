@@ -27,8 +27,13 @@ int main()
  
     // Destination is the left-most top-most corner
     Vertex dest(0, 7);
-    aStar astar(grid);
-    astar.search(src, dest);
+
+    // Obstacles
+    Obstacle o1(1, 4.5*UNIT_LENGTH, 2.5*UNIT_LENGTH, 5, 3, 0);
+    vector<Obstacle> obstacles;
+    obstacles.push_back(o1);
+    aStar astar(grid, obstacles);
+    // astar.search(src, dest);
  
     return 0;
 }

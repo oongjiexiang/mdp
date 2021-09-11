@@ -43,7 +43,7 @@ class Obstacle{
         double y_center;
         double face_direction;      // degree of the image's direction
         bool is_seen;
-        Obstacle(int id, double x_center, double y_center, int row, int column, double face_direction);
+        Obstacle(int id, int row, int column, double face_direction);
         void printObstacle();
 };
 
@@ -53,7 +53,9 @@ class Robot{
     public:
         double x_right, x_left, y_high, y_low;
         double x_center, y_center;
+        int row, column;
         double face_direction;  // theta in range (-pi, pi]
+        Robot(int row, int column, double face_direction);
         void printRobot();
 };
 
