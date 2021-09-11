@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="MDP_Algo_test" />
+		<Option title="MDP_Algo_test_2" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/MDP_Algo_test" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/MDP_Algo_test_2" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -16,7 +16,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/MDP_Algo_test" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/MDP_Algo_test_2" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -30,10 +30,18 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="component.cpp" />
+		<Unit filename="component.h" />
+		<Unit filename="config.cpp" />
+		<Unit filename="config.h" />
+		<Unit filename="data_structure.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="search.cpp" />
+		<Unit filename="search.h" />
+		<Unit filename="tripPlan.cpp" />
+		<Unit filename="tripPlan.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

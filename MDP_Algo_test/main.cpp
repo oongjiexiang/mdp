@@ -29,7 +29,7 @@ int main()
     Vertex dest(0, 7);
 
     // Obstacles
-    Obstacle o1(1, 4.5*UNIT_LENGTH, 2.5*UNIT_LENGTH, 5, 3, 0);
+    Obstacle o1(1, 5, 3, 0);
     vector<Obstacle> obstacles;
     obstacles.push_back(o1);
     aStar astar(grid, obstacles);

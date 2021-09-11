@@ -1,6 +1,7 @@
 package com.example.mdp_android_grp15.ui.main;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,13 +10,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -38,6 +42,7 @@ public class MapTabFragment extends Fragment {
     Switch manualAutoToggleBtn;
     GridMap gridMap;
 
+    Switch dragSwitch;
     Spinner spinner_imageID;
     Spinner spinner_imageBearing;
     private static boolean autoUpdate = false;
@@ -45,6 +50,9 @@ public class MapTabFragment extends Fragment {
 
     static String imageID;
     static String imageBearing;
+    static boolean dragStatus;
+    View.DragShadowBuilder dragShadowBuilder;
+
     public static MapTabFragment newInstance(int index) {
         MapTabFragment fragment = new MapTabFragment();
         Bundle bundle = new Bundle();
@@ -84,6 +92,8 @@ public class MapTabFragment extends Fragment {
         manualAutoToggleBtn = root.findViewById(R.id.autoManualSwitch);
         updateButton = root.findViewById(R.id.updateMapBtn);
 
+//        startDragBtn = root.findViewById(R.id.startDragBtn);
+        dragSwitch = root.findViewById(R.id.dragSwitch);
         spinner_imageID = root.findViewById(R.id.imageIDSpinner);
         spinner_imageBearing = root.findViewById(R.id.bearingSpinner);
         spinner_imageID.setEnabled(false);
@@ -130,6 +140,33 @@ public class MapTabFragment extends Fragment {
                 gridMap.resetMap();
             }
         });
+
+        // TODO
+        // switch for dragging
+        dragSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+//                if(isChecked) {
+//                    // Do something
+//                } else {
+//                // Do the other thing
+//                }
+                showToast("Dragging is " + (isChecked ? "on" : "off"));
+                dragStatus = isChecked;
+            }
+        });
+        // TODO
+//        startDragBtn.setOnClickListener(new View.OnClickListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.N)
+//            @Override
+//            public void onClick(View view) {
+//                showLog("Clicked startDragBtn");
+//                dragShadowBuilder = new View.DragShadowBuilder(gridMap);
+//                boolean b = gridMap.startDragAndDrop(gridMap.clipData, dragShadowBuilder,
+//                        gridMap.localState, 0);
+//            }
+//        });
+
 
         setStartPointToggleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -294,4 +331,10 @@ public class MapTabFragment extends Fragment {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
+//    // TODO
+//    // what to do when switch changes state
+//    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        showToast("Dragging is " + (isChecked ? "on" : "off"));
+//        dragStatus = isChecked;
+//    }
 }
