@@ -1777,6 +1777,8 @@ public class GridMap extends View {
                     break;
             }
         }
+        cells[curCoord[0]][20-curCoord[1]].setType("explored");
+        cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
         setCurCoord(x,y,robotDirection);
         this.invalidate();
         return true;
