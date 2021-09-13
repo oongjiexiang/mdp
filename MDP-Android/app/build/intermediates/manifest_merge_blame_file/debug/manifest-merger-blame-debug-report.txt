@@ -55,7 +55,7 @@
 30-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:28:9-32
 31
 32    <application
-32-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:20:5-41:19
+32-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:20:5-40:19
 33        android:allowBackup="true"
 33-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:21:9-35
 34        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -96,46 +96,43 @@
 53        <activity android:name="com.example.mdp_android_grp15.ui.main.BluetoothPopUp" />
 53-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:38:9-69
 53-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:38:19-57
-54        <activity android:name="com.example.mdp_android_grp15.ui.main.BluetoothChat" />
-54-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:39:9-68
-54-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:39:19-56
-55        <activity android:name="com.example.mdp_android_grp15.ui.main.MapInformation" />
-55-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:40:9-60
-55-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:40:19-57
-56        <!-- Needs to be explicitly declared on P+ -->
-57        <uses-library
-57-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:33:9-35:40
-58            android:name="org.apache.http.legacy"
-58-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:34:13-50
-59            android:required="false" />
-59-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:35:13-37
-60
-61        <activity
-61-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:23:9-26:75
-62            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-62-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:24:13-79
-63            android:exported="false"
-63-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:25:13-37
-64            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-64-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:26:13-72
-65
-66        <meta-data
-66-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\ad645bf65e7bc3d34f0efc68eb3fc5ef\jetified-play-services-basement-17.0.0\AndroidManifest.xml:23:9-25:69
-67            android:name="com.google.android.gms.version"
-67-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\ad645bf65e7bc3d34f0efc68eb3fc5ef\jetified-play-services-basement-17.0.0\AndroidManifest.xml:24:13-58
-68            android:value="@integer/google_play_services_version" />
-68-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\ad645bf65e7bc3d34f0efc68eb3fc5ef\jetified-play-services-basement-17.0.0\AndroidManifest.xml:25:13-66
-69
-70        <provider
-70-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:25:9-29:43
-71            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
-71-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:26:13-79
-72            android:authorities="com.example.mdp_android_grp15.lifecycle-process"
-72-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:27:13-69
-73            android:exported="false"
-73-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:28:13-37
-74            android:multiprocess="true" />
-74-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:29:13-40
-75    </application>
-76
-77</manifest>
+54        <activity android:name="com.example.mdp_android_grp15.ui.main.MapInformation" />
+54-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:39:9-60
+54-->C:\Users\Xin Yi Loh\OneDrive\Documents\GitHub\mdp\MDP-Android\app\src\main\AndroidManifest.xml:39:19-57
+55        <!-- Needs to be explicitly declared on P+ -->
+56        <uses-library
+56-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:33:9-35:40
+57            android:name="org.apache.http.legacy"
+57-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:34:13-50
+58            android:required="false" />
+58-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\a3d702a77cbfacefb23de82416a0cb1f\play-services-maps-17.0.0\AndroidManifest.xml:35:13-37
+59
+60        <activity
+60-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:23:9-26:75
+61            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+61-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:24:13-79
+62            android:exported="false"
+62-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:25:13-37
+63            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+63-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\77c2fc448e2bd0738fd67dce062b1efd\play-services-base-17.0.0\AndroidManifest.xml:26:13-72
+64
+65        <meta-data
+65-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\ad645bf65e7bc3d34f0efc68eb3fc5ef\jetified-play-services-basement-17.0.0\AndroidManifest.xml:23:9-25:69
+66            android:name="com.google.android.gms.version"
+66-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\ad645bf65e7bc3d34f0efc68eb3fc5ef\jetified-play-services-basement-17.0.0\AndroidManifest.xml:24:13-58
+67            android:value="@integer/google_play_services_version" />
+67-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\ad645bf65e7bc3d34f0efc68eb3fc5ef\jetified-play-services-basement-17.0.0\AndroidManifest.xml:25:13-66
+68
+69        <provider
+69-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:25:9-29:43
+70            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
+70-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:26:13-79
+71            android:authorities="com.example.mdp_android_grp15.lifecycle-process"
+71-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:27:13-69
+72            android:exported="false"
+72-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:28:13-37
+73            android:multiprocess="true" />
+73-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Xin Yi Loh\.gradle\caches\transforms-2\files-2.1\58629c19fa6c616abd60edc0d2bb07b8\lifecycle-process-2.2.0\AndroidManifest.xml:29:13-40
+74    </application>
+75
+76</manifest>

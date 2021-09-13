@@ -1381,14 +1381,16 @@ id manualAutoToggleBtn
 id mapInformationView
 id mapTitleTextView
 id mapView
+id mapView2
 id masked
 id message
 id messageButton
+id messageButton2
 id messageReceivedTextVie
+id messageReceivedTextVie3
 id messageReceivedTitleTextView
 id middle
 id mini
-id motionControl
 id mtrl_child_content_container
 id mtrl_internal_children_alpha_tag
 id multiply
@@ -1518,6 +1520,7 @@ id tv_imageBearing2
 id tv_imageID
 id tv_imageID2
 id typeBoxEditText
+id typeBoxEditText2
 id unchecked
 id uniform
 id unlabeled
