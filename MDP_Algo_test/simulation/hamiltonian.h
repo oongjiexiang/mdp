@@ -30,14 +30,19 @@ private:
     vector<vector<QPushButton*>> buttons;
     vector<QPushButton*> controlButtons;
 
+    // initial setup. Call once
     void setupSimulation();
     void setupMap();
     void setupRobotLocation();
     void setupControlPanel();
 
+    // UI
     QPushButton* createPushButton(int row, int col);
     void obstacleInput();
+
+    // When Hamiltonian path search begins
     void startHamiltonianCalculation();
+    void displaySimulation();
 };
 
 #endif // HAMILTONIAN_H

@@ -2,35 +2,38 @@
 #define COMPONENT_H
 
 #include <float.h>
+#include <vector>
 
+using namespace std;
+
+const double AREA_LENGTH = 200;
 const double START_COST = DBL_MAX;
 const double UNIT_LENGTH = 10;
-const int ROW_COUNT = 200/UNIT_LENGTH;
-const int COLUMN_COUNT = 200/UNIT_LENGTH; 
+const int ROW_COUNT = AREA_LENGTH/UNIT_LENGTH;
+const int COLUMN_COUNT = AREA_LENGTH/UNIT_LENGTH; 
 const double OBSTACLE_LENGTH = 10;
-const double BOUNDARY_SIZE = 15;
+const double BOUNDARY_SIZE = 10;    // originally 15. Temporarily changed to 15 for Qt testing
 
 //used for obstacle avoidance
 class Vertex{
     public: 
-        double g_cost, h_cost;
         int row, column;
         double x_right, x_left, y_high, y_low;
         bool is_obstacle, is_border, visited;
-        Vertex* prev_vertex; //reset each time
+        
         Vertex();
         Vertex(int row, int column);
         bool valid(Vertex target);
-        void reset();
         void printVertex();
 };
-
-// to illustrate each step. Will add more attributes when necessary
-class Action{
-    int row, column;
-    double face_direction;
+class State{
     public:
-        Action(int row, int column, double face_direction);
+        Vertex* position;
+        vector<Obstacle> obstaclesSeen;
+        double face_direction;
+        double gCost, hCost;
+        State* prevState; // should add an action here
+        State(Vertex position, vector<Obstacle> obstaclesSeen, double face_direction, State* prevState);
 };
 
 //used to read the obstacles
