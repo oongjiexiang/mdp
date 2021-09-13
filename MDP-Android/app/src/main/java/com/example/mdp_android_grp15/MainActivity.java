@@ -354,62 +354,8 @@ public class MainActivity extends AppCompatActivity {
             int y = Integer.parseInt(cmd[2]) + 1;
             int angle = Integer.parseInt(cmd[3]);
 
-            if((x>-1 && x<20) && (y>-1 && y<20)){
-                switch (angle){
-                    case -90: //turn right
-                        switch (direction){
-                            case "up":
-                                direction = "right";
-                                break;
-                            case "right":
-                                direction = "down";
-                                break;
-                            case "left":
-                                direction = "up";
-                                break;
-                            case "down":
-                                direction = "left";
-                                break;
-                        }
-                        break;
-                    case 180:
-                        switch (direction){
-                            case "up":
-                                direction = "down";
-                                break;
-                            case "right":
-                                direction = "left";
-                                break;
-                            case "left":
-                                direction = "right";
-                                break;
-                            case "down":
-                                direction = "up";
-                                break;
-                        }
-                        break;
-                    case 90: // turn left
-                        switch (direction){
-                            case "up":
-                                direction = "left";
-                                break;
-                            case "right":
-                                direction = "up";
-                                break;
-                            case "left":
-                                direction = "down";
-                                break;
-                            case "down":
-                                direction = "right";
-                                break;
-                        }
-                        break;
-                }
-                // TODO: grid painted in green instead of white & robot can walk through obstacles
-                gridMap.setCurCoord(x,y,direction);
-
-            }
-            gridMap.invalidate();
+            // TODO: grid painted in green instead of white & robot can walk through obstacles
+            gridMap.performAlgoCommand(x, y, angle);
 
             try {
                 if (message.length() > 7 && message.substring(2,6).equals("grid")) {

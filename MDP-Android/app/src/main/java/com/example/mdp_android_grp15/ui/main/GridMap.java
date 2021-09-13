@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.mdp_android_grp15.Constants.*;
+
 public class GridMap extends View {
 
     public GridMap(Context c) {
@@ -1696,17 +1698,17 @@ public class GridMap extends View {
     }
 
     // TODO: add function to feed ITEM_LIST and imageBearing the messages received from bluetooth (for the roaming)
-    // received bluetooth constants (start with 8001)
-    public static final int IMAGE_ID_UPDATE = 8001;
-    public static final int IMAGE_DIRECTION_UPDATE = 8002;
-    public static final int IMAGE_ID_DIRECTION_UPDATE = 8003;
-    public static final int ROBOT_LOC_DIRECTION_UPDATE = 8004;
+//    // received bluetooth constants (start with 8001)
+//    public static final int IMAGE_ID_UPDATE = 8001;
+//    public static final int IMAGE_DIRECTION_UPDATE = 8002;
+//    public static final int IMAGE_ID_DIRECTION_UPDATE = 8003;
+//    public static final int ROBOT_LOC_DIRECTION_UPDATE = 8004;
 
 
     // algo communicates with stm alr, so android only needs the coords from algo to update position
     // Algo : [(<x coordinate in cm>, <y coordinate in cm>, <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
     // performs commands received from algo/rpi/stm via bluetooth
-    public static boolean performBluetoothCommand(int command, String message) {
+    public static boolean performBluetoothCommand(int command, int x, int y, int angle) {
         boolean bool = false;
 
         switch (command) {
@@ -1717,19 +1719,76 @@ public class GridMap extends View {
             case IMAGE_ID_DIRECTION_UPDATE:     // rpi image recog
                 break;
             case ROBOT_LOC_DIRECTION_UPDATE:  // algo? sends "ROBOT,<x>, <y>, <direction>"
-                break;
-        }
 
+        }
         return bool;
     }
 
-    // android app constants (start with 9000)
-    public static final int ADD_OBSTACLE = 9001;
-    public static final int REMOVE_OBSTACLE = 9002;
-    public static final int MOVE_OBSTACLE = 9003;
-    public static final int ROBOT_MOVING = 9004;
-    public static final int START_AUTO_MOVE = 9005;
-    public static final int START_FASTEST_CAR = 9006;
+    public boolean performAlgoCommand(int x, int y, int angle) {
+        if ((x > -1 && x < 20) && (y > -1 && y < 20)) {
+            switch (angle) {
+                case -90: //turn right
+                    switch (robotDirection) {
+                        case "up":
+                            robotDirection = "right";
+                            break;
+                        case "right":
+                            robotDirection = "down";
+                            break;
+                        case "left":
+                            robotDirection = "up";
+                            break;
+                        case "down":
+                            robotDirection = "left";
+                            break;
+                    }
+                    break;
+                case 180:
+                    switch (robotDirection) {
+                        case "up":
+                            robotDirection = "down";
+                            break;
+                        case "right":
+                            robotDirection = "left";
+                            break;
+                        case "left":
+                            robotDirection = "right";
+                            break;
+                        case "down":
+                            robotDirection = "up";
+                            break;
+                    }
+                    break;
+                case 90: // turn left
+                    switch (robotDirection) {
+                        case "up":
+                            robotDirection = "left";
+                            break;
+                        case "right":
+                            robotDirection = "up";
+                            break;
+                        case "left":
+                            robotDirection = "down";
+                            break;
+                        case "down":
+                            robotDirection = "right";
+                            break;
+                    }
+                    break;
+            }
+        }
+        setCurCoord(x,y,robotDirection);
+        this.invalidate();
+        return true;
+    }
+
+//    // android app constants (start with 9000)
+//    public static final int ADD_OBSTACLE = 9001;
+//    public static final int REMOVE_OBSTACLE = 9002;
+//    public static final int MOVE_OBSTACLE = 9003;
+//    public static final int ROBOT_MOVING = 9004;
+//    public static final int START_AUTO_MOVE = 9005;
+//    public static final int START_FASTEST_CAR = 9006;
 
     // use initialRow initialCol bah..
     // return true/false to algo
