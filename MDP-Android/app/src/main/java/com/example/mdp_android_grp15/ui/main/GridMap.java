@@ -30,6 +30,7 @@ import com.example.mdp_android_grp15.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -657,7 +658,7 @@ public class GridMap extends View {
         return obstacleCoord;
     }
 
-    private void showLog(String message) {
+    private static void showLog(String message) {
         Log.d(TAG, message);
     }
 
@@ -1665,8 +1666,9 @@ public class GridMap extends View {
     // algo communicates with stm alr, so android only needs the coords from algo to update position
     // Algo : [(<x coordinate in cm>, <y coordinate in cm>, <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
     // performs commands received from algo/rpi/stm via bluetooth
-    public static boolean performBluetoothCommand(int command) {
+    public static boolean performBluetoothCommand(int command, String message) {
         boolean bool = false;
+
         switch (command) {
             case IMAGE_ID_UPDATE:   // rpi image recog
                 break;
@@ -1677,6 +1679,7 @@ public class GridMap extends View {
             case ROBOT_LOC_UPDATE:  // algo
                 break;
         }
+
         return bool;
     }
 
@@ -1701,31 +1704,31 @@ public class GridMap extends View {
                 msg = "STM|ADD_OBSTACLE,"
                     + ITEM_LIST.get(initialRow - 1)[initialColumn - 1] + ","
                     + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
-                    + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0);
+                    + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0) + "\n";
                 break;
             case REMOVE_OBSTACLE:
                 // format: <target component>|<command>,<image id>,<obstacle coord>
                 msg = "STM|REMOVE_OBSTACLE,"
                     + oldItem + ","
-                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + ")";
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + ")" + "\n";
                 break;
             case MOVE_OBSTACLE:
                 // format: <target component>|<command>,<old coord>,<new coord>
                 msg = "STM|MOVE_OBSTACLE,"
                     + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
-                    + "(" + (endColumn - 1) + "," + (endRow - 1) + ")";
+                    + "(" + (endColumn - 1) + "," + (endRow - 1) + ")" + "\n";
                 break;
             case ROBOT_MOVING:
                 // format: <target component>|<command>,<string>
-                msg = "STM|MSG," + "Move robot";
+                msg = "STM|MSG," + "Move robot" + "\n";
                 break;
             case START_AUTO_MOVE:
                 // format: <target component>|<command>,<string>
-                msg = "STM|MSG," + "Start auto movement.";
+                msg = "STM|MSG," + "Start auto movement." + "\n";
                 break;
             case START_FASTEST_CAR:
                 // format: <target component>|<command>,<string>
-                msg = "STM|MSG," + "Start fastest car.";
+                msg = "STM|MSG," + "Start fastest car." + "\n";
         }
         return msg;
     }

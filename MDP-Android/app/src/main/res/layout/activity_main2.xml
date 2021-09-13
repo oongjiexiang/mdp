@@ -35,12 +35,65 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/mapView"
-                android:layout_width="0dp"
-                android:layout_height="610dp"
-                android:layout_weight="1"
-                android:foreground="@drawable/common_google_signin_btn_icon_light_normal_background" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <view
+                    android:id="@+id/mapView2"
+                    class="com.example.mdp_android_grp15.ui.main.GridMap"
+                    android:layout_width="match_parent"
+                    android:layout_height="447dp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/messageReceivedTextVie3"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:background="@drawable/rounded_corner"
+                        android:gravity="bottom"
+                        android:scrollbars="vertical"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTitleTextView" />
+
+                    <EditText
+                        android:id="@+id/typeBoxEditText2"
+                        android:layout_width="318dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="15dp"
+                        android:background="@drawable/rounded_corner"
+                        android:gravity="center|start"
+                        android:hint="Type something..."
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toStartOf="@+id/messageButton"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextVie3" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/messageButton2"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="28dp"
+                        android:layout_marginRight="28dp"
+                        android:layout_weight="1"
+                        android:foreground="@drawable/ic_send"
+                        android:foregroundGravity="center"
+                        app:backgroundTint="@color/light_blue"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextVie3"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -173,63 +226,6 @@
                     android:textColor="@color/colorBlack"
                     android:textSize="26px" />
             </LinearLayout>
-
-            <Switch
-                android:id="@+id/motionControl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:gravity="center"
-                android:text="Motion Control"
-                android:textColor="@color/colorBlack"
-                android:textSize="26px" />
-
-            <Button
-                android:id="@+id/upBtn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="30dp"
-                android:background="#00FFFFFF"
-                android:foreground="@drawable/outline_arrow_upward_24" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp">
-
-                <Button
-                    android:id="@+id/leftBtn"
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="start"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:background="#00FFFFFF"
-                    android:foreground="@drawable/outline_arrow_back_24" />
-
-                <Button
-                    android:id="@+id/rightBtn"
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="47dp"
-                    android:layout_marginLeft="47dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginRight="6dp"
-                    android:layout_weight="1"
-                    android:background="#00FFFFFF"
-                    android:foreground="@drawable/outline_arrow_forward_24" />
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/downBtn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="0dp"
-                android:background="#00FFFFFF"
-                android:foreground="@drawable/outline_arrow_downward_24" />
 
         </LinearLayout>
 

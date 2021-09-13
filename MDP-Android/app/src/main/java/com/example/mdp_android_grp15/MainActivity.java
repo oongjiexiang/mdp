@@ -11,9 +11,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,9 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.mdp_android_grp15.ui.main.BluetoothChat;
 import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
 import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
+import com.example.mdp_android_grp15.ui.main.BluetoothChatFragment;
 import com.example.mdp_android_grp15.ui.main.GridMap;
 import com.example.mdp_android_grp15.ui.main.MapTabFragment;
 import com.example.mdp_android_grp15.ui.main.ReconfigureFragment;
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static GridMap gridMap;
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
-    static TextView robotStatusTextView, bluetoothStatus;
+    static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice;
     static Button f1, f2;
     static Button upBtn, downBtn, leftBtn, rightBtn;
     Button reconfigure;
@@ -109,18 +107,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(popup);
             }
         });
-        Button chatButton = findViewById(R.id.chatButton);
-        chatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent chat = new Intent(MainActivity.this, BluetoothChat.class);
-                startActivity(chat);
-            }
-        });
 
         // Bluetooth Status
         bluetoothStatus = findViewById(R.id.bluetoothStatus);
-        //bluetoothStatus.setText("Not Connected");
+        bluetoothDevice = findViewById(R.id.bluetoothConnectedDevice);
 
 
         // Map
@@ -224,7 +214,8 @@ public class MainActivity extends AppCompatActivity {
     public static Button getLeftBtn() { return leftBtn; }
     public static Button getRightBtn() { return rightBtn; }
 
-    public static TextView getbluetoothStatus() { return bluetoothStatus; }
+    public static TextView getBluetoothStatus() { return bluetoothStatus; }
+    public static TextView getConnectedDevice() { return bluetoothDevice; }
 
     public static void sharedPreferences() {
         sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
@@ -241,11 +232,14 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnectionService.write(bytes);
         }
         showLog(message);
-        editor.putString("message", BluetoothChat.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message", BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
         showLog("Exiting printMessage");
     }
+
+    // Store received message into string
+
 
     public static void printMessage(String name, int x, int y) throws JSONException {
         showLog("Entering printMessage");
@@ -266,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                 message = "Unexpected default for printMessage: " + name;
                 break;
         }
-        editor.putString("message", BluetoothChat.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message", BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
@@ -276,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void refreshMessageReceived() {
-        BluetoothChat.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+        BluetoothChatFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
     }
 
 
@@ -349,6 +343,74 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("receivedMessage");
             showLog("receivedMessage: message --- " + message);
+
+            String direction = gridMap.getRobotDirection();
+
+            //GridMap.performBluetoothCommand(8004, message);
+
+            String[] cmd = message.split("[(,)]");
+            //String[] cmd = message.split(",");
+            int x = Integer.parseInt(cmd[1]) + 1;
+            int y = Integer.parseInt(cmd[2]) + 1;
+            int angle = Integer.parseInt(cmd[3]);
+
+            if((x>-1 && x<20) && (y>-1 && y<20)){
+                switch (angle){
+                    case -90: //turn right
+                        switch (direction){
+                            case "up":
+                                direction = "right";
+                                break;
+                            case "right":
+                                direction = "down";
+                                break;
+                            case "left":
+                                direction = "up";
+                                break;
+                            case "down":
+                                direction = "left";
+                                break;
+                        }
+                        break;
+                    case 180:
+                        switch (direction){
+                            case "up":
+                                direction = "down";
+                                break;
+                            case "right":
+                                direction = "left";
+                                break;
+                            case "left":
+                                direction = "right";
+                                break;
+                            case "down":
+                                direction = "up";
+                                break;
+                        }
+                        break;
+                    case 90: // turn left
+                        switch (direction){
+                            case "up":
+                                direction = "left";
+                                break;
+                            case "right":
+                                direction = "up";
+                                break;
+                            case "left":
+                                direction = "down";
+                                break;
+                            case "down":
+                                direction = "right";
+                                break;
+                        }
+                        break;
+                }
+                // TODO: grid painted in green instead of white & robot can walk through obstacles
+                gridMap.setCurCoord(x,y,direction);
+
+            }
+            gridMap.invalidate();
+
             try {
                 if (message.length() > 7 && message.substring(2,6).equals("grid")) {
                     String resultString = "";

@@ -36,7 +36,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.main.BluetoothPopUp"></activity>
-        <activity android:name=".ui.main.BluetoothChat"></activity>
         <activity android:name=".ui.main.MapInformation" />
     </application>
 

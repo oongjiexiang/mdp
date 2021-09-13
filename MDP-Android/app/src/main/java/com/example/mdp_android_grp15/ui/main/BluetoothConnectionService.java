@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -197,8 +198,12 @@ public class BluetoothConnectionService {
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(connectionStatus);
             BluetoothConnectionStatus = true;
 
-            TextView status = MainActivity.getbluetoothStatus();
+            TextView status = MainActivity.getBluetoothStatus();
             status.setText("Connected");
+            status.setTextColor(Color.GREEN);
+
+            TextView device = MainActivity.getConnectedDevice();
+            device.setText(mDevice.getName());
 
             this.mSocket = socket;
             InputStream tmpIn = null;

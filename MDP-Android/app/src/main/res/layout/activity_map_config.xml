@@ -9,30 +9,10 @@
         android:id="@+id/tv_imageBearing2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="216dp"
+        android:layout_marginStart="356dp"
+        android:layout_marginLeft="356dp"
+        android:layout_marginTop="52dp"
         android:text="Image Bearing:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Spinner
-        android:id="@+id/imageIDSpinner"
-        android:layout_width="89dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginTop="188dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Spinner
-        android:id="@+id/bearingSpinner"
-        android:layout_width="89dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginTop="216dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,10 +20,30 @@
         android:id="@+id/tv_imageID2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginLeft="56dp"
-        android:layout_marginTop="188dp"
+        android:layout_marginStart="380dp"
+        android:layout_marginLeft="380dp"
+        android:layout_marginTop="24dp"
         android:text="Image ID:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/bearingSpinner"
+        android:layout_width="89dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="472dp"
+        android:layout_marginLeft="472dp"
+        android:layout_marginTop="52dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/imageIDSpinner"
+        android:layout_width="89dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="472dp"
+        android:layout_marginLeft="472dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,9 +74,9 @@
         android:id="@+id/updateMapBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginLeft="72dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginStart="384dp"
+        android:layout_marginLeft="384dp"
+        android:layout_marginTop="20dp"
         android:text="Update"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/changeDirectionBtn" />
@@ -85,9 +85,9 @@
         android:id="@+id/autoManualSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="72dp"
-        android:layout_marginRight="72dp"
+        android:layout_marginTop="144dp"
+        android:layout_marginEnd="228dp"
+        android:layout_marginRight="228dp"
         android:text="MANUAL"
         android:textFontWeight="500"
         android:textOff="@string/manual"
@@ -100,12 +100,15 @@
         android:id="@+id/resetBtn"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:layout_marginEnd="72dp"
-        android:layout_marginRight="72dp"
+        android:layout_marginStart="86dp"
+        android:layout_marginLeft="86dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="364dp"
+        android:layout_marginRight="364dp"
         android:text="Reset Map"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/autoManualSwitch" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/changeDirectionBtn" />
 
     <ToggleButton
         android:id="@+id/startpointToggleBtn"
@@ -131,26 +134,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Switch
-        android:id="@+id/dragSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="184dp"
-        android:text="Switch"
-        app:layout_constraintStart_toEndOf="@+id/textView_drag"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/textView_drag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="272dp"
-        android:layout_marginLeft="272dp"
-        android:layout_marginTop="188dp"
+        android:layout_marginStart="404dp"
+        android:layout_marginLeft="404dp"
+        android:layout_marginTop="88dp"
         android:text="Drag:"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/dragSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="84dp"
+        android:text="Switch"
+        app:layout_constraintStart_toEndOf="@+id/textView_drag"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
