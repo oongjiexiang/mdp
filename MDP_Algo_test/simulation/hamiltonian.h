@@ -24,16 +24,20 @@ private:
     Ui::Hamiltonian *ui;
     enum { ROW_COUNT = 10, COLUMN_COUNT = 10 };
     vector<Obstacle*> obstacles;
-    void createHorizontalGroupBox();
-    void createGridGroupBox();
-    void createFormGroupBox();
+    QGroupBox *verticalGroupBox;
+    QGroupBox *gridGroupBox;
+    QGroupBox *horizontalGroupBox;
+    vector<vector<QPushButton*>> buttons;
+    vector<QPushButton*> controlButtons;
+
+    void setupSimulation();
+    void setupMap();
+    void setupRobotLocation();
+    void setupControlPanel();
+
     QPushButton* createPushButton(int row, int col);
     void obstacleInput();
-
-    QGroupBox *horizontalGroupBox;
-    QGroupBox *gridGroupBox;
-    QGroupBox *formGroupBox;
-    vector<vector<QPushButton*>> buttons;
+    void startHamiltonianCalculation();
 };
 
 #endif // HAMILTONIAN_H

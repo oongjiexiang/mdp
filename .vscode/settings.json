@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "vector": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "qgroupbox": "cpp"
     }
 }

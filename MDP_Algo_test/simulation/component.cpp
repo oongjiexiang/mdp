@@ -35,7 +35,9 @@ Action::Action(int row, int column, double face_direction):
     row(row), column(column), face_direction(face_direction){}
     
 Obstacle::Obstacle(int id, int row, int column, double face_direction):   // should we not feed row and column, since we can mathematically calculate it?
-    id(id), row(row), column(column), face_direction(face_direction){}
+    id(id), row(row), column(column), face_direction(face_direction){
+        is_seen = false;
+}
 
 void Obstacle::printObstacle(){
     printf("Obstacle: %d: (%d, %d), %s\n", id, row, column, is_seen? "seen": "not seen");

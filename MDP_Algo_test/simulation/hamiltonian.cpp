@@ -6,6 +6,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <iostream>
 
 const int BUTTON_SIZE = 50;
 static int obstacleId = 1;
@@ -15,28 +16,28 @@ Hamiltonian::Hamiltonian(QWidget *parent) :
     ui(new Ui::Hamiltonian)
 {
 //    ui->setupUi(this);
-    createHorizontalGroupBox();
+    setupSimulation();
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(horizontalGroupBox);
+    mainLayout->addWidget(verticalGroupBox);
 
     setLayout(mainLayout);
     setWindowTitle(tr("Simulation of Hamiltonian Path"));
 
 }
-void Hamiltonian::createHorizontalGroupBox()
+void Hamiltonian::setupSimulation()
 {
-    horizontalGroupBox = new QGroupBox(tr("Horizontal layout"));
-    QHBoxLayout *layout = new QHBoxLayout;
+    verticalGroupBox = new QGroupBox(tr(""));
+    QVBoxLayout *layout = new QVBoxLayout;
 
-    createGridGroupBox();
-    createFormGroupBox();
+    setupMap();
+    setupControlPanel();
     layout->addWidget(gridGroupBox);
-    layout->addWidget(formGroupBox);
-    horizontalGroupBox->setLayout(layout);
+    layout->addWidget(horizontalGroupBox);
+    verticalGroupBox->setLayout(layout);
 }
-void Hamiltonian::createGridGroupBox()
+void Hamiltonian::setupMap()
 {
-    gridGroupBox = new QGroupBox(tr("Grid layout"));
+    gridGroupBox = new QGroupBox(tr("Top Down Map"));
     buttons.resize(ROW_COUNT, vector<QPushButton*>(COLUMN_COUNT));
     QGridLayout *gridLayout = new QGridLayout;
     for (int i = 0; i < ROW_COUNT; ++i) {
@@ -45,11 +46,19 @@ void Hamiltonian::createGridGroupBox()
             gridLayout->addWidget(buttons[i][j], i, j);
         }
     }
+    setupRobotLocation();
     gridLayout->setSpacing(0);
     gridLayout->setColumnStretch(1, 10);
 
-
     gridGroupBox->setLayout(gridLayout);
+}
+void Hamiltonian::setupRobotLocation(){
+    for(int i = -1; i <= 1; i++){
+        for(int j = -1; j <= 1; j++){
+            // currently hard code initial position as (1, 1), will need to change later
+            buttons[1+i][1+j]->setStyleSheet("border: 1px solid black; margin: 1px; width: 40px; height: 40px; background: yellow");
+        }
+    }
 }
 
 QPushButton* Hamiltonian::createPushButton(int row, int col){
@@ -60,13 +69,16 @@ QPushButton* Hamiltonian::createPushButton(int row, int col){
     connect(button, &QPushButton::clicked, this, &Hamiltonian::obstacleInput);
     return button;
 }
-void Hamiltonian::createFormGroupBox()
+void Hamiltonian::setupControlPanel()
 {
-    formGroupBox = new QGroupBox(tr("Form layout"));
-    QFormLayout *formLayout = new QFormLayout;
-    formLayout->addRow(new QLabel(tr("Obstacle:")), new QComboBox);
+    horizontalGroupBox = new QGroupBox(tr("Control Panel"));
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    QPushButton* start = new QPushButton("Start Search");
+    controlButtons.push_back(start);
+    connect(start, &QPushButton::clicked, this, &Hamiltonian::startHamiltonianCalculation);
 
-    formGroupBox->setLayout(formLayout);
+    hLayout->addWidget(start);
+    horizontalGroupBox->setLayout(hLayout);
 }
 void Hamiltonian::obstacleInput(){
     int row = sender()->property("row").toInt();
@@ -101,6 +113,17 @@ void Hamiltonian::obstacleInput(){
     buttons[row][col]->setText("E");
     buttons[row][col]->setStyleSheet("border: 1px solid black; margin: 1px; width: 40px; height: 40px; background: gray");
     obstacles.push_back(obs);
+}
+void Hamiltonian::startHamiltonianCalculation(){
+    int obstacleSize = obstacles.size();
+    for(int i = 0; i < obstacleSize; i++){
+        obstacles[i]->id = i + 1;
+    }
+    // call other file's Hamiltonian path search
+    for(int i = 0; i < obstacleSize; i++){
+        obstacles[i]->printObstacle();
+    }
+    cout << "start calling" << endl;
 }
 Hamiltonian::~Hamiltonian()
 {
