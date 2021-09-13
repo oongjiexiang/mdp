@@ -1776,6 +1776,8 @@ public class GridMap extends View {
                     }
                     break;
             }
+        } else {
+            return false;
         }
         cells[curCoord[0]][20-curCoord[1]].setType("explored");
         cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
@@ -1784,13 +1786,92 @@ public class GridMap extends View {
         return true;
     }
 
-//    // android app constants (start with 9000)
-//    public static final int ADD_OBSTACLE = 9001;
-//    public static final int REMOVE_OBSTACLE = 9002;
-//    public static final int MOVE_OBSTACLE = 9003;
-//    public static final int ROBOT_MOVING = 9004;
-//    public static final int START_AUTO_MOVE = 9005;
-//    public static final int START_FASTEST_CAR = 9006;
+    // currently assuming we receiving coordinates for obstacles too
+    public boolean performRpiCommand(int x, int y, String imageID, String imageBearing) {
+        if (((-1 < x && x < 20) && (-1 < y && y < 20))|| imageID == null || imageBearing == null) {
+            MainActivity.printMessage("target coord out of bounds or imageID/imageBearing is missing.");
+            return false;
+        }
+
+        // curCoord[0] = col, curCoord[1] = row (havent convert)
+        // item_list.get(initialrow - 1)[initialcol - 1] (initialrow is converted alr)
+        switch (imageID) {
+            case "1": ITEM_LIST.get(x)[y] = "1";
+                break;
+            case "2": ITEM_LIST.get(x)[y] = "2";
+                break;
+            case "3": ITEM_LIST.get(x)[y] = "3";
+                break;
+            case "4": ITEM_LIST.get(x)[y] = "4";
+                break;
+            case "5": ITEM_LIST.get(x)[y] = "5";
+                break;
+            case "6": ITEM_LIST.get(x)[y] = "6";
+                break;
+            case "7": ITEM_LIST.get(x)[y] = "7";
+                break;
+            case "8": ITEM_LIST.get(x)[y] = "8";
+                break;
+            case "9": ITEM_LIST.get(x)[y] = "9";
+                break;
+            case "10": ITEM_LIST.get(x)[y] = "10";
+                break;
+            case "11": ITEM_LIST.get(x)[y] = "11";
+                break;
+            case "12": ITEM_LIST.get(x)[y] = "12";
+                break;
+            case "13": ITEM_LIST.get(x)[y] = "13";
+                break;
+            case "14": ITEM_LIST.get(x)[y] = "14";
+                break;
+            case "15": ITEM_LIST.get(x)[y] = "15";
+                break;
+            case "16": ITEM_LIST.get(x)[y] = "16";
+                break;
+            case "17": ITEM_LIST.get(x)[y] = "17";
+                break;
+            case "18": ITEM_LIST.get(x)[y] = "18";
+                break;
+            case "19": ITEM_LIST.get(x)[y] = "19";
+                break;
+            case "20": ITEM_LIST.get(x)[y] = "20";
+                break;
+            case "21": ITEM_LIST.get(x)[y] = "21";
+                break;
+            case "22": ITEM_LIST.get(x)[y] = "22";
+                break;
+            case "23": ITEM_LIST.get(x)[y] = "23";
+                break;
+            case "24": ITEM_LIST.get(x)[y] = "24";
+                break;
+            case "25": ITEM_LIST.get(x)[y] = "25";
+                break;
+            case "26": ITEM_LIST.get(x)[y] = "26";
+                break;
+            case "27": ITEM_LIST.get(x)[y] = "27";
+                break;
+            case "28": ITEM_LIST.get(x)[y] = "28";
+                break;
+            case "29": ITEM_LIST.get(x)[y] = "29";
+                break;
+            case "30": ITEM_LIST.get(x)[y] = "30";
+                break;
+            default: ITEM_LIST.get(x)[y] = "";
+        }
+
+        switch (imageBearing) {
+            case "N": imageBearings.get(x)[y] = "North";
+                break;
+            case "S": imageBearings.get(x)[y] = "South";
+                break;
+            case "E": imageBearings.get(x)[y] = "East";
+                break;
+            case "W": imageBearings.get(x)[y] = "West";
+                break;
+            default: imageBearings.get(x)[y] = "";
+        }
+        return true;
+    }
 
     // use initialRow initialCol bah..
     // return true/false to algo
