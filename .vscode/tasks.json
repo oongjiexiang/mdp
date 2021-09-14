@@ -7,6 +7,7 @@
             "args": [
                 "-g",
                 "component.cpp",
+                "config.cpp",
                 "testMain.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"

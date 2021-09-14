@@ -8,22 +8,23 @@
 using namespace std;
 
 Map::Map(){
-    grids.resize(ROW_COUNT, vector<Vertex&>(COLUMN_COUNT));
+    grids.resize(ROW_COUNT, vector<Vertex*>(COLUMN_COUNT));
     //initialize all the variables for all vertices of the graph
     for(int i=0; i < ROW_COUNT; i++){
         for(int j=0; j < COLUMN_COUNT; j++){
-            grids[i][j] = Vertex(i, j); // Q: without `new`, will it be destroyed?
+            grids[i][j] = new Vertex(i, j);
         }
     }
 }
-Map::Map(vector<Obstacle&> obstacles): Map::Map() {
-    int boundaryGridCount = BOUNDARY_SIZE/UNIT_LENGTH;
+
+Map::Map(vector<Obstacle> obstacles): Map::Map() {
+    int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
     for(int i = 0; i < obstacles.size(); i++){
-        Obstacle& o = obstacles[i];
-        grids[o.row][o.column].is_obstacle = true;
+        Obstacle o = obstacles[i];
+        grids[o.row][o.column]->is_obstacle = true;
         for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
             for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
-                grids[o.row + j][o.column + k].is_border = grids[o.row + j][o.column + k].is_obstacle? false: true;
+                grids[o.row + j][o.column + k]->is_border = grids[o.row + j][o.column + k]->is_obstacle? false: true;
             }
         }
     }
@@ -78,19 +79,19 @@ void Map::add_obstacle(vector<Obstacle> obstacleList){
 */
 
 //search for a vertex given the x and y coordinates and returns a pointer to the vertex
-Vertex Map::findVertexByCoor(double x_center, double y_center){
-    int row = ceil(y_center/UNIT_LENGTH);
-    int col = ceil(x_center/UNIT_LENGTH);
-    return grids.at(row).at(col);
+Vertex* Map::findVertexByCoor(double x_center, double y_center){
+    int row = (int)(ceil(y_center/UNIT_LENGTH));
+    int col = (int)(ceil(x_center/UNIT_LENGTH));
+    return grids[row][col];
 }
 
-Vertex Map::findVertexByGrid(int row, int col){
+Vertex* Map::findVertexByGrid(int row, int col){
     return grids[row][col];
 }
 
 bool Map::isValidCoor(double x_center, double y_center){
-    return (x_center*UNIT_LENGTH < AREA_LENGTH && y_center*UNIT_LENGTH < AREA_LENGTH 
-    && x_center*UNIT_LENGTH >= 0 && y_center*UNIT_LENGTH >= 0);
+    return (x_center < AREA_LENGTH && y_center < AREA_LENGTH 
+    && x_center >= 0 && y_center >= 0);
 }
 
 bool Map::isValidGrid(int row, int col){
@@ -98,10 +99,24 @@ bool Map::isValidGrid(int row, int col){
 }
 
 // get vertex array
-vector<vector<Vertex&>> Map::getVertexArray(){
+vector<vector<Vertex*>>& Map::getVertexArray(){
     return grids;
 }
 
 vector<Obstacle>& Map::getObstacles(){
     return obstacles;
+}
+
+// debug
+void Map::printMap(){
+    cout << "---------------Map----------------" << endl;
+    for(int i = grids.size() - 1; i >= 0; i--){
+        for(int j = 0; j < grids.size(); j++){
+            if(grids[i][j]->is_obstacle) cout << "O";
+            else if(grids[i][j]->is_border) cout << "B";
+            else cout << " ";
+        }
+        cout << endl;
+    }
+    cout << "---------------End----------------" << endl << endl;
 }
