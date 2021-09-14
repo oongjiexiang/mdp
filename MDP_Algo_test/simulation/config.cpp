@@ -17,7 +17,8 @@ Map::Map(){
     }
 }
 
-Map::Map(vector<Obstacle> obstacles): Map::Map() {
+Map::Map(vector<Obstacle> obstacles): Map::Map(){
+    this->obstacles = obstacles;
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
     for(int i = 0; i < obstacles.size(); i++){
         Obstacle o = obstacles[i];
@@ -80,8 +81,8 @@ void Map::add_obstacle(vector<Obstacle> obstacleList){
 
 //search for a vertex given the x and y coordinates and returns a pointer to the vertex
 Vertex* Map::findVertexByCoor(double x_center, double y_center){
-    int row = (int)(ceil(y_center/UNIT_LENGTH));
-    int col = (int)(ceil(x_center/UNIT_LENGTH));
+    int row = (int)(ceil(y_center/UNIT_LENGTH)) - 1;
+    int col = (int)(ceil(x_center/UNIT_LENGTH)) - 1;
     return grids[row][col];
 }
 

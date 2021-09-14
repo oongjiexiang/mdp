@@ -3,6 +3,8 @@
         "vector": "cpp",
         "tuple": "cpp",
         "qgroupbox": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "new": "cpp",
+        "ostream": "cpp"
     }
 }
