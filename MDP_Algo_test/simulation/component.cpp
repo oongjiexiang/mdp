@@ -26,10 +26,6 @@ void Vertex::printVertex(){
     // printf("Vertex (%d, %d) - %d %d\n", row, column, is_border, is_obstacle);    // uncomment if see vital (RELEVANT) debug info
 }
 
-// State
-State::State(Vertex position, vector<Obstacle> obstaclesSeen, double face_direction, State* prevState):
-    position(&position), obstaclesSeen(obstaclesSeen), face_direction(face_direction), prevState(prevState){}
-
 // Obstacles
 Obstacle::Obstacle(int id, int row, int column, double face_direction):   // should we not feed row and column, since we can mathematically calculate it?
     id(id), row(row), column(column), face_direction(face_direction){

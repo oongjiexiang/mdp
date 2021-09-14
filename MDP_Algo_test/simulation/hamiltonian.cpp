@@ -123,10 +123,11 @@ void Hamiltonian::startHamiltonianCalculation(){
     for(int i = 0; i < obstacleSize; i++){
         obstacles[i]->printObstacle();
     }
-    displaySimulation();
+    simulate();
 }
-void Hamiltonian::displaySimulation(){
+void Hamiltonian::simulate(){
     cout << "this function to simulate every second" << endl;
+    
 }
 Hamiltonian::~Hamiltonian()
 {

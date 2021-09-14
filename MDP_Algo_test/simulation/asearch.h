@@ -3,35 +3,38 @@
 
 #include "config.h"
 #include "math.h"
+#include "action.h"
 #include <vector>
 #include <iostream>
 #include <tuple>
 
 // Creating a shortcut for tuple<int, Vertex> type
-typedef tuple<double, int, int> Tuple;
-typedef pair<double, vector<Action>> SearchResult;
+typedef tuple<double, State> Tuple;
+typedef pair<double, vector<State>> SearchResult;
+
+const int ROBOT_INIT_ROW = 1;
+const int ROBOT_INIT_COL = 1;
+const double ROBOT_INIT_FACEDIRECTION = 90;
 
 class aStar{
-    Map* grid;
+    Map* grid; 
+    vector<Action*> possibleActions;
 
-    // check whether cell is not blocked
-    bool isUnBlocked(const Vertex& vertex); 
-    
-    bool isDestination(const Vertex& position, const Vertex& dest);
+    bool isDestination(const State& curState, const Obstacle& obstacle);
     
     // A Utility Function to calculate the 'h' heuristics.
-    double calculateHValue(const Vertex& src, const Vertex& dest);  // tochange
+    double calculateHValue(const State& curState, const Obstacle& obstacle);
     
     // Encapsulate g cost calculation
-    double calculateGValue(Vertex& cur);
+    double calculateGValue(State& curState, Action* action);
     
     // A Utility Function to trace the path from the source to destination
-    void tracePath(const vector<vector<Vertex>>& cellDetails, Vertex dest, SearchResult& searchResult);
+    void tracePath(State goalState, SearchResult& searchResult);
     
     public:
         aStar();
-        aStar(vector<vector<int>> fullMap, vector<Obstacle> obstacles);
-        void search(Vertex& src, Obstacle& dest, SearchResult& searchResult);
+        aStar(vector<Obstacle&> obstacles);
+        State* search(State& initState, Obstacle& dest, SearchResult& searchResult);
 };
 
 #endif

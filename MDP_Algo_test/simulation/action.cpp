@@ -8,28 +8,39 @@ const float MAX_IMAGE_VIEW_DISTANCE = 20;
 const int MAX_IMAGE_VIEW_DISTANCE_GRID = (int)(ceil(MAX_IMAGE_VIEW_DISTANCE/UNIT_LENGTH));
 const float MAX_IMAGE_VIEW_ANGLE = 180; // currently set as complete opposite. Will change in real application
 
+// State
+State::State(Vertex position, int obstacleSeen, double face_direction, State* prevState, Action* broughtBy):
+    position(&position), obstacleSeen(obstacleSeen), face_direction(face_direction), prevState(prevState), broughtBy(broughtBy){}
+
 // Forward action
 ActionForward::ActionForward(float travelDist): 
     travelDist(travelDist){}
 
 State ActionForward::takeAction(State* initState, Map& maps){
     Vertex newPosition = *(initState->position);
-    vector<Obstacle> newObstaclesSeen = initState->obstaclesSeen;
-    newPosition.row+=sin(initState->face_direction);
-    newPosition.column+=cos(initState->face_direction);
-    State endState(newPosition, newObstaclesSeen, initState->face_direction, initState);
+    int newObstacleSeen = initState->obstacleSeen;
+
+    int moveGridDistance = (int)travelDist/UNIT_LENGTH;
+    newPosition.row+=moveGridDistance*sin(initState->face_direction);
+    newPosition.column+=moveGridDistance*cos(initState->face_direction);
+    State endState(newPosition, newObstacleSeen, initState->face_direction, initState, this);
     return endState;
 }
 bool ActionForward::canTakeAction(State* initState, Map& maps){
     Vertex newPosition = *(initState->position);
     double faceDirection = initState->face_direction;
-    int newRow = (int)(newPosition.row + sin(faceDirection));
-    int newCol = (int)(newPosition.column + cos(faceDirection));
+
+    int moveGridDistance = (int)travelDist/UNIT_LENGTH;
+    int newRow = (int)(newPosition.row + moveGridDistance*sin(faceDirection));
+    int newCol = (int)(newPosition.column + moveGridDistance*cos(faceDirection));
     if(maps.isValidGrid(newRow, newCol)){
         Vertex cell = maps.findVertexByGrid(newRow, newCol);
         return !cell.is_obstacle && !cell.is_border;
     }
     return false;
+}
+int ActionForward::getCost(){
+    return cost;
 }
 
 // Reverse action
@@ -38,23 +49,29 @@ ActionReverse::ActionReverse(float traverseDist):
 
 State ActionReverse::takeAction(State* initState, Map& maps){
     Vertex newPosition = *(initState->position);
-    vector<Obstacle> newObstaclesSeen = initState->obstaclesSeen;
-    newPosition.row-=sin(initState->face_direction);
-    newPosition.column-=cos(initState->face_direction);
-    State endState(newPosition, newObstaclesSeen, initState->face_direction, initState);
+    int newObstacleSeen = initState->obstacleSeen;
+
+    int moveGridDistance = (int)travelDist/UNIT_LENGTH;
+    newPosition.row-=moveGridDistance*sin(initState->face_direction);
+    newPosition.column-=moveGridDistance*cos(initState->face_direction);
+    State endState(newPosition, newObstacleSeen, initState->face_direction, initState, this);
     return endState;
 }
 bool ActionReverse::canTakeAction(State* initState, Map& maps){
     Vertex newPosition = *(initState->position);
     double faceDirection = initState->face_direction;
     
-    int newRow = (int)(newPosition.row - sin(faceDirection));
-    int newCol = (int)(newPosition.column - cos(faceDirection));
+    int moveGridDistance = (int)travelDist/UNIT_LENGTH;
+    int newRow = (int)(newPosition.row - moveGridDistance*sin(faceDirection));
+    int newCol = (int)(newPosition.column - moveGridDistance*cos(faceDirection));
     if(maps.isValidGrid(newRow, newCol)){
         Vertex cell = maps.findVertexByGrid(newRow, newCol);
         return !cell.is_obstacle && !cell.is_border;
     }
     return false;
+}
+int ActionReverse::getCost(){
+    return cost;
 }
 
 // Turning Action
@@ -83,8 +100,8 @@ State ActionTurn::takeAction(State* initState, Map& maps){
 
     Vertex newPosition = maps.findVertexByCoor(newX, newY);
 
-    vector<Obstacle> newObstaclesSeen = initState->obstaclesSeen;
-    State endState(newPosition, newObstaclesSeen, newFaceDirection, initState);
+    int newObstacleSeen = initState->obstacleSeen;
+    State endState(newPosition, newObstacleSeen, newFaceDirection, initState, this);
     return endState;
 }
 bool ActionTurn::canTakeAction(State* initState, Map& maps){
@@ -120,7 +137,11 @@ bool ActionTurn::canTakeAction(State* initState, Map& maps){
     }
     return true;
 }
+int ActionDetect::getCost(){
+    return cost;
+}
 
+// Detect Action
 ActionDetect::ActionDetect(){
     imageDetected = false;
     obstacleId = 0;
@@ -149,6 +170,12 @@ bool ActionDetect::canTakeAction(State* initState, Map& maps){     // actual int
     }
     return false;
 }
+int ActionDetect::getCost(){
+    return cost;
+}
+
+
+// Utility Euclidean distance
 double euclidean(double x1, double y1, double x2, double y2){
     return pow(pow((x1 - x2), 2.0) + pow((y1 - y2), 2.0), 0.5);
 }

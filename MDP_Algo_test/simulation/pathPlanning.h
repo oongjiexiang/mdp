@@ -5,21 +5,17 @@
 #include "component.h"
 #include "config.h"
 
-typedef pair<double, vector<int>> pathDist;
-// main class for week 8 and simulation for Hamiltonian path
-class Hamiltonian{
+// main class for week 8 and simulation for ShortestPath path
+class ShortestPath{
     aStar astar;
     vector<vector<SearchResult>> shortestDist;
-    vector<Obstacle> obstacles;
-    Hamiltonian(vector<vector<int>> fullMap, vector<Obstacle> obstacles);
-
-    // perform A* search between all obstacles and initial point and keep them for permutation later
-    void shortestPathMatrix();
+    vector<Obstacle&> obstacles;
+    ShortestPath(vector<Obstacle&> obstacles);
 
     // Master Control and Solver for the entire Week 8 problem
-    void hamiltonianPath();
+    vector<State> hamiltonianPath();
 
     // calculates each combination of A* between two obstacles and with the initial point
-    void permutation(vector<pathDist>& paths);
+    void permutation(vector<double>& fullPathDistance, vector<vector<State>>& fullPathSolution);
 };
 #endif

@@ -26,15 +26,6 @@ class Vertex{
         bool valid(Vertex target);
         void printVertex();
 };
-class State{
-    public:
-        Vertex* position;
-        vector<Obstacle> obstaclesSeen;
-        double face_direction;
-        double gCost, hCost;
-        State* prevState; // should add an action here
-        State(Vertex position, vector<Obstacle> obstaclesSeen, double face_direction, State* prevState);
-};
 
 //used to read the obstacles
 class Obstacle{

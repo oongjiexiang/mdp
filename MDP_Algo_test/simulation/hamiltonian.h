@@ -42,7 +42,7 @@ private:
 
     // When Hamiltonian path search begins
     void startHamiltonianCalculation();
-    void displaySimulation();
+    void simulate();
 };
 
 #endif // HAMILTONIAN_H
