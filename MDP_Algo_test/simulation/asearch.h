@@ -12,10 +12,6 @@
 typedef tuple<double, State> Tuple;
 typedef pair<double, vector<State>> SearchResult;
 
-const int ROBOT_INIT_ROW = 1;
-const int ROBOT_INIT_COL = 1;
-const double ROBOT_INIT_FACEDIRECTION = 90;
-
 class aStar{
     Map* grid; 
     vector<Action*> possibleActions;

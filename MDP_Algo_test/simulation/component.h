@@ -6,6 +6,13 @@
 
 using namespace std;
 
+// robot 
+const int ROBOT_INIT_ROW = 1;
+const int ROBOT_INIT_COL = 1;
+const double ROBOT_INIT_FACEDIRECTION = 90;
+const double ROBOT_OCCUPY_LENGTH = 30;
+
+// map
 const double AREA_LENGTH = 200;
 const double START_COST = DBL_MAX;
 const double UNIT_LENGTH = 10;
