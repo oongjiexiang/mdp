@@ -17,10 +17,6 @@ bool aStar::isDestination(const State& curState, const Obstacle& obstacle){
 
 // A Utility Function to calculate the 'h' heuristics.
 double aStar::calculateHValue(State& curState, Obstacle& obstacle){  // tochange
-    cout << "--- Check h cost" << endl;
-    curState.printState();
-    obstacle.printObstacle();
-    cout << "--- h cost check end" << endl;
 
     double hCost = 0;
     Vertex* finalState = grid->findVertexByGrid(obstacle.row, obstacle.column);
@@ -29,16 +25,11 @@ double aStar::calculateHValue(State& curState, Obstacle& obstacle){  // tochange
 }
 
 // Encapsulate g cost calculation
-double aStar::calculateGValue(State& curState, Action* action){ 
-    cout << "--- check g cost" << endl;
-    curState.printState();
-    action->printAction();
-
+double aStar::calculateGValue(State& curState, Action* action){
     return curState.gCost + action->getCost(); 
 }
 // A Utility Function to trace the path from the source to destination
-double aStar::tracePath(State* goalState, vector<State*>* states){
-    cout << "!!!!!!!!!!!!   trace path begins" << endl; 
+double aStar::tracePath(State* goalState, vector<State*>* states){ 
     stack<State*> Path;
     State* next_node = goalState;
 
@@ -70,10 +61,6 @@ aStar::aStar(){
 
 aStar::aStar(vector<Obstacle> obstacles){
     grid = new Map(obstacles);
-
-    // test
-    cout << "test in aStar constructor after feeding in obstacles input vector" << endl;
-    grid->printMap();
 }
 
 void aStar::generatePossibleActions(Obstacle obstacle){
@@ -135,15 +122,10 @@ State* aStar::search(State& initState, Obstacle& dest, double* pathCost, vector<
     cellDetails[position->row][position->column][(int)(curCell->face_direction)] = curCell;
     // mark as visited
 
-    cout << "*************A STAR SEARCH***************" << endl;
     while (!openList.empty()) { // A* search begins
     
         const Tuple& p = openList.top();
         State* source = get<1>(p);
-
-        cout << "Current initial state" << endl;
-        source->printState();
-        cout << endl;
 
         // Remove this vertex from the open list
         openList.pop();
@@ -151,14 +133,10 @@ State* aStar::search(State& initState, Obstacle& dest, double* pathCost, vector<
 
         // start finding next states/ neighbours
         for(int i = 0; i < possibleActions.size(); i++){
-            possibleActions[i]->printAction();  // debug
 
             if(possibleActions[i]->canTakeAction(source, *grid)){
-                cout << "can take action" << endl;
                 State* newState = possibleActions[i]->takeAction(source, *grid);
-                newState->printState(); // debug
                 if(isDestination(*newState, dest)){
-                    cout << "The goal is found\n" << endl;
                     newState->gCost = calculateGValue(*source, possibleActions[i]);
                     *pathCost = tracePath(newState, states);
                     return newState;
@@ -177,18 +155,14 @@ State* aStar::search(State& initState, Obstacle& dest, double* pathCost, vector<
                     cellDetails[neighbourPosition->row][neighbourPosition->column][neighbourFaceDirection] = neighbourCell;
                 }
 
-                neighbourCell->printState(); // debug
-
                 // If the successor is not yet in the closed list
                 if(!closedList[neighbourPosition->row][neighbourPosition->column][neighbourFaceDirection/90]){
-                    cout << "not in closed list" << endl;
                     double gNew, hNew, fNew;
                     gNew = calculateGValue(*source, possibleActions[i]);
                     hNew = calculateHValue(*neighbourCell, dest);
                     fNew = gNew + hNew;
                     
                     if(newlySeenState || neighbourCell->gCost + neighbourCell->hCost > fNew){
-                        cout << "pushing curCell into pq" << endl;
                         openList.push(Tuple(fNew, newState));
                         neighbourCell->gCost = gNew;
                         neighbourCell->hCost = hNew;

@@ -61,8 +61,6 @@ bool ActionForward::canTakeAction(State* initState, Map& maps){
     int newCol = (int)(newPosition.column + moveGridDistance*cos(M_PI/180*faceDirection));
     if(maps.isValidGrid(newRow, newCol)){
         Vertex* cell = maps.findVertexByGrid(newRow, newCol);
-        cout << "possible new vertex" << endl;
-        cell->printVertex();
         return !cell->is_obstacle && !cell->is_border;
     }
     return false;
@@ -272,9 +270,12 @@ bool ActionDetect::canTakeAction(State* initState, Map& maps){     // actual int
     Vertex position = *(initState->position);
     for(int i = 0; i < obstacles.size(); i++){
         Obstacle& o = obstacles[i];
-        cout << euclidean(position.column, position.row, o.column, o.row) << " " << abs(initState->face_direction - o.face_direction) << endl;
+
+        double faceDirection = initState->face_direction;
+        if(faceDirection < 0) faceDirection+=360;
+
         if(!o.is_seen && euclidean(position.column, position.row, o.column, o.row) <= MAX_IMAGE_VIEW_DISTANCE_GRID
-        && abs(initState->face_direction - o.face_direction) >= MAX_IMAGE_VIEW_ANGLE){ // not really >=
+        && faceDirection - o.face_direction >= MAX_IMAGE_VIEW_ANGLE){ // not really >=
             obstacleId = o.id;
             return true;
         }

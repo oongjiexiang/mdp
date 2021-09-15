@@ -8,7 +8,7 @@ using namespace std;
 
 int main(){
     vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 4, 4, 0));
+    obstacles.push_back(Obstacle(1, 7, 7, 90));
     // obstacles.push_back(Obstacle(2, 2, 11, 90));
     // obstacles.push_back(Obstacle(6, 5, 1, 270));
     // obstacles.push_back(Obstacle(3, 10, 9, -100));
@@ -35,14 +35,14 @@ int main(){
 
     //**************** test asearch.cpp ***************
     Vertex* initPosition = new Vertex(4, 7);
-    State* initState = new State(initPosition, false, 180, nullptr, "");
-    initState->printState();
+    State* initState = new State(initPosition, false, 90, nullptr, "");
     aStar* astar = new aStar(obstacles);
     
     double pathCost = 0;
     vector<State*> resultStates;
     astar->search(*initState, obstacles[0], &pathCost, &resultStates);
     
+    cout << "-----------path--------------" << endl;
     for(int i = 0; i < resultStates.size(); i++){
         resultStates[i]->printState();
     }
