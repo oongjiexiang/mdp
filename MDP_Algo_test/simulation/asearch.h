@@ -9,7 +9,7 @@
 #include <tuple>
 
 // Creating a shortcut for tuple<int, Vertex> type
-typedef tuple<double, State> Tuple;
+typedef tuple<double, State*> Tuple;
 typedef pair<double, vector<State>> SearchResult;
 
 class aStar{
@@ -19,18 +19,19 @@ class aStar{
     bool isDestination(const State& curState, const Obstacle& obstacle);
     
     // A Utility Function to calculate the 'h' heuristics.
-    double calculateHValue(const State& curState, const Obstacle& obstacle);
+    double calculateHValue(State& curState, Obstacle& obstacle);
     
     // Encapsulate g cost calculation
     double calculateGValue(State& curState, Action* action);
     
     // A Utility Function to trace the path from the source to destination
-    void tracePath(State goalState, SearchResult& searchResult);
+    double tracePath(State* goalState, vector<State*>* states);
     
     public:
         aStar();
-        aStar(vector<Obstacle&> obstacles);
-        State* search(State& initState, Obstacle& dest, SearchResult& searchResult);
+        aStar(vector<Obstacle> obstacles);
+        void generatePossibleActions(Obstacle obstacle);
+        State* search(State& initState, Obstacle& dest, double* pathCost, vector<State*>* states);
 };
 
 #endif

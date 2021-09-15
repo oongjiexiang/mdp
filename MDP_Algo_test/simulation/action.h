@@ -71,6 +71,7 @@ class ActionTurn : public Action{
         ActionTurn(float turnAngle);
         State* takeAction(State* initState, Map& maps);
         bool canTakeAction(State* initState, Map& maps);
+
         int getCost();
         string generateActionString();
 
@@ -87,6 +88,8 @@ class ActionDetect : public Action{
         ActionDetect(int obsId);
         State* takeAction(State* initState, Map& maps);
         bool canTakeAction(State* initState, Map& maps);
+
+        void setObstacleId(int obstacleId);
         int getCost();
         string generateActionString();
 

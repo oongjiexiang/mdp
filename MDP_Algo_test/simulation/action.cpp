@@ -61,6 +61,8 @@ bool ActionForward::canTakeAction(State* initState, Map& maps){
     int newCol = (int)(newPosition.column + moveGridDistance*cos(M_PI/180*faceDirection));
     if(maps.isValidGrid(newRow, newCol)){
         Vertex* cell = maps.findVertexByGrid(newRow, newCol);
+        cout << "possible new vertex" << endl;
+        cell->printVertex();
         return !cell->is_obstacle && !cell->is_border;
     }
     return false;
@@ -278,6 +280,10 @@ bool ActionDetect::canTakeAction(State* initState, Map& maps){     // actual int
         }
     }
     return false;
+}
+
+void ActionDetect::setObstacleId(int obstacleId){
+    this->obstacleId = obstacleId;
 }
 
 int ActionDetect::getCost(){
