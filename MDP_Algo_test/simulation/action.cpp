@@ -159,6 +159,9 @@ ActionDetect::ActionDetect(int obsId){
 State* ActionDetect::takeAction(State* initState, Map& maps){
     vector<Obstacle>& obstacles = maps.getObstacles();
     Vertex position = *(initState->position);
+    if(position.yGrid == 3 && position.xGrid == 5){
+        cout << "here" << endl;
+    }
     for(int i = 0; i < obstacles.size(); i++){
         Obstacle& o = obstacles[i];
         int faceDirection = initState->face_direction;

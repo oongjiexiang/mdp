@@ -120,14 +120,20 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
     // 4. A* algorithm begins
     while (!openList.empty()) {
         const Tuple& p = openList.top();
+        // localMap.printMap();    // debug
         State* source = get<1>(p);
         // Remove this vertex from the open list
+        // source->printState(); // debug
+        if(source->position->xGrid == 5 && source->position->yGrid == 2){
+            cout << "debug (5, 2)" << endl;
+        }
         openList.pop();
-        closedList[source->position->xGrid][source->position->yGrid][faceDirection] = true;
+        closedList[source->position->xGrid][source->position->yGrid][source->face_direction/90] = true;
 
         // start finding next states/ neighbours
         for(int i = 0; i < possibleActions.size(); i++){
             State* neighbourState = possibleActions[i]->takeAction(source, localMap);
+            // possibleActions[i]->printAction();  // debug
             // if action fails to be taken, skip
             if(neighbourState == nullptr) continue;
             
@@ -135,6 +141,7 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
             if(isDestination(*neighbourState, dest)){
                 neighbourState->gCost = calculateGValue(*source, possibleActions[i], localMap, dest);
                 *pathCost = tracePath(neighbourState, states);
+                localMap.printMap();
                 return neighbourState;
             }
             Vertex* neighbourPosition = neighbourState->position;
@@ -165,7 +172,6 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
             }
         }
     }
-    localMap.printMap();
     // When the destination cell is not found
     printf("Failed to find the Destination Cell\n");
     return nullptr;

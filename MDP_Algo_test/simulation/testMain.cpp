@@ -55,7 +55,7 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    Vertex* initPosition = new Vertex(1, 1);
+    Vertex* initPosition = new Vertex(4, 2);
     State* initState = new State(initPosition, false, 90, nullptr);
     aStar* astar = new aStar(obstacles);
     
