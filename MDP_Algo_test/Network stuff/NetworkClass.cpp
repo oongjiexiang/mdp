@@ -12,12 +12,6 @@
 #include <NetworkClass.h>
 
 using namespace std;
-/*
-string serverIP = "192.168.1.8"; //ip address of the server
-int portNumber= 17; //listening port on the server
-int checker;
-string message = "test message";//u8 encodes the string us utf-8 format
-*/
 char receiveBuffer[4096];
 
 //create wsaData and socket
@@ -74,6 +68,9 @@ string Network::encodeMessage(int targetDevice, string unformattedMessage){
     else if(targetDevice==2){
         formattedMessage = "STM|"+unformattedMessage+"\n";
     }
+    else if(targetDevice==3){
+        formattedMessage = "RPI|"+unformattedMessage+"\n";
+    }
     else{
         printf("Error, target device index does not exist!");
         formattedMessage="ERROR";
@@ -126,6 +123,32 @@ string Network::decodeMessage(){
         i++;
     }
     return retMessage;
+}
+
+//if true, all actions from the message are completed, if false, there was an error, resend
+bool messageSender(string message, Network n, int receiverNumber){
+    //read the list of commands
+    //send 1 command at a time to RPi
+    //wait for ready msg from STM/Rpi
+    int i=0;
+    string readMsg="";
+    string encodedMsg="";
+    string reply="";
+    while(readMsg.compare("\n")!=0){
+        readMsg = message.substr(i,1);
+        //parameter 1 = send to STM
+        encodedMsg = n.encodeMessage(receiverNumber,readMsg);
+        if(encodedMsg.compare("ERROR")){
+            return false;
+        }
+        n.sendMessage(encodedMsg);
+        reply = n.decodeMessage();
+        while(reply.compare("a")!=0){
+            printf("Waiting for ready, current msg: %s\n",reply.c_str());
+        }
+        i++;
+    }
+    return true;
 }
 
 //call this once you are done sending and receiving messages from the server
