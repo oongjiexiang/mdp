@@ -7,8 +7,8 @@
 using namespace std;
 
 int main(){
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 7, 7, 0));
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 5, 5, 270));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -54,17 +54,17 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    // Vertex* initPosition = new Vertex(4, 7);
-    // State* initState = new State(initPosition, false, 90, nullptr, "");
-    // aStar* astar = new aStar(obstacles);
+    Vertex* initPosition = new Vertex(5, 7);
+    State* initState = new State(initPosition, false, 90, nullptr);
+    aStar* astar = new aStar(obstacles);
     
-    // double pathCost = 0;
-    // vector<State*> resultStates;
-    // astar->search(*initState, obstacles[0], &pathCost, &resultStates);
+    float pathCost = 0;
+    vector<State*> resultStates;
+    astar->search(*initState, obstacles[0], &pathCost, &resultStates);
     
-    // cout << "-----------path--------------" << endl;
-    // for(int i = 0; i < resultStates.size(); i++){
-    //     resultStates[i]->printState();
-    // }
-    // cout << pathCost << endl;
+    cout << "-----------path--------------" << endl;
+    for(int i = 0; i < resultStates.size(); i++){
+        resultStates[i]->printState();
+    }
+    cout << pathCost << endl;
 }

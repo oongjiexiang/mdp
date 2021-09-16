@@ -46,10 +46,7 @@ State* ActionStraight::takeAction(State* initState, Map& maps){
     int newXGrid = curPosition.xGrid + moveGridDistance*cos(M_PI/180*initState->face_direction);
 
     // check if action can be taken
-    if(maps.isValidGrid(newXGrid, newYGrid)){
-        Vertex* cell = maps.findVertexByGrid(newXGrid, newYGrid);
-        if(cell->is_obstacle || cell->is_border) return nullptr;
-    }
+    if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;
 
     // Action can be taken!
     // 1. update map
@@ -73,8 +70,11 @@ void ActionStraight::printAction(){
 }
 
 // -------------------Turning Action----------------------
-ActionTurn::ActionTurn(int turnAngle):
-    turnAngle(turnAngle){}
+ActionTurn::ActionTurn(int turnAngle){
+    // if(turnAngle < 0) this->turnAngle = turnAngle + 360;
+    // else this->turnAngle = turnAngle;
+    this->turnAngle = turnAngle;
+}
     
 State* ActionTurn::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
@@ -106,7 +106,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
             newYGrid = curYGrid - 1;
         break;
         default:
-            cout << "turnAngle is not straight, but = " << turnAngle << endl;
+            cout << "faceDirection is not straight, but = " << faceDirection << endl;
             return nullptr;
     }
 
@@ -128,7 +128,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
     }
 
     // introduce new state
-    int newFaceDirection = (faceDirection + (int)turnAngle)%360;
+    int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
     int newObstacleSeen = initState->obstacleSeen;
     
     State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
@@ -166,16 +166,16 @@ State* ActionDetect::takeAction(State* initState, Map& maps){
 
         switch(faceDirection){
             case 0:
-                correctOrientation = (o.face_direction == 180 && o.xGrid > position.xGrid);
+                correctOrientation = (o.face_direction == 180 && o.xGrid > position.xGrid && o.yGrid == position.yGrid);
             break;
             case 90:
-                correctOrientation = (o.face_direction == 270 && o.yGrid > position.yGrid);
+                correctOrientation = (o.face_direction == 270 && o.yGrid > position.yGrid && o.xGrid == position.xGrid);
             break;
             case 180:
-                correctOrientation = (o.face_direction == 0 && o.xGrid < position.xGrid);
+                correctOrientation = (o.face_direction == 0 && o.xGrid < position.xGrid && o.yGrid == position.yGrid);
             break;
             case 270:
-                correctOrientation = (o.face_direction == 90 && o.yGrid < position.yGrid);
+                correctOrientation = (o.face_direction == 90 && o.yGrid < position.yGrid && o.xGrid == position.xGrid);
             break;
             default:
                 correctOrientation = false;

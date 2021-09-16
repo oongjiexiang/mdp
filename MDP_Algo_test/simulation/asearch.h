@@ -9,8 +9,8 @@
 #include <tuple>
 
 // Creating a shortcut for tuple<int, Vertex> type
-typedef tuple<double, State*> Tuple;
-typedef pair<double, vector<State>> SearchResult;
+typedef tuple<float, State*> Tuple;
+typedef pair<float, vector<State>> SearchResult;
 
 class aStar{
     Map* grid; 
@@ -19,19 +19,21 @@ class aStar{
     bool isDestination(const State& curState, const Obstacle& obstacle);
     
     // A Utility Function to calculate the 'h' heuristics.
-    double calculateHValue(State& curState, Obstacle& obstacle);
+    float calculateHValue(State& curState, Obstacle& obstacle);
     
     // Encapsulate g cost calculation
-    double calculateGValue(State& curState, Action* action);
+    float calculateGValue(State& curState, Action* action, Map& localMap, Obstacle& obstacle);
     
     // A Utility Function to trace the path from the source to destination
-    double tracePath(State* goalState, vector<State*>* states);
+    float tracePath(State* goalState, vector<State*>* states);
+
+    // We can include more actions available for the robot. Currently there are 5
+    void generatePossibleActions(Obstacle obstacle);
     
     public:
         aStar();
         aStar(vector<Obstacle> obstacles);
-        void generatePossibleActions(Obstacle obstacle);
-        State* search(State& initState, Obstacle& dest, double* pathCost, vector<State*>* states);
+        State* search(State& initState, Obstacle& dest, float* pathCost, vector<State*>* states);
 };
 
 #endif

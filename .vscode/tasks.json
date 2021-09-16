@@ -9,7 +9,7 @@
                 "component.cpp",
                 "config.cpp",
                 "action.cpp",
-                // "asearch.cpp",
+                "asearch.cpp",
                 "testMain.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
