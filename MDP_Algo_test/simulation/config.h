@@ -17,14 +17,14 @@ class Map{
         Map(vector<Obstacle> obstacles);
 
         //search for a vertex given the x and y coordinates and returns a pointer to the vertex
-        Vertex* findVertexByCoor(double x_center, double y_center);
+        Vertex* findVertexByCoor(float x_center, float y_center);
 
-        // search for a vertex given the row and column
-        Vertex* findVertexByGrid(int row, int column);
+        // search for a vertex given the yGrid and xGridumn
+        Vertex* findVertexByGrid(int xGrid, int yGrid);
 
-        bool isValidCoor(double x_center, double y_center);
+        bool isValidCoor(float x_center, float y_center);
 
-        bool isValidGrid(int row, int col);
+        bool isValidGrid(int xGrid, int yGrid);
 
         // get vertex array
         vector<vector<Vertex*>>& getVertexArray();

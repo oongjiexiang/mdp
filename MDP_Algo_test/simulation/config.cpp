@@ -8,10 +8,10 @@
 using namespace std;
 
 Map::Map(){
-    grids.resize(ROW_COUNT, vector<Vertex*>(COLUMN_COUNT));
+    grids.resize(X_GRID_COUNT, vector<Vertex*>(Y_GRID_COUNT));
     //initialize all the variables for all vertices of the graph
-    for(int i=0; i < ROW_COUNT; i++){
-        for(int j=0; j < COLUMN_COUNT; j++){
+    for(int i=0; i < X_GRID_COUNT; i++){
+        for(int j=0; j < Y_GRID_COUNT; j++){
             grids[i][j] = new Vertex(i, j);
         }
     }
@@ -22,10 +22,10 @@ Map::Map(vector<Obstacle> obstacles): Map::Map(){
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
     for(int i = 0; i < obstacles.size(); i++){
         Obstacle o = obstacles[i];
-        grids[o.row][o.column]->is_obstacle = true;
+        grids[o.xGrid][o.yGrid]->is_obstacle = true;
         for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
             for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
-                grids[o.row + j][o.column + k]->is_border = grids[o.row + j][o.column + k]->is_obstacle? false: true;
+                grids[o.xGrid + j][o.yGrid + k]->is_border = grids[o.xGrid + j][o.yGrid + k]->is_obstacle? false: true;
             }
         }
     }
@@ -36,9 +36,9 @@ Map::Map(vector<Obstacle> obstacles): Map::Map(){
 //adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
 void Map::add_obstacle(vector<Obstacle> obstacleList){
     int i,j;
-    double obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, border_x_left, border_x_right, border_y_high, border_y_low;
-    double obstacle_length = OBSTACLE_LENGTH/2;      // JX: var here means half of obstacle length to find the left, right, high, low coordinates (for loop below)
-    double boundary_size = BOUNDARY_SIZE;
+    float obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, border_x_left, border_x_right, border_y_high, border_y_low;
+    float obstacle_length = OBSTACLE_LENGTH/2;      // JX: var here means half of obstacle length to find the left, right, high, low coordinates (for loop below)
+    float boundary_size = BOUNDARY_SIZE;
 
     // 1. register the list of obstacles into this grid map
     obstacles.insert(obstacleList.end(), obstacleList.begin(), obstacleList.end());
@@ -62,15 +62,15 @@ void Map::add_obstacle(vector<Obstacle> obstacleList){
         
         Vertex bottomLeft = findVertexByCoor(obstacle_x_left, obstacle_y_low);
         Vertex topRight = findVertexByCoor(obstacle_x_right, obstacle_y_high);
-        for(int i = bottomLeft.row; i <= topRight.row; i++){
-            for(int j = bottomLeft.column; j <= topRight.column; j++){
+        for(int i = bottomLeft.yGrid; i <= topRight.yGrid; i++){
+            for(int j = bottomLeft.xGrid; j <= topRight.xGrid; j++){
                 grids[i][j].is_obstacle = true;
             }
         }
         bottomLeft = findVertexByCoor(border_x_left, border_y_low);
         topRight = findVertexByCoor(border_x_right, border_y_high);
-        for(int i = bottomLeft.row; i <= topRight.row; i++){
-            for(int j = bottomLeft.column; j <= topRight.column; j++){
+        for(int i = bottomLeft.yGrid; i <= topRight.yGrid; i++){
+            for(int j = bottomLeft.xGrid; j <= topRight.xGrid; j++){
                 grids[i][j].is_border = grids[i][j].is_obstacle? false: true;
             }
         }
@@ -80,23 +80,23 @@ void Map::add_obstacle(vector<Obstacle> obstacleList){
 */
 
 //search for a vertex given the x and y coordinates and returns a pointer to the vertex
-Vertex* Map::findVertexByCoor(double x_center, double y_center){
-    int row = (int)(ceil(y_center/UNIT_LENGTH)) - 1;
-    int col = (int)(ceil(x_center/UNIT_LENGTH)) - 1;
-    return grids[row][col];
+Vertex* Map::findVertexByCoor(float x_center, float y_center){
+    int xGrid = (int)(ceil(x_center/UNIT_LENGTH)) - 1;
+    int yGrid = (int)(ceil(y_center/UNIT_LENGTH)) - 1;
+    return grids[xGrid][yGrid];
 }
 
-Vertex* Map::findVertexByGrid(int row, int col){
-    return grids[row][col];
+Vertex* Map::findVertexByGrid(int xGrid, int yGrid){
+    return grids[xGrid][yGrid];
 }
 
-bool Map::isValidCoor(double x_center, double y_center){
+bool Map::isValidCoor(float x_center, float y_center){
     return (x_center < AREA_LENGTH && y_center < AREA_LENGTH 
     && x_center >= 0 && y_center >= 0);
 }
 
-bool Map::isValidGrid(int row, int col){
-    return (row >= 0 && col >= 0 && row < ROW_COUNT && col < COLUMN_COUNT);
+bool Map::isValidGrid(int xGrid, int yGrid){
+    return (yGrid >= 0 && xGrid >= 0 && yGrid < Y_GRID_COUNT && xGrid < X_GRID_COUNT);
 }
 
 // get vertex array
@@ -111,10 +111,10 @@ vector<Obstacle>& Map::getObstacles(){
 // debug
 void Map::printMap(){
     cout << "---------------Map----------------" << endl;
-    for(int i = grids.size() - 1; i >= 0; i--){
-        for(int j = 0; j < grids.size(); j++){
-            if(grids[i][j]->is_obstacle) cout << "O";
-            else if(grids[i][j]->is_border) cout << "B";
+    for(int i = Y_GRID_COUNT - 1; i >= 0; i--){
+        for(int j = 0; j < X_GRID_COUNT; j++){
+            if(grids[j][i]->is_obstacle) cout << "O";
+            else if(grids[j][i]->is_border) cout << "B";
             else cout << " ";
         }
         cout << endl;
