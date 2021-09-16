@@ -30,59 +30,160 @@ double* findTargetLocation(double obstacleX, double obstacleY, std::string obsta
     }
     return retValue;
 }
-//run both functions below when checking if there is an obstacle in the path
-//function to check if robot's bounding box at any location will intersect with an obstacle bounding bo
-bool boundingBox(double x1, double y1, double objectSize1, double x2, double y2, double objectSize2){
-    double halfObstacleSize1;
-    double halfObstacleSize2;
-    if(objectSize1==0 || objectSize2==0){
-        printf("object size must be greater than 0");
+//use this before using lines straddle
+//checks if the bounding boxes of the lines intersect, quick rejection test
+bool boundingBox(double pX0, double pX1, double pY0, double pY1, double oX0, double oX1, double oY0, double oY1){
+    if((pX1 >= oX0) &&  (oX1 >= pX0) && (pY1 >= oY0) && (oY1 >= pY0)){
         return true;
-    }
-    halfObstacleSize1 = objectSize1/2;
-    halfObstacleSize2 = objectSize2/2;
-        //following the bounding box intersect equation from the slides
-    if((x2+halfObstacleSize2>=x1-halfObstacleSize1) && (x1+halfObstacleSize1>=x2-halfObstacleSize2) && (y2+halfObstacleSize2>=y1-halfObstacleSize1) && (y1+halfObstacleSize1>=y2-halfObstacleSize2)){
-            return true;
     }
     return false;
 }
-//checks if 2 lines intersect (obstacle boundary line and path traveled line), returns true if line straddles
-bool linesStraddle(double object_X, double object_Y, double obstacleLength, double xStart, double xEnd, double yStart, double yEnd){
-    double x1, x2, x3, y1, y2, y3,eq1, eq2;
-    //p2,p3 -> obstacle lines
-    //p0,p1 -> robot path
-    //p0 = x1, y1
-    //p1 = x2, y2
-    //p2 or p3 = x3, y3
 
-    x1 = xStart;
-    y1 = yStart;
-    x2 = xEnd;
-    y2 = yEnd;
-    //5 is the length of an obstacle from the center
-    //this is the bot left point of the obstacle
-    x3 = object_X-5;
-    y3 = object_Y-5;
-    eq1 = ((x3-x1)*(y2-y1)) - ((y3-y1)*(x2-x1));
-    //this is the top right point of the obstacle
-    x3 = object_X+5;
-    y3 = object_Y+5;
-    eq2 = ((x3-x1)*(y2-y1)) - ((y3-y1)*(x2-x1));
+//call this twice and swap the lines
+bool linesStraddle(double x0, double x1, double x2, double x3, double y0, double y1, double y2, double y3){
+    double equation1, equation2;
+    equation1 = ((x3 - x0) * (y1-y0)) - ((y3 - y0) * (x1-x0));
+    equation2 = ((x3 - x0) * (y1-y0)) - ((y3 - y0) * (x1-x0));
 
-    if(eq1==0 && eq2==0){
-        //on the same line
+    //if the 2 equations have different signs, it means the 2 points of the second line are on two different sides of the first line
+    if(equation1 > 0 && equation2 < 0){
         return true;
     }
-    if(eq1>0 && eq2>0){
-        //line straddles
+    if(equation1 < 0 && equation2 > 0){
         return true;
     }
-    else if(eq1<0 && eq2<0){
+    //if the 2 lines are collinear
+    if(equation1 == 0 && equation2 ==0){
+        //we have checked that their bounding boxes intersect, so we know the 2 collinear lines are touching each other, thus return true
         return true;
     }
-
     return false;
+}
+bool checkIntersect(Vertex vertex, double initPathX, double initPathY, double endPathX, double endPathY){
+    double vX0, vX1, vY0, vY1;
+    bool intersect = true; // initialisation value does not matter
+    vX0 = vertex.x_left;
+    vX1 = vertex.x_right;
+    vY0 = vertex.y_low;
+    vY1 = vertex.y_high;
+    intersect = boundingBox(initPathX, endPathX, initPathY, endPathY, vX0, vX1, vY0, vY1);
+    //if bounding box does not intersect, return false
+    if(!intersect){
+        return false;
+    }
+    //test if vertex border intersects with path
+    intersect = linesStraddle(initPathX, endPathX, vertex.x_left, vertex.x_right, initPathY, endPathY, vertex.y_low, vertex.y_high);
+    if(intersect){
+        return true;
+    }
+    //test if path intersects with border
+    intersect = linesStraddle(vertex.x_left, vertex.x_right, initPathX, endPathX, vertex.y_low, vertex.y_high, initPathY, endPathY);
+    if(intersect){
+        return true;
+    }
+    return false;
+}
+
+//only allow turning angles of 30, 60, 90
+//turnDirection can only be left or right
+//assume turningRadius is ~22
+//facing direction between 0 to 359
+//
+bool curveIntersects(double robotCenterX, double robotCenterY, double oX0, double oX1, double oY0, double oY1, double turningRadius, double turningAngle, double facingDirection, std::string turnDirection){
+    //determine circle center using affine transformation
+    //draw part of the circle using x=rcos(theta), y=rsin(theta) in radians for theta = 0 to turning angle r. turning radius = 21 * turningAngle/90
+    //check for each x,y position, does it fall in the bounding box of any obstacles
+    double circleCenterX, circleCenterY, tempX, tempY, a, b, c, discriminant, sqrtdisc, root1, root2, startOfValidAngle, endOfValidAngle,checkAngle;
+
+    //convert facing direction and turning angle to radian
+    facingDirection = facingDirection/180 * M_PI;
+    turningAngle = turningAngle/180 * M_PI;
+    startOfValidAngle = facingDirection;
+
+    //find circle center
+    //offset circle then rotate to facing direction
+    if(turnDirection.compare("right")==0){
+        //circle should be offset to the right of the robot to simulate right turn path
+        circleCenterX = robotCenterX+turningRadius;
+        circleCenterY = 0;
+
+        startOfValidAngle = facingDirection+(0.5*M_PI); //offset angle from facing direction by positive 90 degrees to start from the left side of the circle
+        endOfValidAngle = startOfValidAngle-turningAngle;
+    }
+    else{
+        //circle should be offset to the left of the robot to simulate left turn path
+        circleCenterX = robotCenterY-turningRadius;
+        circleCenterY = 0;
+        startOfValidAngle = facingDirection-(0.5*M_PI); //offset angle from facing direction by negative 90 degrees to start from the right side of the cirle
+        endOfValidAngle = startOfValidAngle+turningAngle;
+    }
+    //apply rotation of facingDirection
+    tempX = circleCenterX*cos(facingDirection) - circleCenterY*sin(facingDirection);
+    tempY = circleCenterX*sin(facingDirection) + circleCenterY*cos(facingDirection);
+    //offset the circle to location of the robot to find the center point of the circle to be drawn
+    circleCenterX = tempX+robotCenterX;
+    circleCenterY = tempY+robotCenterY;
+
+    //check if the line given will intersect with the circle
+    //to do this more easily we move the circle back to the origin, and offset the line by the same amount
+    oX0 = oX0 - circleCenterX;
+    oX1 = oX1 - circleCenterX;
+    oY0 = oY0 - circleCenterY;
+    oY1 = oY1 - circleCenterY;
+
+    //since we want to check for intersection, we equate the equation of the line, with the equation of the circle
+    //given the circle has an equation of x^2 + y^2 =r^2,
+    //the line has an equation of x = Ax + t(Bx-Ax) and y = Ay + t(By-Ay) , where A = start, B = end, 0<t<1
+    //then we sub in the x and y values and simplify to get
+    //Ax^2 + Ay^2 - R2 + 2*t*(Ax + ((Bx-Ax))^2 + Ay + ((By-Ay))) + ((Bx+Ax)^2 + (By+Ay)^2)^2
+    //this is now a quadratic equation, use the discriminant to find if two real values of t exist to see if lines intersect
+    //split that into 3 parts a, b, c to find the
+    a = pow((oX1 - oX0),2) + pow((oY1 - oY0),2);
+    b = 2*(oX0*(oX1 - oX0) + oY0*(oY1 - oY0));
+    c = pow(oX0,2) + pow(oX1,2) - turningRadius;
+
+    discriminant = pow(b,2) - 4*a*c;
+
+    if(discriminant <=0){
+        return false; //no real roots, does not intersect
+    }
+    sqrtdisc = sqrt(discriminant);
+
+    root1 = (-b +sqrtdisc)/(2*a);
+    root2 = (-b -sqrtdisc)/(2*a);
+    //if the roots are within the valid root range
+    if(root1 <0 && root1 >0){
+        //check if the intersects are within the turning angle
+        tempX = oX0 + root1*(oX1 - oX0);
+        tempY = oY0 + root1*(oY1 - oY0);
+        if(tempX == 0){
+            return false; //the starting location of X will not have any obstacles
+        }
+        checkAngle = tan(tempY/tempX);
+        if(startOfValidAngle <= checkAngle && endOfValidAngle>=checkAngle){
+            return true;//intersection occurs within the turning path
+        }
+    }
+    if(root2 <0 && root2 >0){
+    //check if the intersects are within the turning angle
+        tempX = oX0 + root2*(oX1 - oX0);
+        tempY = oY0 + root2*(oY1 - oY0);
+        if(tempX == 0){
+            return false; //the starting location of X will not have any obstacles
+        }
+        checkAngle = tan(tempY/tempX);
+        if(startOfValidAngle <= checkAngle && endOfValidAngle>=checkAngle){
+            return true;//intersection occurs within the turning path
+        }
+    }
+    return false;
+    //determine circle center using affine transformation
+    //draw the whole circle
+    //check if line intersects with circle
+    //if yes, find the points of intersection
+    //check if points of intersection are within turning angle
+    //if right turn, angle to check: 180 to turningAngle to 180 + rotation(facingDirection)
+    //if left turn, angle to check: 0 to turningAngle +rotation(facingDirection)
 }
 
 //receives a message from STM
@@ -131,33 +232,45 @@ std::string aroundObstacleTillDetect(char imageDetected, Vertex targetVertex, Ro
 //The samplingPoints is the number of points that you check on the circle.
 //(Eg. if sampling points = 10 and turning angle = 90, you will sample 10 points on the circle to check if they intersect with the vertex).
 //This is to let you choose if you want to sample all angles from 0 to 90 for accuracy or sample half of the points for speed. (More samples = longer runtime).
-bool gridOnCurve(Vertex vertex, int initRow, int initCol, int targetRow, int targetCol, double turnRadius, double turnAngle, int samplingPoints){
+bool gridOnCurve(Vertex vertex, int initRow, int initCol, std::string turnDirection, double turnRadius, double turnAngle, int samplingPoints, double faceDirection){
     //assuming turn radius = 34
     double angleSection;
-    double x,y,startX,startY;
-    startX = 0;
-    startY = 0;
+    double x,y,offsetX,offsetY;
+    offsetX = 0;
+    offsetY = 0;
+    //convert to radian
+    turnAngle=turnAngle/180;
     angleSection = turnAngle/samplingPoints;
-    //if initCol==targetCol startX =0
-    if(initCol>targetCol){
-        startX = startX + turnRadius;
-    }
-    else if(initCol<targetCol){
-        startX = startX - turnRadius;
-    }
+    offsetX = turnRadius*cos(faceDirection);
+    offsetY = turnRadius*sin(faceDirection);
 
-    if(initRow>targetRow){
-        startY = startY - turnRadius;
-    }
-    else if(initRow<targetRow){
-        startY = startY + turnRadius;
-    }
     for(int i =0;i<=samplingPoints;i++){
-        x = turnRadius*cos(angleSection*i)+startX; //10 is the grid size, can be adjusted
-        y = turnRadius*sin(angleSection*i)+startY;
+        x = turnRadius*cos(angleSection*i)+offsetX; //10 is the grid size, can be adjusted
+        y = turnRadius*sin(angleSection*i)+offsetY;
         if(vertex.x_left<x && vertex.x_right>x && vertex.y_high>y && vertex.y_low<y){
             return true;
         }
     }
     return false;
 }
+
+//----------------- maybe can delete--------------------
+/*
+//run both functions below when checking if there is an obstacle in the path
+//function to check if robot's bounding box at any location will intersect with an obstacle bounding bo
+bool boundingBox2(double x1, double y1, double objectSize1, double x2, double y2, double objectSize2){
+    double halfObstacleSize1;
+    double halfObstacleSize2;
+    if(objectSize1==0 || objectSize2==0){
+        printf("object size must be greater than 0");
+        return true;
+    }
+    halfObstacleSize1 = objectSize1/2;
+    halfObstacleSize2 = objectSize2/2;
+        //following the bounding box intersect equation from the slides
+    if((x2+halfObstacleSize2>=x1-halfObstacleSize1) && (x1+halfObstacleSize1>=x2-halfObstacleSize2) && (y2+halfObstacleSize2>=y1-halfObstacleSize1) && (y1+halfObstacleSize1>=y2-halfObstacleSize2)){
+            return true;
+    }
+    return false;
+}
+*/
