@@ -7,9 +7,9 @@
             "args": [
                 "-g",
                 "component.cpp",
-                "config.cpp",
-                "action.cpp",
-                "asearch.cpp",
+                // "config.cpp",
+                // "action.cpp",
+                // "asearch.cpp",
                 "testMain.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"

@@ -7,30 +7,28 @@
 using namespace std;
 
 // robot 
-const int ROBOT_INIT_ROW = 1;
-const int ROBOT_INIT_COL = 1;
-const double ROBOT_INIT_FACEDIRECTION = 90;
-const double ROBOT_OCCUPY_LENGTH = 30;
+const int ROBOT_INIT_Y_GRID = 1;
+const int ROBOT_INIT_X_GRID = 1;
+const float ROBOT_INIT_FACEDIRECTION = 90;
+const float ROBOT_OCCUPY_LENGTH = 22;
 
 // map
-const double AREA_LENGTH = 200;
-const double START_COST = DBL_MAX;
-const double UNIT_LENGTH = 10;
-const int ROW_COUNT = AREA_LENGTH/UNIT_LENGTH;
-const int COLUMN_COUNT = AREA_LENGTH/UNIT_LENGTH; 
-const double OBSTACLE_LENGTH = 10;
-const double BOUNDARY_SIZE = 10;    // originally 15. Temporarily changed to 15 for Qt testing
+const float AREA_LENGTH = 200;
+const float START_COST = FLT_MAX;
+const float UNIT_LENGTH = 10;
+const int Y_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH;
+const int X_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH; 
+const float OBSTACLE_LENGTH = 10;
+const float BOUNDARY_SIZE = 10;    // originally 15. Temporarily changed to 15 for Qt testing
 
 //used for obstacle avoidance
 class Vertex{
     public: 
-        int row, column;
-        double x_right, x_left, y_high, y_low;
-        bool is_obstacle, is_border, visited;
+        int xGrid, yGrid;
+        float x_right, x_left, y_high, y_low;
+        bool is_obstacle, is_border, safe;
         
-        Vertex();
-        Vertex(int row, int column);
-        bool valid(Vertex target);
+        Vertex(int xGrid, int yGrid);
         void printVertex();
 };
 
@@ -38,13 +36,13 @@ class Vertex{
 class Obstacle{
     public:
         int id;
-        int row;
-        int column;
-        double x_center;
-        double y_center;
-        double face_direction;      // degree of the image's direction
-        bool is_seen;
-        Obstacle(int id, int row, int column, double face_direction);
+        int xGrid;
+        int yGrid;
+        float x_center;
+        float y_center;
+        int face_direction;      // degree of the image's direction. Int as it is used in simulation only
+        bool is_seen;   // 16/9 no use currently
+        Obstacle(int id, int xGrid, int yGrid, int face_direction);
         void printObstacle();
 };
 
@@ -52,11 +50,11 @@ class Obstacle{
 //used to track the robot's simulated location
 class Robot{
     public:
-        double x_right, x_left, y_high, y_low;
-        double x_center, y_center;
-        int row, column;
-        double face_direction;  // theta in range (-pi, pi]
-        Robot(int row, int column, double face_direction);
+        float x_right, x_left, y_high, y_low;
+        float x_center, y_center;
+        int xGrid, yGrid;
+        float face_direction;  // theta in range (-pi, pi]
+        Robot(int xGrid, int yGrid, float face_direction);
         void printRobot();
 };
 
