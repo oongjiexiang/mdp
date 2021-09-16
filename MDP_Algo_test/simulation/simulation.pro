@@ -12,16 +12,27 @@ SOURCES += \
     hamiltonian.cpp \
     main.cpp \
     mainwindow.cpp \
-    component.cpp
+    component.cpp \
+    config.cpp \
+    action.cpp \
+    asearch.cpp \
+    pathPlanning.cpp \
+    simulator.cpp
 
 HEADERS += \
     hamiltonian.h \
     mainwindow.h \
-    component.h
+    component.h \
+    config.h \
+    action.h \
+    asearch.h \
+    pathPlanning.h \
+    simulator.h
 
 FORMS += \
     hamiltonian.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    simulator.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

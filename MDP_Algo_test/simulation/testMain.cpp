@@ -9,7 +9,7 @@ using namespace std;
 
 int main(){
     vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 5, 5, 270));
+    obstacles.push_back(Obstacle(1, 4, 9, 270));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -70,15 +70,15 @@ int main(){
     // cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
-    ShortestPath sp(obstacles);
-    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
-    cout << result.size() << endl;
-    for(int i = 0; i < result.size(); i++){
-        cout << "Obstacle-------------------------" << endl;
-        result[i].first.printObstacle();
-        vector<State*> states = result[i].second;
-        for(int j = 0; j < states.size(); j++){
-            states[j]->printState();
-        }
-    }
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // cout << result.size() << endl;
+    // for(int i = 0; i < result.size(); i++){
+    //     cout << "Obstacle-------------------------" << endl;
+    //     result[i].first.printObstacle();
+    //     vector<State*> states = result[i].second;
+    //     for(int j = 0; j < states.size(); j++){
+    //         states[j]->printState();
+    //     }
+    // }
 }

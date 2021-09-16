@@ -60,8 +60,6 @@ aStar::aStar(){
 
 aStar::aStar(vector<Obstacle> obstacles){
     grid = new Map(obstacles);
-    cout << "in aStar constructor" << endl;
-    grid->printMap();
 }
 
 void aStar::generatePossibleActions(Obstacle obstacle){
@@ -89,7 +87,6 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
     // If the destination cell is the same as source cell
     if (isDestination(initState, dest)) {
         printf("We already detected %d at (%d, %d)\n", dest.id, dest.xGrid, dest.yGrid);
-        initState.printState();
         return nullptr;
     }
 
@@ -136,7 +133,6 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
             if(isDestination(*neighbourState, dest)){
                 neighbourState->gCost = calculateGValue(*source, possibleActions[i], localMap, dest);
                 *pathCost = tracePath(neighbourState, states);
-                localMap.printMap();
                 return neighbourState;
             }
             Vertex* neighbourPosition = neighbourState->position;

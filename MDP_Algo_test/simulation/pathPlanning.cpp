@@ -42,12 +42,15 @@ void ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
     }
     sort(goal_ids.begin(), goal_ids.end());
 
+    int iteration_debug = 0;
+    int totalPermutation = 1;
+    for(int i = 0; i < goal_ids.size(); i++) totalPermutation*=(i+1);
     // for each permutation
     do{
         vector<ActionListPerObstacle> onePermuteSolution;
         vector<double> onePermuteSubDistance;
         SearchResult buffer;
-
+        cout << float(iteration_debug++)/totalPermutation << "%" << endl;
         // initial state
         Vertex robotInitPosition(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
         State* initState = new State(&robotInitPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);

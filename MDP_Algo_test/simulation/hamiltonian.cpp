@@ -1,4 +1,10 @@
 #include "hamiltonian.h"
+#include "component.h"
+#include "config.h"
+#include "action.h"
+#include "asearch.h"
+#include "pathPlanning.h"
+#include "simulator.h"
 #include "ui_hamiltonian.h"
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -38,12 +44,12 @@ void Hamiltonian::setupSimulation()
 void Hamiltonian::setupMap()
 {
     gridGroupBox = new QGroupBox(tr("Top Down Map"));
-    buttons.resize(ROW_COUNT, vector<QPushButton*>(COLUMN_COUNT));
+    buttons.resize(Y_GRID_COUNT, vector<QPushButton*>(X_GRID_COUNT));
     QGridLayout *gridLayout = new QGridLayout;
-    for (int i = 0; i < ROW_COUNT; ++i) {
-        for(int j = 0; j < COLUMN_COUNT; ++j){
-            buttons[i][j] = createPushButton(i, j);
-            gridLayout->addWidget(buttons[i][j], i, j);
+    for (int i = Y_GRID_COUNT - 1; i >= 0; i--) {
+        for(int j = 0; j < X_GRID_COUNT; ++j){
+            buttons[j][i] = createPushButton(j, i);
+            gridLayout->addWidget(buttons[j][i], Y_GRID_COUNT - i - 1, j);
         }
     }
     setupRobotLocation();
@@ -56,16 +62,17 @@ void Hamiltonian::setupRobotLocation(){
     for(int i = -1; i <= 1; i++){
         for(int j = -1; j <= 1; j++){
             // currently hard code initial position as (1, 1), will need to change later
-            buttons[1+i][1+j]->setStyleSheet("border: 1px solid black; margin: 1px; width: 40px; height: 40px; background: yellow");
+            buttons[ROBOT_INIT_X_GRID + i][ROBOT_INIT_Y_GRID + j]->setEnabled(false);
+            buttons[ROBOT_INIT_X_GRID + i][ROBOT_INIT_Y_GRID + j]->setStyleSheet("border: 1px solid black; margin: 1px; width: 20px; height: 20px; background: yellow");
         }
     }
 }
 
-QPushButton* Hamiltonian::createPushButton(int row, int col){
+QPushButton* Hamiltonian::createPushButton(int xGrid, int yGrid){
     QPushButton* button = new QPushButton("");
-    button->setStyleSheet("border: 1px solid black; margin: 1px; width: 40px; height: 40px; background: white");
-    button->setProperty("row", row);
-    button->setProperty("col", col);
+    button->setStyleSheet("border: 1px solid black; margin: 1px; width: 20px; height: 20px; background: white");
+    button->setProperty("xGrid", xGrid);
+    button->setProperty("yGrid", yGrid);
     connect(button, &QPushButton::clicked, this, &Hamiltonian::obstacleInput);
     return button;
 }
@@ -81,37 +88,37 @@ void Hamiltonian::setupControlPanel()
     horizontalGroupBox->setLayout(hLayout);
 }
 void Hamiltonian::obstacleInput(){
-    int row = sender()->property("row").toInt();
-    int col = sender()->property("col").toInt();
-    qDebug().nospace() << qPrintable(QString::number(row)) << " " << qPrintable(QString::number(col));
+    int yGrid = sender()->property("yGrid").toInt();
+    int xGrid = sender()->property("xGrid").toInt();
+    qDebug().nospace() << qPrintable(QString::number(xGrid)) << " " << qPrintable(QString::number(yGrid));
     for(unsigned int i = 0; i < obstacles.size(); i++){
-        if(obstacles[i]->row == row && obstacles[i]->column == col){
+        if(obstacles[i]->yGrid == yGrid && obstacles[i]->xGrid == xGrid){
             qDebug() << qPrintable(QString::number((int)(obstacles[i]->face_direction)));
             switch((int)(obstacles[i]->face_direction)){
             case 90:
-                buttons[row][col]->setText("W");
+                buttons[xGrid][yGrid]->setText("W");
                 obstacles[i]->face_direction = 180;
                 break;
             case 180:
-                buttons[row][col]->setText("S");
-                obstacles[i]->face_direction = -90;
+                buttons[xGrid][yGrid]->setText("S");
+                obstacles[i]->face_direction = 270;
                 break;
             case 0:
-                buttons[row][col]->setText("N");
+                buttons[xGrid][yGrid]->setText("N");
                 obstacles[i]->face_direction = 90;
                 break;
             default:    // remove obstacle after clicking four times
                 obstacles.erase(obstacles.begin() + i);
-                buttons[row][col]->setText("");
-                buttons[row][col]->setStyleSheet("border: 1px solid black; margin: 1px; width: 40px; height: 40px; background: white");
+                buttons[xGrid][yGrid]->setText("");
+                buttons[xGrid][yGrid]->setStyleSheet("border: 1px solid black; margin: 1px; width: 20px; height: 20px; background: white");
             }
             return;
         }
     }
     // new obstacle
-    Obstacle* obs = new Obstacle(obstacleId++, row, col, 0);    // obstacle id is temporary. Before obstacle vector is sent for A*, the obstacle id will be modified again. Need another function
-    buttons[row][col]->setText("E");
-    buttons[row][col]->setStyleSheet("border: 1px solid black; margin: 1px; width: 40px; height: 40px; background: gray");
+    Obstacle* obs = new Obstacle(obstacleId++, xGrid, yGrid, 0);    // obstacle id is temporary. Before obstacle vector is sent for A*, the obstacle id will be modified again. Need another function
+    buttons[xGrid][yGrid]->setText("E");
+    buttons[xGrid][yGrid]->setStyleSheet("border: 1px solid black; margin: 1px; width: 20px; height: 20px; background: gray");
     obstacles.push_back(obs);
 }
 void Hamiltonian::startHamiltonianCalculation(){
@@ -127,7 +134,17 @@ void Hamiltonian::startHamiltonianCalculation(){
 }
 void Hamiltonian::simulate(){
     cout << "this function to simulate every second" << endl;
-    
+    vector<Obstacle> simulateObstacles;
+    for(int i = 0; i < obstacles.size(); i++){
+        simulateObstacles.push_back(*obstacles[i]);
+    }
+    ShortestPath sp(simulateObstacles);
+    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    cout << result.size() << endl;
+    cout << "result done. Sending to simulator" << endl;
+    Simulator simulator;
+    simulator.setModal(true);
+    simulator.exec();
 }
 Hamiltonian::~Hamiltonian()
 {

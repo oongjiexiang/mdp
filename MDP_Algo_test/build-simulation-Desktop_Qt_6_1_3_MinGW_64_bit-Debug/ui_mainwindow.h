@@ -10,8 +10,10 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
@@ -26,13 +28,14 @@ public:
     QPushButton *pushButton;
     QPushButton *pushButton_2;
     QMenuBar *menubar;
+    QMenu *menuWeek_8_Shortest_Path_Image_Recognition_Simulation;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(800, 600);
+        MainWindow->resize(400, 200);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         pushButton = new QPushButton(centralwidget);
@@ -44,11 +47,15 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 21));
+        menubar->setGeometry(QRect(0, 0, 400, 21));
+        menuWeek_8_Shortest_Path_Image_Recognition_Simulation = new QMenu(menubar);
+        menuWeek_8_Shortest_Path_Image_Recognition_Simulation->setObjectName(QString::fromUtf8("menuWeek_8_Shortest_Path_Image_Recognition_Simulation"));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
         MainWindow->setStatusBar(statusbar);
+
+        menubar->addAction(menuWeek_8_Shortest_Path_Image_Recognition_Simulation->menuAction());
 
         retranslateUi(MainWindow);
         QObject::connect(pushButton_2, &QPushButton::clicked, MainWindow, qOverload<>(&QMainWindow::close));
@@ -61,6 +68,7 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         pushButton->setText(QCoreApplication::translate("MainWindow", "Simulate", nullptr));
         pushButton_2->setText(QCoreApplication::translate("MainWindow", "Exit", nullptr));
+        menuWeek_8_Shortest_Path_Image_Recognition_Simulation->setTitle(QCoreApplication::translate("MainWindow", "Week 8 Shortest Path Image Recognition Simulation", nullptr));
     } // retranslateUi
 
 };
