@@ -1,5 +1,6 @@
 #include "config.h"
 #include "component.h"
+#include "action.h"
 #include "asearch.h"
 #include "pathPlanning.h"
 #include <vector>
@@ -8,49 +9,60 @@
 
 
 
-ShortestPath::ShortestPath(vector<Obstacle&> obstacles): obstacles(obstacles){
+ShortestPath::ShortestPath(vector<Obstacle> obstacles): obstacles(obstacles){
     astar = aStar(obstacles);
     int nObstacles = obstacles.size();
-    shortestDist.resize(nObstacles + 1, vector<SearchResult>(nObstacles + 1));
+    // shortestPathSolution.resize(nObstacles);
 }
 
-vector<State> ShortestPath::hamiltonianPath(){
-    vector<double> completePathDistance;
-    vector<vector<State>> completePathSolution;
-    permutation(completePathDistance, completePathSolution);
+vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
+    vector<vector<double>> pathDistanceList;
+    vector<vector<ActionListPerObstacle>> pathSolutionList;
+    permutation(pathDistanceList, pathSolutionList);
+
     int minPathIndex = 0;
     double minPathDist = DBL_MAX;
-    for(int i = 0; i < completePathDistance.size(); i++){
-        if(minPathDist < completePathDistance[i]){
-            minPathDist = completePathDistance[i];
-            minPathIndex = i;
+    for(int i = 0; i < pathDistanceList.size(); i++){
+        double pathDist = 0;
+        for(int j = 0; j < pathDistanceList[i].size(); j++){
+            pathDist+=pathDistanceList[i][j];
+            if(minPathDist > pathDist){
+                minPathDist = pathDist;
+                minPathIndex = i;
+            }
         }
     }
-    return completePathSolution[minPathIndex];
+    return pathSolutionList[minPathIndex];
 }
 
-void ShortestPath::permutation(vector<double>& completePathDistance, vector<vector<State>>& completePathSolution){
+void ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<vector<ActionListPerObstacle>>& pathSolutionList){
     vector<int> goal_ids;
-    for(int i = 1; i <= obstacles.size(); i++){
+    for(int i = 0; i < obstacles.size(); i++){
         goal_ids.push_back(i);
     }
     sort(goal_ids.begin(), goal_ids.end());
+
+    // for each permutation
     do{
-        double totalDist = 0;
-        vector<State> fullPathSolution;
-        Vertex robotInitPosition(ROBOT_INIT_ROW, ROBOT_INIT_COL); 
-        State* initState = new State(robotInitPosition, false, ROBOT_INIT_FACEDIRECTION, nullptr, nullptr);
-        vector<SearchResult> pathSolution(obstacles.size());
+        vector<ActionListPerObstacle> onePermuteSolution;
+        vector<double> onePermuteSubDistance;
+        SearchResult buffer;
+
+        // initial state
+        Vertex robotInitPosition(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
+        State* initState = new State(&robotInitPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);
+
+        // compute the Hamiltonian path
         for(int i = 0; i < goal_ids.size(); i++){
-            initState = astar.search(*initState, obstacles[i], pathSolution[i]);
+            initState = astar.search(*initState, obstacles[goal_ids[i]], &buffer.first, &buffer.second);
+            onePermuteSolution.push_back(make_pair(obstacles[goal_ids[i]], buffer.second));
+            onePermuteSubDistance.push_back(buffer.first);
         }
         // combine path solution from one obstacle to another into a single path solution
-        for(int i = 0; i < pathSolution.size(); i++){
-            totalDist+=pathSolution[i].first;
-            fullPathSolution.insert(fullPathSolution.end(), pathSolution.begin(), pathSolution.end());
+        for(int i = 0; i < onePermuteSolution.size(); i++){
+            pathDistanceList.push_back(onePermuteSubDistance);
+            pathSolutionList.push_back(onePermuteSolution);
         }
-        completePathDistance.push_back(totalDist);
-        completePathSolution.push_back(fullPathSolution);
     // + 1 because first position is always initial point with id = 0
-    }while(next_permutation(goal_ids.begin() + 1, goal_ids.end())); 
+    }while(next_permutation(goal_ids.begin(), goal_ids.end())); 
 }

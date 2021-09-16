@@ -9,7 +9,7 @@ using namespace std;
 // robot 
 const int ROBOT_INIT_Y_GRID = 1;
 const int ROBOT_INIT_X_GRID = 1;
-const float ROBOT_INIT_FACEDIRECTION = 90;
+const int ROBOT_INIT_FACEDIRECTION = 90;
 const float ROBOT_OCCUPY_LENGTH = 22;
 
 // map

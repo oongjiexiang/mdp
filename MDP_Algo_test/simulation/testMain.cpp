@@ -2,6 +2,7 @@
 #include "config.h"
 #include "action.h"
 #include "asearch.h"
+#include "pathPlanning.h"
 #include <iostream>
 
 using namespace std;
@@ -22,7 +23,7 @@ int main(){
     //***************** test config.cpp********************
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
     // obstacles.push_back(Obstacle(6, 5, 1, 270));
-    // obstacles.push_back(Obstacle(3, 10, 9, -100));
+    obstacles.push_back(Obstacle(3, 10, 9, 90));
     // obstacles.push_back(Obstacle(5, 13, 14, 90));
     // Map map(obstacles);
     // map.printMap();
@@ -54,7 +55,7 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    Vertex* initPosition = new Vertex(5, 7);
+    Vertex* initPosition = new Vertex(1, 1);
     State* initState = new State(initPosition, false, 90, nullptr);
     aStar* astar = new aStar(obstacles);
     
@@ -67,4 +68,9 @@ int main(){
         resultStates[i]->printState();
     }
     cout << pathCost << endl;
+
+    //*******************test pathPlanning.cpp ****************
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // cout << result.size() << endl;
 }

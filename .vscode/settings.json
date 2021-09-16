@@ -5,6 +5,7 @@
         "qgroupbox": "cpp",
         "utility": "cpp",
         "new": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "algorithm": "cpp"
     }
 }

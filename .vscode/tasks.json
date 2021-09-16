@@ -10,6 +10,7 @@
                 "config.cpp",
                 "action.cpp",
                 "asearch.cpp",
+                "pathPlanning.cpp",
                 "testMain.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"

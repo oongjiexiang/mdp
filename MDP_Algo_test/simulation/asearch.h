@@ -10,7 +10,7 @@
 
 // Creating a shortcut for tuple<int, Vertex> type
 typedef tuple<float, State*> Tuple;
-typedef pair<float, vector<State>> SearchResult;
+typedef pair<float, vector<State*>> SearchResult;
 
 class aStar{
     Map* grid; 

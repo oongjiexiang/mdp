@@ -165,7 +165,7 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
             }
         }
     }
-
+    localMap.printMap();
     // When the destination cell is not found
     printf("Failed to find the Destination Cell\n");
     return nullptr;
