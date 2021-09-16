@@ -26,6 +26,7 @@ class Map{
 
         bool isValidGrid(int xGrid, int yGrid);
 
+        bool isAvailableGrid(int xGrid, int yGrid);
         // get vertex array
         vector<vector<Vertex*>>& getVertexArray();
 

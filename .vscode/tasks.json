@@ -8,7 +8,7 @@
                 "-g",
                 "component.cpp",
                 "config.cpp",
-                // "action.cpp",
+                "action.cpp",
                 // "asearch.cpp",
                 "testMain.cpp",
                 "-o",

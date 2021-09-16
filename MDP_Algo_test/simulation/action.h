@@ -12,11 +12,10 @@ class State{
     public:
         Vertex* position;
         int obstacleSeen = 0;
-        double face_direction;
-        double gCost, hCost;
-        string broughtByAction;
+        int face_direction;
+        float gCost, hCost;
         State* prevState;
-        State(Vertex* position, int obstacleSeen, double face_direction, State* prevState, string broughtByAction);
+        State(Vertex* position, int obstacleSeen, int face_direction, State* prevState);
         
         // debug
         void printState();
@@ -25,55 +24,35 @@ class State{
 class Action{
     public:
         virtual State* takeAction(State* initState, Map& maps) = 0;
-        virtual bool canTakeAction(State* initState, Map& maps) = 0;    // 14/9/2021 JX: simple checks only. eg if move forward by 3 squares, check only the goal square. In actual fact, should check all 3 
         // only consider one because currently each step in A* involves moving one square
-        virtual int getCost() = 0;
-        virtual string generateActionString() = 0;
+        virtual int getCost(State* initState, Map maps, Obstacle o) = 0;
 
         // debug
         virtual void printAction() = 0;
 };
 
-class ActionForward : public Action{
-    float travelDist;   // in cm
+class ActionStraight : public Action{
+    float travelDistGrid;   // in cm
     int cost = 1;
     public:
-        ActionForward();
-        ActionForward(float travelDist);
+        ActionStraight();
+        ActionStraight(float travelDistGrid);
         State* takeAction(State* initState, Map& maps);
-        bool canTakeAction(State* initState, Map& maps);
-        int getCost();
-        string generateActionString();
 
-        // debug
-        void printAction();
-};
-
-class ActionReverse : public Action {
-    float travelDist;
-    int cost = 1;
-    public:
-        ActionReverse();
-        ActionReverse(float travelDist);
-        State* takeAction(State* initState, Map& maps);
-        bool canTakeAction(State* initState, Map& maps);
-        int getCost();
-        string generateActionString();
+        int getCost(State* initState, Map maps, Obstacle o);
 
         // debug
         void printAction();
 };
 
 class ActionTurn : public Action{
-    float turnAngle;
+    int turnAngle;
     int cost = 4;  // need to use mathematical calculation
     public:
-        ActionTurn(float turnAngle);
+        ActionTurn(int turnAngle);
         State* takeAction(State* initState, Map& maps);
-        bool canTakeAction(State* initState, Map& maps);
 
-        int getCost();
-        string generateActionString();
+        int getCost(State* initState, Map maps, Obstacle o);
 
         // debug
         void printAction();
@@ -87,11 +66,9 @@ class ActionDetect : public Action{
         ActionDetect();
         ActionDetect(int obsId);
         State* takeAction(State* initState, Map& maps);
-        bool canTakeAction(State* initState, Map& maps);
 
         void setObstacleId(int obstacleId);
-        int getCost();
-        string generateActionString();
+        int getCost(State* initState, Map maps, Obstacle o);
 
         // debug
         void printAction();

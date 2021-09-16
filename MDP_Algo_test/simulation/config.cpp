@@ -99,6 +99,14 @@ bool Map::isValidGrid(int xGrid, int yGrid){
     return (yGrid >= 0 && xGrid >= 0 && yGrid < Y_GRID_COUNT && xGrid < X_GRID_COUNT);
 }
 
+bool Map::isAvailableGrid(int xGrid, int yGrid){
+    if(isValidGrid(xGrid, yGrid)){
+        Vertex* v = grids[xGrid][yGrid];
+        return !v->is_border && !v->is_obstacle;
+    }
+    return false;
+}
+
 // get vertex array
 vector<vector<Vertex*>>& Map::getVertexArray(){
     return grids;
@@ -115,6 +123,7 @@ void Map::printMap(){
         for(int j = 0; j < X_GRID_COUNT; j++){
             if(grids[j][i]->is_obstacle) cout << "O";
             else if(grids[j][i]->is_border) cout << "B";
+            else if(grids[j][i]->safe) cout << "^";
             else cout << " ";
         }
         cout << endl;

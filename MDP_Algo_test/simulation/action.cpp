@@ -7,232 +7,135 @@ using namespace std;
 // const float TURN_RADIUS = 34;   // to update regularly according to STM Team
 const float TURN_RADIUS = 20;
 const int TURN_RADIUS_GRID = (int)(ceil(TURN_RADIUS/UNIT_LENGTH));
-const float MAX_IMAGE_VIEW_DISTANCE = 20;
+const float MAX_IMAGE_VIEW_DISTANCE = 30;
 const int MAX_IMAGE_VIEW_DISTANCE_GRID = (int)(ceil(MAX_IMAGE_VIEW_DISTANCE/UNIT_LENGTH));
 const float MAX_IMAGE_VIEW_ANGLE = 180; // currently set as complete opposite. Will change in real application
 
 // -------------Utility Euclidean distance-------------
-double euclidean(double x1, double y1, double x2, double y2){
+float euclidean(float x1, float y1, float x2, float y2){
     return pow(pow((x1 - x2), 2.0) + pow((y1 - y2), 2.0), 0.5);
 }
 
 
 // State
-State::State(Vertex* position, int obstacleSeen, double face_direction, State* prevState, string broughtByAction):
-    position(position), obstacleSeen(obstacleSeen), face_direction(face_direction), prevState(prevState), broughtByAction(broughtByAction){}
+State::State(Vertex* position, int obstacleSeen, int face_direction, State* prevState):
+    position(position), obstacleSeen(obstacleSeen), face_direction(face_direction), prevState(prevState){}
 
 // debug State
 void State::printState(){
-    cout << "--------------State---------------" << endl;
+    cout << "--------------State---------------\n\t";
     position->printVertex();
-    cout << "obstacleSeen: " << obstacleSeen << endl;
-    cout << "faceDirection: " << face_direction << endl;
-    cout << "action: " << broughtByAction << endl;
+    cout << "\tobstacleSeen: " << obstacleSeen << endl;
+    cout << "\tfaceDirection: " << face_direction << endl;
     cout << "--------------End State---------------" << endl;
 }
 
 // ------------------------Forward action------------------------
-ActionForward::ActionForward(): travelDist(UNIT_LENGTH), cost(1) {}
+ActionStraight::ActionStraight(): travelDistGrid(1), cost(1) {}
 
-ActionForward::ActionForward(float travelDist): travelDist(travelDist){
+ActionStraight::ActionStraight(float travelDistGrid): travelDistGrid(travelDistGrid){
     cost = 1;
 }
 
-State* ActionForward::takeAction(State* initState, Map& maps){
+State* ActionStraight::takeAction(State* initState, Map& maps){
     Vertex curPosition = *(initState->position);
     int newObstacleSeen = initState->obstacleSeen;
 
-    int moveGridDistance = (int)(travelDist/UNIT_LENGTH);
-    int newRow = curPosition.row + moveGridDistance*sin(M_PI/180*initState->face_direction);
-    int newColumn = curPosition.column + moveGridDistance*cos(M_PI/180*initState->face_direction);
+    int moveGridDistance = (int)(travelDistGrid);
+    int newYGrid = curPosition.yGrid + moveGridDistance*sin(M_PI/180*initState->face_direction);
+    int newXGrid = curPosition.xGrid + moveGridDistance*cos(M_PI/180*initState->face_direction);
 
-    Vertex* newPosition = new Vertex(newRow, newColumn);
-    State* endState = new State(newPosition, newObstacleSeen, initState->face_direction, initState, this->generateActionString());
+    // check if action can be taken
+    if(maps.isValidGrid(newXGrid, newYGrid)){
+        Vertex* cell = maps.findVertexByGrid(newXGrid, newYGrid);
+        if(cell->is_obstacle || cell->is_border) return nullptr;
+    }
+
+    // Action can be taken!
+    // 1. update map
+    maps.getVertexArray()[newXGrid][newYGrid]->safe = true;
+
+    // 2. generate new state
+    Vertex* newPosition = new Vertex(newXGrid, newYGrid);
+    State* endState = new State(newPosition, newObstacleSeen, initState->face_direction, initState);
 
     return endState;
 }
 
-bool ActionForward::canTakeAction(State* initState, Map& maps){
-    Vertex newPosition = *(initState->position);
-    double faceDirection = initState->face_direction;
-
-    int moveGridDistance = (int)travelDist/UNIT_LENGTH;
-    int newRow = (int)(newPosition.row + moveGridDistance*sin(M_PI/180*faceDirection));
-    int newCol = (int)(newPosition.column + moveGridDistance*cos(M_PI/180*faceDirection));
-    if(maps.isValidGrid(newRow, newCol)){
-        Vertex* cell = maps.findVertexByGrid(newRow, newCol);
-        return !cell->is_obstacle && !cell->is_border;
-    }
-    return false;
-}
-
-int ActionForward::getCost(){
+int ActionStraight::getCost(State* initState, Map maps, Obstacle o){
     return cost;
 }
 
-string ActionForward::generateActionString(){
-    return "FORWARD " + to_string(travelDist);
+// debug ActionStraight
+void ActionStraight::printAction(){
+    if(travelDistGrid > 0) cout << "FORWARD: travelDistGrid = " << travelDistGrid << endl;
+    else cout << "REVERSE: travelDistGrid = " << travelDistGrid << endl;
 }
-
-// debug ActionForward
-void ActionForward::printAction(){
-    cout << "FORWARD: travelDist = " << travelDist << endl;
-}
-
-
-// ---------- Reverse action ------------
-ActionReverse::ActionReverse(): travelDist(UNIT_LENGTH), cost(1) {}
-
-ActionReverse::ActionReverse(float travelDist):
-    travelDist(travelDist){}
-
-State* ActionReverse::takeAction(State* initState, Map& maps){
-    Vertex curPosition = *(initState->position);
-    int newObstacleSeen = initState->obstacleSeen;
-
-    int moveGridDistance = (int)(travelDist/UNIT_LENGTH);
-    int newRow = curPosition.row - moveGridDistance*sin(M_PI/180*initState->face_direction);
-    int newColumn = curPosition.column - moveGridDistance*cos(M_PI/180*initState->face_direction);
-    
-    Vertex* newPosition = new Vertex(newRow, newColumn);
-    State* endState = new State(newPosition, newObstacleSeen, initState->face_direction, initState, this->generateActionString());
-    return endState;
-}
-
-bool ActionReverse::canTakeAction(State* initState, Map& maps){
-    Vertex newPosition = *(initState->position);
-    double faceDirection = initState->face_direction;
-    
-    int moveGridDistance = (int)travelDist/UNIT_LENGTH;
-    int newRow = (int)(newPosition.row - moveGridDistance*sin(M_PI/180*faceDirection));
-    int newCol = (int)(newPosition.column - moveGridDistance*cos(M_PI/180*faceDirection));
-    if(maps.isValidGrid(newRow, newCol)){
-        Vertex* cell = maps.findVertexByGrid(newRow, newCol);
-        return !cell->is_obstacle && !cell->is_border;
-    }
-    return false;
-}
-
-int ActionReverse::getCost(){
-    return cost;
-}
-
-string ActionReverse::generateActionString(){
-    return "REVERSE " + to_string(travelDist);
-}
-
-// debug ActionReverse
-void ActionReverse::printAction(){
-    cout << "REVERSE: travelDist = " << travelDist << endl;
-}
-
 
 // -------------------Turning Action----------------------
-ActionTurn::ActionTurn(float turnAngle):
+ActionTurn::ActionTurn(int turnAngle):
     turnAngle(turnAngle){}
     
 State* ActionTurn::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
-    float newX, newY, centerX, centerY;
-    Vertex position = *(initState->position);
-    float pivotY = position.row*UNIT_LENGTH + UNIT_LENGTH/2;
-    float pivotX = position.column*UNIT_LENGTH + UNIT_LENGTH/2;
-    double faceDirection = initState->face_direction;
+    Vertex* newPosition;
+    int newXGrid, newYGrid;
 
-    // determine turning center (xc, yc)
-    switch((int)faceDirection){
+    int faceDirection = initState->face_direction;
+    int curXGrid = initState->position->xGrid;
+    int curYGrid = initState->position->yGrid;
+    vector<vector<Vertex*>> grids = maps.getVertexArray();
+
+    // 1. find new state
+    switch(faceDirection){
         case 0:
-            centerX = pivotX - TURN_RADIUS;
-            centerY = pivotY;
+            newXGrid = curXGrid + 1;
+            newYGrid = curYGrid + turnAngle/abs(turnAngle);
+            
         break;
         case 90:
-            centerX = pivotX;
-            centerY = pivotY - TURN_RADIUS;
+            newXGrid = curXGrid - turnAngle/abs(turnAngle);
+            newYGrid = curYGrid + 1;
         break;
         case 180:
-            centerX = pivotX + TURN_RADIUS;
-            centerY = pivotY;
+            newXGrid = curXGrid - 1;
+            newYGrid = curYGrid - turnAngle/abs(turnAngle);
         break;
-        case -90:
-            centerX = pivotX;
-            centerY = pivotY + TURN_RADIUS;
+        case 270:
+            newXGrid = curXGrid + turnAngle/abs(turnAngle);
+            newYGrid = curYGrid - 1;
         break;
         default:
-            cout << "faceDirection is " << faceDirection << endl;
+            cout << "turnAngle is not straight, but = " << turnAngle << endl;
+            return nullptr;
     }
 
-    // T(xc, yc)R(turnAngle)T(-xc, -yx) affine transformation
-    newX = (pivotX - centerX)*cos(M_PI/180*turnAngle) - (pivotY - centerY)*sin(M_PI/180*turnAngle) + centerX;
-    newY = (pivotX - centerX)*sin(M_PI/180*turnAngle) - (pivotY - centerY)*cos(M_PI/180*turnAngle) + centerY;
-    
-    double newFaceDirection = (faceDirection + turnAngle);
-    if(newFaceDirection > 180) newFaceDirection-=360;
-    else if(newFaceDirection <= -180) newFaceDirection+=360;
+    // 2. check if new position and surrounding grids are safe
+    if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;   // check if new grid is valid
+    newPosition = grids[newXGrid][newYGrid];
+    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){    // check if all other neighbouring grids exist and are available
+        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
+            if(!maps.isAvailableGrid(i, j)) return nullptr;
+        }
+    }
 
-    Vertex* newPosition = maps.findVertexByCoor(newX, newY);
+    // 3. perform action since it can be taken
+    // update map
+    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
+        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
+            maps.getVertexArray()[i][j]->safe = true;
+        }
+    }
 
+    // introduce new state
+    int newFaceDirection = (faceDirection + (int)turnAngle)%360;
     int newObstacleSeen = initState->obstacleSeen;
-    State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState, this->generateActionString());
+    
+    State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
     return endState;
 }
 
-bool ActionTurn::canTakeAction(State* initState, Map& maps){
-    float newX, newY, centerX, centerY;
-    Vertex position = *(initState->position);
-    float pivotY = position.row*UNIT_LENGTH + UNIT_LENGTH/2;
-    float pivotX = position.column*UNIT_LENGTH + UNIT_LENGTH/2;
-    double faceDirection = initState->face_direction;
-
-    // determine turning center (xc, yc)
-    switch((int)faceDirection){
-        case 0:
-            centerX = pivotX - TURN_RADIUS;
-            centerY = pivotY;
-        break;
-        case 90:
-            centerX = pivotX;
-            centerY = pivotY - TURN_RADIUS;
-        break;
-        case 180:
-            centerX = pivotX + TURN_RADIUS;
-            centerY = pivotY;
-        break;
-        case -90:
-            centerX = pivotX;
-            centerY = pivotY + TURN_RADIUS;
-        break;
-        default:
-            cout << "faceDirection is " << faceDirection << endl;
-    }
-
-    // T(xc, yc)R(turnAngle)T(-xc, -yx) affine transformation
-    newX = (pivotX - centerX)*cos(M_PI/180*turnAngle) - (pivotY - centerY)*sin(M_PI/180*turnAngle) + centerX;
-    newY = (pivotX - centerX)*sin(M_PI/180*turnAngle) - (pivotY - centerY)*cos(M_PI/180*turnAngle) + centerY;
-    
-    double newFaceDirection = (faceDirection + turnAngle);
-    if(newFaceDirection > 180) newFaceDirection-=360;
-    else if(newFaceDirection <= -180) newFaceDirection+=360;
-
-    Vertex newPosition;
-    if(maps.isValidCoor(newX, newY)){
-        newPosition = *maps.findVertexByCoor(newX, newY);
-    }
-    else return false;  // if out of map, return false
-
-    // check if there is any obstacle
-    for(int i = min(position.row, newPosition.row); i <= max(position.row, newPosition.row); i++){
-        for(int j = min(position.column, newPosition.column); j <= max(position.column, newPosition.column); j++){
-            if(maps.findVertexByGrid(i, j)->is_obstacle || maps.findVertexByGrid(i, j)->is_border) return false;
-        }
-    }
-    return true;
-}
-
-string ActionTurn::generateActionString(){
-    return "TURN " + to_string(turnAngle);
-}
-
-int ActionTurn::getCost(){
+int ActionTurn::getCost(State* initState, Map maps, Obstacle o){
     return cost;
 }
 
@@ -254,45 +157,45 @@ ActionDetect::ActionDetect(int obsId){
 }
 
 State* ActionDetect::takeAction(State* initState, Map& maps){
-    imageDetected = true;       // actual interaction logic with RPi should be here
-    vector<Obstacle>& obstacles = maps.getObstacles();
-    for(int i = 0; i < obstacles.size(); i++){
-        if(obstacles[i].id == obstacleId){
-            obstacles[i].is_seen = true;
-            State* endState = new State(initState->position, obstacleId, initState->face_direction, initState, this->generateActionString());
-            return endState;
-        }
-    }
-}
-
-bool ActionDetect::canTakeAction(State* initState, Map& maps){     // actual interaction logic with RPi should be here
     vector<Obstacle>& obstacles = maps.getObstacles();
     Vertex position = *(initState->position);
     for(int i = 0; i < obstacles.size(); i++){
         Obstacle& o = obstacles[i];
+        int faceDirection = initState->face_direction;
+        bool correctOrientation = false;
 
-        double faceDirection = initState->face_direction;
-        if(faceDirection < 0) faceDirection+=360;
-
-        if(!o.is_seen && euclidean(position.column, position.row, o.column, o.row) <= MAX_IMAGE_VIEW_DISTANCE_GRID
-        && faceDirection - o.face_direction >= MAX_IMAGE_VIEW_ANGLE){ // not really >=
+        switch(faceDirection){
+            case 0:
+                correctOrientation = (o.face_direction == 180 && o.xGrid > position.xGrid);
+            break;
+            case 90:
+                correctOrientation = (o.face_direction == 270 && o.yGrid > position.yGrid);
+            break;
+            case 180:
+                correctOrientation = (o.face_direction == 0 && o.xGrid < position.xGrid);
+            break;
+            case 270:
+                correctOrientation = (o.face_direction == 90 && o.yGrid < position.yGrid);
+            break;
+            default:
+                correctOrientation = false;
+        }
+        if(correctOrientation && euclidean(position.xGrid, position.yGrid, o.xGrid, o.yGrid) <= MAX_IMAGE_VIEW_DISTANCE_GRID){ 
             obstacleId = o.id;
-            return true;
+            imageDetected = true;
+            State* endState = new State(initState->position, obstacleId, initState->face_direction, initState);
+            return endState;
         }
     }
-    return false;
+    return nullptr;
 }
 
 void ActionDetect::setObstacleId(int obstacleId){
     this->obstacleId = obstacleId;
 }
 
-int ActionDetect::getCost(){
+int ActionDetect::getCost(State* initState, Map maps, Obstacle o){
     return cost;
-}
-
-string ActionDetect::generateActionString(){
-    return "DETECT " + to_string(obstacleId);
 }
 
 // debug ActionDetect
