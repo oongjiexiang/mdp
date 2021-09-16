@@ -55,22 +55,30 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    Vertex* initPosition = new Vertex(4, 2);
-    State* initState = new State(initPosition, false, 90, nullptr);
-    aStar* astar = new aStar(obstacles);
+    // Vertex* initPosition = new Vertex(4, 2);
+    // State* initState = new State(initPosition, false, 90, nullptr);
+    // aStar* astar = new aStar(obstacles);
     
-    float pathCost = 0;
-    vector<State*> resultStates;
-    astar->search(*initState, obstacles[0], &pathCost, &resultStates);
+    // float pathCost = 0;
+    // vector<State*> resultStates;
+    // astar->search(*initState, obstacles[0], &pathCost, &resultStates);
     
-    cout << "-----------path--------------" << endl;
-    for(int i = 0; i < resultStates.size(); i++){
-        resultStates[i]->printState();
-    }
-    cout << pathCost << endl;
+    // cout << "-----------path--------------" << endl;
+    // for(int i = 0; i < resultStates.size(); i++){
+    //     resultStates[i]->printState();
+    // }
+    // cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
-    // ShortestPath sp(obstacles);
-    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
-    // cout << result.size() << endl;
+    ShortestPath sp(obstacles);
+    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    cout << result.size() << endl;
+    for(int i = 0; i < result.size(); i++){
+        cout << "Obstacle-------------------------" << endl;
+        result[i].first.printObstacle();
+        vector<State*> states = result[i].second;
+        for(int j = 0; j < states.size(); j++){
+            states[j]->printState();
+        }
+    }
 }
