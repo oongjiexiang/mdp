@@ -332,6 +332,9 @@ public class GridMap extends View {
                         robotColor);
             }
 
+//            if (getRobotDirection() == "None") {
+//                setRobotDirection();
+//            }
 
             // use cells[initalCol][20 - initialRow] as ref
             switch (this.getRobotDirection()) {
@@ -787,6 +790,7 @@ public class GridMap extends View {
             ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
             imageBearings.get(initialRow-1)[initialColumn-1] = "";
             showLog(commandMsgGenerator(REMOVE_OBSTACLE));
+            MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
         }
         // drop within gridmap
         else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
@@ -807,6 +811,7 @@ public class GridMap extends View {
                 ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
                 imageBearings.get(initialRow-1)[initialColumn-1] = "";
                 showLog(commandMsgGenerator(REMOVE_OBSTACLE));
+                MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
             }
             // if dropped within gridmap, shift it to new position unless already got existing
             else if ((1 <= initialColumn && initialColumn <= 20)
@@ -832,6 +837,7 @@ public class GridMap extends View {
                     }
                     cells[initialColumn][20 - initialRow].setType("unexplored");
                     showLog(commandMsgGenerator(MOVE_OBSTACLE));
+                    MainActivity.printMessage(commandMsgGenerator(MOVE_OBSTACLE));
                 }
             } else {
                 showLog("Drag event failed.");
@@ -989,6 +995,8 @@ public class GridMap extends View {
                     // this function affects obstacle turning too
                     this.setObstacleCoord(column, row);
                     showLog(commandMsgGenerator(ADD_OBSTACLE));
+                    MainActivity.printMessage(commandMsgGenerator(ADD_OBSTACLE));
+
                 }
                 this.invalidate();
                 return true;
@@ -1779,8 +1787,10 @@ public class GridMap extends View {
         } else {
             return false;
         }
-        cells[curCoord[0]][20-curCoord[1]].setType("explored");
-        cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
+        if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
+            cells[curCoord[0]][20 - curCoord[1]].setType("explored");
+            cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
+        }
         setCurCoord(x,y,robotDirection);
         this.invalidate();
         return true;
@@ -1788,88 +1798,94 @@ public class GridMap extends View {
 
     // currently assuming we receiving coordinates for obstacles too
     public boolean performRpiCommand(int x, int y, String imageID, String imageBearing) {
-        if (((-1 < x && x < 20) && (-1 < y && y < 20))|| imageID == null || imageBearing == null) {
-            MainActivity.printMessage("target coord out of bounds or imageID/imageBearing is missing.");
+        if (!((-1 < x && x < 20) && (-1 < y && y < 20))) {
+            MainActivity.printMessage("target coord out of bounds");
             return false;
+        }
+        if (imageID == null || imageBearing == null) {
+            MainActivity.printMessage("null imageid/bearing");
         }
 
         // curCoord[0] = col, curCoord[1] = row (havent convert)
         // item_list.get(initialrow - 1)[initialcol - 1] (initialrow is converted alr)
         switch (imageID) {
-            case "1": ITEM_LIST.get(x)[y] = "1";
+            case "1": ITEM_LIST.get(y)[x] = "1";
                 break;
-            case "2": ITEM_LIST.get(x)[y] = "2";
+            case "2": ITEM_LIST.get(y)[x] = "2";
                 break;
-            case "3": ITEM_LIST.get(x)[y] = "3";
+            case "3": ITEM_LIST.get(y)[x] = "3";
                 break;
-            case "4": ITEM_LIST.get(x)[y] = "4";
+            case "4": ITEM_LIST.get(y)[x] = "4";
                 break;
-            case "5": ITEM_LIST.get(x)[y] = "5";
+            case "5": ITEM_LIST.get(y)[x] = "5";
                 break;
-            case "6": ITEM_LIST.get(x)[y] = "6";
+            case "6": ITEM_LIST.get(y)[x] = "6";
                 break;
-            case "7": ITEM_LIST.get(x)[y] = "7";
+            case "7": ITEM_LIST.get(y)[x] = "7";
                 break;
-            case "8": ITEM_LIST.get(x)[y] = "8";
+            case "8": ITEM_LIST.get(y)[x] = "8";
                 break;
-            case "9": ITEM_LIST.get(x)[y] = "9";
+            case "9": ITEM_LIST.get(y)[x] = "9";
                 break;
-            case "10": ITEM_LIST.get(x)[y] = "10";
+            case "10": ITEM_LIST.get(y)[x] = "10";
                 break;
-            case "11": ITEM_LIST.get(x)[y] = "11";
+            case "11": ITEM_LIST.get(y)[x] = "11";
                 break;
-            case "12": ITEM_LIST.get(x)[y] = "12";
+            case "12": ITEM_LIST.get(y)[x] = "12";
                 break;
-            case "13": ITEM_LIST.get(x)[y] = "13";
+            case "13": ITEM_LIST.get(y)[x] = "13";
                 break;
-            case "14": ITEM_LIST.get(x)[y] = "14";
+            case "14": ITEM_LIST.get(y)[x] = "14";
                 break;
-            case "15": ITEM_LIST.get(x)[y] = "15";
+            case "15": ITEM_LIST.get(y)[x] = "15";
                 break;
-            case "16": ITEM_LIST.get(x)[y] = "16";
+            case "16": ITEM_LIST.get(y)[x] = "16";
                 break;
-            case "17": ITEM_LIST.get(x)[y] = "17";
+            case "17": ITEM_LIST.get(y)[x] = "17";
                 break;
-            case "18": ITEM_LIST.get(x)[y] = "18";
+            case "18": ITEM_LIST.get(y)[x] = "18";
                 break;
-            case "19": ITEM_LIST.get(x)[y] = "19";
+            case "19": ITEM_LIST.get(y)[x] = "19";
                 break;
-            case "20": ITEM_LIST.get(x)[y] = "20";
+            case "20": ITEM_LIST.get(y)[x] = "20";
                 break;
-            case "21": ITEM_LIST.get(x)[y] = "21";
+            case "21": ITEM_LIST.get(y)[x] = "21";
                 break;
-            case "22": ITEM_LIST.get(x)[y] = "22";
+            case "22": ITEM_LIST.get(y)[x] = "22";
                 break;
-            case "23": ITEM_LIST.get(x)[y] = "23";
+            case "23": ITEM_LIST.get(y)[x] = "23";
                 break;
-            case "24": ITEM_LIST.get(x)[y] = "24";
+            case "24": ITEM_LIST.get(y)[x] = "24";
                 break;
-            case "25": ITEM_LIST.get(x)[y] = "25";
+            case "25": ITEM_LIST.get(y)[x] = "25";
                 break;
-            case "26": ITEM_LIST.get(x)[y] = "26";
+            case "26": ITEM_LIST.get(y)[x] = "26";
                 break;
-            case "27": ITEM_LIST.get(x)[y] = "27";
+            case "27": ITEM_LIST.get(y)[x] = "27";
                 break;
-            case "28": ITEM_LIST.get(x)[y] = "28";
+            case "28": ITEM_LIST.get(y)[x] = "28";
                 break;
-            case "29": ITEM_LIST.get(x)[y] = "29";
+            case "29": ITEM_LIST.get(y)[x] = "29";
                 break;
-            case "30": ITEM_LIST.get(x)[y] = "30";
+            case "30": ITEM_LIST.get(y)[x] = "30";
                 break;
-            default: ITEM_LIST.get(x)[y] = "";
+            default: ITEM_LIST.get(y)[x] = "";
         }
 
         switch (imageBearing) {
-            case "N": imageBearings.get(x)[y] = "North";
+            case "N": imageBearings.get(y)[x] = "North";
                 break;
-            case "S": imageBearings.get(x)[y] = "South";
+            case "S": imageBearings.get(y)[x] = "South";
                 break;
-            case "E": imageBearings.get(x)[y] = "East";
+            case "E": imageBearings.get(y)[x] = "East";
                 break;
-            case "W": imageBearings.get(x)[y] = "West";
+            case "W": imageBearings.get(y)[x] = "West";
                 break;
-            default: imageBearings.get(x)[y] = "";
+            default: imageBearings.get(y)[x] = "";
         }
+        cells[x + 1][20 - y - 1].setType("robot");
+        setObstacleCoord(x + 1, y + 1);
+        this.invalidate();
         return true;
     }
 

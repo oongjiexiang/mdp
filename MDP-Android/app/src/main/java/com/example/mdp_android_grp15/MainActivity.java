@@ -223,7 +223,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Send message to bluetooth
-    public static void printMessage(String message) {
+    public static void
+
+    printMessage(String message) {
         showLog("Entering printMessage");
         editor = sharedPreferences.edit();
 
@@ -344,18 +346,28 @@ public class MainActivity extends AppCompatActivity {
             String message = intent.getStringExtra("receivedMessage");
             showLog("receivedMessage: message --- " + message);
 
-            String direction = gridMap.getRobotDirection();
+            if(message.contains(",")) {
 
-            //GridMap.performBluetoothCommand(8004, message);
 
-            String[] cmd = message.split("[(,)]");
-            //String[] cmd = message.split(",");
-            int x = Integer.parseInt(cmd[1]) + 1;
-            int y = Integer.parseInt(cmd[2]) + 1;
-            int angle = Integer.parseInt(cmd[3]);
+                //String[] cmd = message.split("[(,)]");
+                String[] cmd = message.split(",");
+                int x = Integer.parseInt(cmd[0]);
+                int y = Integer.parseInt(cmd[1]);
 
-            // TODO: grid painted in green instead of white & robot can walk through obstacles
-            gridMap.performAlgoCommand(x, y, angle);
+                if (cmd.length == 3) {
+
+                    int angle = Integer.parseInt(cmd[2]);
+
+                    gridMap.performAlgoCommand(x, y, angle);
+                } else {
+                    String id = cmd[2];
+                    printMessage(id);
+                    String image = cmd[3];
+                    printMessage(image);
+                    gridMap.performRpiCommand(x, y, id, image);
+                }
+            }
+
 
             try {
                 if (message.length() > 7 && message.substring(2,6).equals("grid")) {
