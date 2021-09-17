@@ -126,7 +126,7 @@ string Network::decodeMessage(){
 }
 
 //if true, all actions from the message are completed, if false, there was an error, resend
-bool messageSender(string message, Network n, int receiverNumber){
+bool Network::messageSender(string message, Network n, int receiverNumber){
     //read the list of commands
     //send 1 command at a time to RPi
     //wait for ready msg from STM/Rpi
