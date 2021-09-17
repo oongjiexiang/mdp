@@ -16,8 +16,7 @@ SOURCES += \
     config.cpp \
     action.cpp \
     asearch.cpp \
-    pathPlanning.cpp \
-    simulator.cpp
+    pathPlanning.cpp
 
 HEADERS += \
     hamiltonian.h \
@@ -26,13 +25,11 @@ HEADERS += \
     config.h \
     action.h \
     asearch.h \
-    pathPlanning.h \
-    simulator.h
+    pathPlanning.h 
 
 FORMS += \
     hamiltonian.ui \
-    mainwindow.ui \
-    simulator.ui
+    mainwindow.ui 
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

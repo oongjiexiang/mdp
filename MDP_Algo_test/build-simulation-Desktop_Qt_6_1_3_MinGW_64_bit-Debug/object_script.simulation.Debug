@@ -6,7 +6,5 @@ debug/config.o
 debug/action.o
 debug/asearch.o
 debug/pathPlanning.o
-debug/simulator.o
 debug/moc_hamiltonian.o
 debug/moc_mainwindow.o
-debug/moc_simulator.o

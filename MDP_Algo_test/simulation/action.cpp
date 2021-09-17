@@ -25,9 +25,9 @@ State::State(Vertex* position, int obstacleSeen, int face_direction, State* prev
 void State::printState(){
     cout << "--------------State---------------\n\t";
     position->printVertex();
-    cout << "\tobstacleSeen: " << obstacleSeen << endl;
-    cout << "\tfaceDirection: " << face_direction << endl;
-    cout << "--------------End State---------------" << endl;
+    // cout << "\tobstacleSeen: " << obstacleSeen << endl;
+    // cout << "\tfaceDirection: " << face_direction << endl;
+    // cout << "--------------End State---------------" << endl;
 }
 
 // ------------------------Forward action------------------------

@@ -33,7 +33,7 @@ class aStar{
     public:
         aStar();
         aStar(vector<Obstacle> obstacles);
-        State* search(State& initState, Obstacle& dest, float* pathCost, vector<State*>* states);
+        State* search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states);
 };
 
 #endif

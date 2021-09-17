@@ -3,6 +3,7 @@
 
 #include "component.h"
 #include "config.h"
+#include "asearch.h"
 #include <utility>
 
 typedef pair<Obstacle, vector<State*>> ActionListPerObstacle;

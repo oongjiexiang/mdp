@@ -52,20 +52,18 @@ void ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         SearchResult buffer;
         cout << float(iteration_debug++)/totalPermutation << "%" << endl;
         // initial state
-        Vertex robotInitPosition(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
-        State* initState = new State(&robotInitPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);
+        Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
+        State* initState = new State(robotInitPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);
 
         // compute the Hamiltonian path
         for(int i = 0; i < goal_ids.size(); i++){
-            initState = astar.search(*initState, obstacles[goal_ids[i]], &buffer.first, &buffer.second);
+            initState = astar.search(initState, obstacles[goal_ids[i]], &buffer.first, &buffer.second);
             onePermuteSolution.push_back(make_pair(obstacles[goal_ids[i]], buffer.second));
             onePermuteSubDistance.push_back(buffer.first);
         }
-        // combine path solution from one obstacle to another into a single path solution
-        for(int i = 0; i < onePermuteSolution.size(); i++){
-            pathDistanceList.push_back(onePermuteSubDistance);
-            pathSolutionList.push_back(onePermuteSolution);
-        }
+        pathDistanceList.push_back(onePermuteSubDistance);
+        pathSolutionList.push_back(onePermuteSolution);
+        // }
     // + 1 because first position is always initial point with id = 0
     }while(next_permutation(goal_ids.begin(), goal_ids.end())); 
 }

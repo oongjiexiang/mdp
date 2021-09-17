@@ -2,6 +2,8 @@
 #define HAMILTONIAN_H
 
 #include "component.h"
+#include "pathPlanning.h"
+#include "action.h"
 #include <vector>
 #include <QDialog>
 #include <QGroupBox>
@@ -21,14 +23,21 @@ public:
     ~Hamiltonian();
 
 private:
+    // Qt UI elements
     Ui::Hamiltonian *ui;
-    enum { ROW_COUNT = 10, COLUMN_COUNT = 10 };
-    vector<Obstacle*> obstacles;
     QGroupBox *verticalGroupBox;
     QGroupBox *gridGroupBox;
     QGroupBox *horizontalGroupBox;
     vector<vector<QPushButton*>> buttons;
     vector<QPushButton*> controlButtons;
+
+    // search variables
+    vector<Obstacle*> obstacles;
+    vector<ActionListPerObstacle> results;
+    State* curState;
+    State* nextState;
+    int showingObstacle = 0;
+    int showingStep = 0;
 
     // initial setup. Call once
     void setupSimulation();
@@ -42,6 +51,8 @@ private:
 
     // When Hamiltonian path search begins
     void startHamiltonianCalculation();
+    void displayRobotLocation();
+    void displayNextStep();
     void simulate();
 };
 

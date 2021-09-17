@@ -6,7 +6,5 @@ release/config.o
 release/action.o
 release/asearch.o
 release/pathPlanning.o
-release/simulator.o
 release/moc_hamiltonian.o
 release/moc_mainwindow.o
-release/moc_simulator.o

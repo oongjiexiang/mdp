@@ -76,16 +76,16 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.push_back(right);
 }
 
-State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<State*>* states){
+State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states){
     // 1. Check if this search definitely fails
     // Either the source or the destination is blocked
-    if (!grid->isAvailableGrid(initState.position->xGrid, initState.position->yGrid)){
+    if (!grid->isAvailableGrid(initState->position->xGrid, initState->position->yGrid)){
         printf("Source is blocked\n");
         return nullptr;
     }
 
     // If the destination cell is the same as source cell
-    if (isDestination(initState, dest)) {
+    if (isDestination(*initState, dest)) {
         printf("We already detected %d at (%d, %d)\n", dest.id, dest.xGrid, dest.yGrid);
         return nullptr;
     }
@@ -104,15 +104,15 @@ State* aStar::search(State& initState, Obstacle& dest, float* pathCost, vector<S
     priority_queue<Tuple, vector<Tuple>, greater<Tuple> > openList; // e. Priority Queue <f-cost, state>
 
     // for indexing purposes. For cellDetails, 0 degree to 0, 90 corresponds to 1, 180 to 2, -90 to 3
-    int faceDirection = (int)(initState.face_direction)/90;
+    int faceDirection = (int)(initState->face_direction)/90;
     
     // 3. Set up initial state
-    Vertex* position = initState.position;
+    Vertex* position = initState->position;
     position->safe = true;
-    initState.gCost = initState.hCost = 0.0;
-    initState.prevState = nullptr;
-    cellDetails[position->xGrid][position->yGrid][faceDirection] = &initState;  // mark as visited
-    openList.emplace(Tuple(0.0, &initState));
+    initState->gCost = initState->hCost = 0.0;
+    initState->prevState = nullptr;
+    cellDetails[position->xGrid][position->yGrid][faceDirection] = initState;  // mark as visited
+    openList.emplace(Tuple(0.0, initState));
 
     // 4. A* algorithm begins
     while (!openList.empty()) {
