@@ -26,6 +26,7 @@ class Network{
     std::string decodeMessage();
     int sendMessage(std::string formattedMessage);
     void endConnection();
+    bool messageSender(std::string message, Network n, int receiverNumber);
 };
 
 #endif
