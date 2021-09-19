@@ -6,8 +6,8 @@ using namespace std;
 
 int main()
 {
-    string ipAddr = "192.168.25.1";
-    int port =5180;
+    //string ipAddr = "192.168.25.1";
+    //int port =5180;
     int checker=0;
     //message stored as a string of commands with no characters in between
     string message="fhggh\n";
@@ -16,7 +16,7 @@ int main()
     // "bijbii"
     // "fhffifffib"
     string retMessage="";
-    Network n(ipAddr,port);
+    Network n;
     checker = n.initializeConnection();
     if(checker == 1){
         printf("error during initialization");

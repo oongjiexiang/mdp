@@ -1,0 +1,21 @@
+# depslib dependency file v1.0
+1632049397 source:c:\users\zhi yu\desktop\github\mdp_algo_test\network stuff\main.cpp
+	<iostream>
+	<string>
+	"NetworkClass.h"
+
+1632048330 c:\users\zhi yu\desktop\github\mdp_algo_test\network stuff\networkclass.h
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+
+1632049688 source:c:\users\zhi yu\desktop\github\mdp_algo_test\network stuff\networkclass.cpp
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+	<NetworkClass.h>
+

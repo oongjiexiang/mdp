@@ -20,13 +20,13 @@ class Network{
     int checker;
     std::string message;//u8 encodes the string us utf-8 format
     int bufferLength; //change this later
-    Network(std::string ipAddr, int portNo);
+    Network();
     int initializeConnection();
     std::string encodeMessage(int targetDevice, std::string unformattedMessage);
     std::string decodeMessage();
     int sendMessage(std::string formattedMessage);
     void endConnection();
-    bool messageSender(std::string message, Network n, int receiverNumber);
+    bool messageSender(std::string message);
 };
 
 #endif

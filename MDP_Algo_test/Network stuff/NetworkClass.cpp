@@ -20,14 +20,15 @@ SOCKET ConnectSocket = INVALID_SOCKET;
 sockaddr_in hint;
 
 //constructor to set the server ip address and port number
-Network::Network(string ipAddr, int portNo){
-    Network::serverIP = ipAddr;
-    Network::portNumber = portNo;
+Network::Network(){
+    Network::serverIP = "192.168.25.1"; //ip given by RPi
+    Network::portNumber = 5180;
     Network::checker =0;
     Network::message = "test message";
     Network::bufferLength = 4096; //change this later
     //create wsadata
 }
+
 //call this to initialize the network
 int Network::initializeConnection(){
     //initialize WSAData as version 2.2
@@ -59,6 +60,7 @@ int Network::initializeConnection(){
     }
     return 0;
 }
+
 //target device 1 for android, 2 for stm, assumes the unformatted message is correct
 string Network::encodeMessage(int targetDevice, string unformattedMessage){
     string formattedMessage;
@@ -78,6 +80,7 @@ string Network::encodeMessage(int targetDevice, string unformattedMessage){
     return formattedMessage;
 }
 
+//sends only 1 message to the server and waits for a reply
 //sends message to the server and receives data that is input into the receiveBuffer
 int Network::sendMessage(string formattedMessage){
     //set current message to formatted message
@@ -113,11 +116,12 @@ int Network::sendMessage(string formattedMessage){
     return 0;
 }
 
+//decode the message received from the server
 string Network::decodeMessage(){
     int i=0;
     char temp='a';
     string retMessage="";
-    while(temp!='\n'){
+    while(temp!='\n' || i < 4096){
         temp = receiveBuffer[i];
         retMessage = retMessage+temp;
         i++;
@@ -125,25 +129,45 @@ string Network::decodeMessage(){
     return retMessage;
 }
 
+//sends multiple messages, message should be in the format of single char commands with no spacing in between them and ending in '\n'
+//eg. "aaab\n"
 //if true, all actions from the message are completed, if false, there was an error, resend
-bool Network::messageSender(string message, Network n, int receiverNumber){
+bool Network::messageSender(string message){
     //read the list of commands
     //send 1 command at a time to RPi
     //wait for ready msg from STM/Rpi
     int i=0;
-    string readMsg="";
-    string encodedMsg="";
-    string reply="";
-    while(readMsg.compare("\n")!=0){
+    string readMsg = "";
+    string receiverNumberString = "0";
+    int receiverNumber = 0;
+    string checkMsg = "";
+    string encodedMsg = "";
+    string reply = "";
+    while(true){
+        checkMsg = message.substr(i,2);
+        if(checkMsg.compare("\n")==0 || i > 4096){
+            return true;
+        }
         readMsg = message.substr(i,1);
+        receiverNumberString = message.substr(i+1,1);
+        //3 cases for which subteam to send the message to 1 AND, 2 STM, 3 RPI
+        if(receiverNumberString.compare("1")==0){
+            receiverNumber=1;
+        }
+        if(receiverNumberString.compare("2")==0){
+            receiverNumber=2;
+        }
+        if(receiverNumberString.compare("3")==0){
+            receiverNumber=3;
+        }
         //parameter 1 = send to STM
-        encodedMsg = n.encodeMessage(receiverNumber,readMsg);
+        encodedMsg = encodeMessage(receiverNumber,readMsg);
         if(encodedMsg.compare("ERROR")){
             return false;
         }
-        n.sendMessage(encodedMsg);
-        reply = n.decodeMessage();
-        while(reply.compare("a")!=0){
+        sendMessage(encodedMsg);
+        reply = decodeMessage();
+        while(reply.compare("r")!=0){
             printf("Waiting for ready, current msg: %s\n",reply.c_str());
         }
         i++;
