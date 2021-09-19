@@ -355,6 +355,8 @@ public class MainActivity extends AppCompatActivity {
                 int y = Integer.parseInt(cmd[1]);
 
                 if (cmd.length == 3) {
+                    x+=1;
+                    y+=1;
 
                     int angle = Integer.parseInt(cmd[2]);
 

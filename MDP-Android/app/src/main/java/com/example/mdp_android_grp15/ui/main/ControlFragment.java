@@ -140,7 +140,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
         gridMap = MainActivity.getGridMap();
 
-        // TODO: maybe change the message sent over bluetooth to robot
         // Button Listener
         moveForwardImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,7 +154,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                         updateStatus("moving forward");
                     else
                         updateStatus("Unable to move forward");
-                   MainActivity.printMessage("STM|b \n");
+                    MainActivity.printMessage("STM|b \n");
                 }
                 else
                     updateStatus("Please press 'STARTING POINT'");
@@ -302,7 +301,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     if(phoneTiltSwitch.isChecked()){
                         showToast("Tilt motion control: ON");
                         phoneTiltSwitch.setPressed(true);
-
                         mSensorManager.registerListener(ControlFragment.this, mSensor, mSensorManager.SENSOR_DELAY_NORMAL);
                         sensorHandler.post(sensorDelay);
                     }else{
@@ -327,7 +325,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 }
             }
         });
-
         calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

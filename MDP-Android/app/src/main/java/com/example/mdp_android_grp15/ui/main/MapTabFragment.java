@@ -88,12 +88,12 @@ public class MapTabFragment extends Fragment {
         manualAutoToggleBtn = root.findViewById(R.id.autoManualSwitch);
         updateButton = root.findViewById(R.id.updateMapBtn);
 
-//        startDragBtn = root.findViewById(R.id.startDragBtn);
         dragSwitch = root.findViewById(R.id.dragSwitch);
         spinner_imageID = root.findViewById(R.id.imageIDSpinner);
         spinner_imageBearing = root.findViewById(R.id.bearingSpinner);
         spinner_imageID.setEnabled(false);
         spinner_imageBearing.setEnabled(false);
+
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
                 R.array.imageID_array, android.R.layout.simple_spinner_item);
@@ -141,13 +141,14 @@ public class MapTabFragment extends Fragment {
         dragSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
-//                if(isChecked) {
-//                    // Do something
-//                } else {
-//                // Do the other thing
-//                }
                 showToast("Dragging is " + (isChecked ? "on" : "off"));
                 dragStatus = isChecked;
+                if (dragStatus == true) {
+                    // disable imageID and imageBearing and disable setObstacle when drag is on
+                    spinner_imageID.setEnabled(false);
+                    spinner_imageBearing.setEnabled(false);
+                    gridMap.setSetObstacleStatus(false);
+                }
             }
         });
 
@@ -225,6 +226,8 @@ public class MapTabFragment extends Fragment {
                     spinner_imageID.setEnabled(false);
                     spinner_imageBearing.setEnabled(false);
                 }
+
+                dragSwitch.setChecked(false);
                 showLog("obstacle status = " + gridMap.getSetObstacleStatus());
                 showLog("Exiting obstacleImageBtn");
             }
