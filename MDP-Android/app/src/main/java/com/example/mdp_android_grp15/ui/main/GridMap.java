@@ -140,6 +140,7 @@ public class GridMap extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         showLog("Entering onDraw");
+        showLog(String.valueOf(getCanDrawRobot()));
         super.onDraw(canvas);
         showLog("Redrawing map");
 
@@ -300,6 +301,8 @@ public class GridMap extends View {
     }
 
     private void drawRobot(Canvas canvas, int[] curCoord) {
+
+
         showLog("Entering drawRobot");
 //        int androidRowCoord = this.convertRow(curCoord[1]);
         showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
@@ -959,25 +962,26 @@ public class GridMap extends View {
 
                     // after init, at stated column and row, add the id to use as ref to update the grid
                     ITEM_LIST.get(row - 1)[column - 1] = imageID;
-
+                    imageBearings.get(row - 1)[column - 1] = imageBearing;
 
                 /*
                 add border colour to grid on the side image is on (N,S,E or W)
                  */
-                    switch (imageBearing) {
-                        case "North":
-                            imageBearings.get(row - 1)[column - 1] = "North";
-                            break;
-                        case "South":
-                            imageBearings.get(row - 1)[column - 1] = "South";
-                            break;
-                        case "East":
-                            imageBearings.get(row - 1)[column - 1] = "East";
-                            break;
-                        case "West":
-                            imageBearings.get(row - 1)[column - 1] = "West";
-                            break;
-                    }
+//                    switch (imageBearing) {
+//                        case "North":
+//                            imageBearings.get(row - 1)[column - 1] = "North";
+//                            break;
+//                        case "South":
+//                            imageBearings.get(row - 1)[column - 1] = "South";
+//                            break;
+//                        case "East":
+//                            imageBearings.get(row - 1)[column - 1] = "East";
+//                            break;
+//                        case "West":
+//                            imageBearings.get(row - 1)[column - 1] = "West";
+//                            break;
+//                    }
+
 
 
                 /* test boundaries of cells
@@ -1238,7 +1242,6 @@ public class GridMap extends View {
         this.invalidate();
     }
 
-    // TODO: obstacle and turning fixed for now by checking for obstacle directly in front first
     // e.g obstacle is on right side of 2x2 and can turn left and vice versa
     public void moveRobot(String direction) {
         showLog("Entering moveRobot");
@@ -1471,7 +1474,7 @@ public class GridMap extends View {
     public boolean checkObstaclesRightInFront(int[] coord, List<int[]> obstacles) {
         showLog("Enter checking for obstacles directly in front");
 //        if (getValidPosition())
-            // check obstacle for new position
+        // check obstacle for new position
         for (int x = coord[0] - 1; x <= coord[0]; x++) {
             for (int y = coord[1] - 1; y <= coord[1]; y++) {
                 for (int i = 0; i < obstacles.size(); i++) {
@@ -1697,43 +1700,25 @@ public class GridMap extends View {
 
         @Override
         public void onDrawShadow(Canvas canvas) {
-
             // Draws the ColorDrawable in the Canvas passed in from the system.
-            canvas.scale(mScaleFactor.x/(float)getView().getWidth(), mScaleFactor.y/(float)getView().getHeight());
+            canvas.scale(mScaleFactor.x/(float)getView().getWidth(),
+                    mScaleFactor.y/(float)getView().getHeight());
             getView().draw(canvas);
         }
 
     }
 
-    // TODO: add function to feed ITEM_LIST and imageBearing the messages received from bluetooth (for the roaming)
-//    // received bluetooth constants (start with 8001)
-//    public static final int IMAGE_ID_UPDATE = 8001;
-//    public static final int IMAGE_DIRECTION_UPDATE = 8002;
-//    public static final int IMAGE_ID_DIRECTION_UPDATE = 8003;
-//    public static final int ROBOT_LOC_DIRECTION_UPDATE = 8004;
-
-
-    // algo communicates with stm alr, so android only needs the coords from algo to update position
-    // Algo : [(<x coordinate in cm>, <y coordinate in cm>, <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
-    // performs commands received from algo/rpi/stm via bluetooth
-    public static boolean performBluetoothCommand(int command, int x, int y, int angle) {
-        boolean bool = false;
-
-        switch (command) {
-            case IMAGE_ID_UPDATE:   // rpi image recog
-                break;
-            case IMAGE_DIRECTION_UPDATE:    // rpi image recog
-                break;
-            case IMAGE_ID_DIRECTION_UPDATE:     // rpi image recog
-                break;
-            case ROBOT_LOC_DIRECTION_UPDATE:  // algo? sends "ROBOT,<x>, <y>, <direction>"
-
-        }
-        return bool;
-    }
-
+    /*
+    algo communicates with stm alr, so android only needs the coords from algo to update position
+    Algo : [(<x coordinate in cm>, <y coordinate in cm>,
+            <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
+    performs commands received from algo via bluetooth for robot position/movement
+     */
     public boolean performAlgoCommand(int x, int y, int angle) {
-        if ((x > -1 && x < 20) && (y > -1 && y < 20)) {
+        if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
+            if (robotDirection.equals("None")) {
+                robotDirection = "up";
+            }
             switch (angle) {
                 case -90: //turn right
                     switch (robotDirection) {
@@ -1787,11 +1772,28 @@ public class GridMap extends View {
         } else {
             return false;
         }
+
+        MainActivity.printMessage(Integer.toString(curCoord[0]));
+        MainActivity.printMessage(Integer.toString(curCoord[1]));
+
+        // if robot pos was not set initially, don't set as explored before moving to new coord
         if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
-            cells[curCoord[0]][20 - curCoord[1]].setType("explored");
-            cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
+            // TODO: fix robot tping
+            // check if new x and y is more than just one grid away to see if it's tp or just moving
+            // if just moving then ignore, else tp then do sth
+            if (Math.abs(x - curCoord[0]) > 1 && Math.abs(y - curCoord[1]) > 1) {
+                for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
+                    for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
+                        cells[i][19-j].setType("explored");
+                    }
+                }
+            } else {
+                cells[curCoord[0]][20 - curCoord[1]].setType("explored");
+                cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
+            }
         }
-        setCurCoord(x,y,robotDirection);
+        setCurCoord(x,y,robotDirection);    // set new coords and direction
+        canDrawRobot = true;
         this.invalidate();
         return true;
     }
@@ -1898,21 +1900,21 @@ public class GridMap extends View {
             case ADD_OBSTACLE:
                 // format: <target component>|<command>,<image id>,<obstacle coord>,<face direction>
                 msg = "STM|ADD_OBSTACLE,"
-                    + ITEM_LIST.get(initialRow - 1)[initialColumn - 1] + ","
-                    + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
-                    + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0) + "\n";
+                        + ITEM_LIST.get(initialRow - 1)[initialColumn - 1] + ","
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
+                        + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0) + "\n";
                 break;
             case REMOVE_OBSTACLE:
                 // format: <target component>|<command>,<image id>,<obstacle coord>
                 msg = "STM|REMOVE_OBSTACLE,"
-                    + oldItem + ","
+                        + oldItem + ","
                         + "(" + (initialColumn - 1) + "," + (initialRow - 1) + ")" + "\n";
                 break;
             case MOVE_OBSTACLE:
                 // format: <target component>|<command>,<old coord>,<new coord>
                 msg = "STM|MOVE_OBSTACLE,"
-                    + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
-                    + "(" + (endColumn - 1) + "," + (endRow - 1) + ")" + "\n";
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
+                        + "(" + (endColumn - 1) + "," + (endRow - 1) + ")" + "\n";
                 break;
             case ROBOT_MOVING:
                 // format: <target component>|<command>,<string>
