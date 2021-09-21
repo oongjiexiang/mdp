@@ -22,6 +22,8 @@ class Map{
         // search for a vertex given the yGrid and xGridumn
         Vertex* findVertexByGrid(int xGrid, int yGrid);
 
+        void addObstacle(Obstacle* o);
+
         bool isValidCoor(float x_center, float y_center);
 
         bool isValidGrid(int xGrid, int yGrid);

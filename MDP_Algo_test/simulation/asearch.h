@@ -34,6 +34,7 @@ class aStar{
         aStar();
         aStar(vector<Obstacle> obstacles);
         State* search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states);
+        void changeObstacleFace(Obstacle obstacle, int newFaceDirection);
 };
 
 #endif

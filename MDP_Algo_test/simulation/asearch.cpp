@@ -43,15 +43,10 @@ float aStar::tracePath(State* goalState, vector<State*>* states){
     while(!Path.empty()){
         State* p = Path.top();
         states->push_back(p);
+
         Path.pop();
     }
     return states->back()->gCost;
-    // printf("\nThe Path is ");    // for printing the full path
-    // while (!Path.empty()) {
-    //     Vertex p = Path.top();
-    //     Path.pop();
-    //     printf("-> (%d,%d) ", p.yGrid, p.xGrid);
-    // }
 }
 
 aStar::aStar(){
@@ -69,11 +64,22 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     ActionTurn* left = new ActionTurn(90);
     ActionTurn* right = new ActionTurn(-90);
 
+    possibleActions.clear();
     possibleActions.push_back(forward);
     possibleActions.push_back(reverse);
     possibleActions.push_back(detect);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
+}
+
+void aStar::changeObstacleFace(Obstacle obstacle, int newFaceDirection){
+    vector<Obstacle>& obstacles = grid->getObstacles();
+    for(int i = 0; i < obstacles.size(); i++){
+        if(obstacles[i].id == obstacle.id){
+            obstacles[i].face_direction = newFaceDirection;
+            return;
+        }
+    }
 }
 
 State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states){

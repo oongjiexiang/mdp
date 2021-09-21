@@ -25,9 +25,9 @@ State::State(Vertex* position, int obstacleSeen, int face_direction, State* prev
 void State::printState(){
     cout << "--------------State---------------\n\t";
     position->printVertex();
-    // cout << "\tobstacleSeen: " << obstacleSeen << endl;
-    // cout << "\tfaceDirection: " << face_direction << endl;
-    // cout << "--------------End State---------------" << endl;
+    cout << "\tobstacleSeen: " << obstacleSeen << endl;
+    cout << "\tfaceDirection: " << face_direction << endl;
+    cout << "--------------End State---------------" << endl;
 }
 
 // ------------------------Forward action------------------------
@@ -42,8 +42,8 @@ State* ActionStraight::takeAction(State* initState, Map& maps){
     int newObstacleSeen = initState->obstacleSeen;
 
     int moveGridDistance = (int)(travelDistGrid);
-    int newYGrid = curPosition.yGrid + moveGridDistance*sin(M_PI/180*initState->face_direction);
-    int newXGrid = curPosition.xGrid + moveGridDistance*cos(M_PI/180*initState->face_direction);
+    int newYGrid = curPosition.yGrid + moveGridDistance*(int)(sin(M_PI/180*initState->face_direction));
+    int newXGrid = curPosition.xGrid + moveGridDistance*(int)(cos(M_PI/180*initState->face_direction));
 
     // check if action can be taken
     if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;

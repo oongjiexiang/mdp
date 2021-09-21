@@ -1,84 +1,45 @@
-#include "../../Simulation/component.h"
-#include "../../Simulation/config.h"
+#include "../include/moveAround.h"
 #include "../../Simulation/action.h"
-#include "../../Simulation/asearch.h"
-#include "../../Simulation/pathPlanning.h"
 #include <iostream>
 
 using namespace std;
 
-int main(){
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 4, 9, 270));
+MoveAround::MoveAround(vector<Obstacle> obstacles){
+    astar = new aStar(obstacles);
+}
 
-    //*********************test component.cpp******************
-    // Robot r(3, 4, 90);
-    // Vertex v(1, 10);
-    // Obstacle o(1, 7, 7, 90);
-    // r.printRobot();
-    // v.printVertex();
-    // o.printObstacle();
+void MoveAround::generatePath(State* robotInitState, Obstacle obstacle){
+    Obstacle obs = obstacle;
+    float distance; // Placeholder to keep distance
+    vector<State*> subgoalStates;
+    State* newInitState = robotInitState;
 
-
-    //***************** test config.cpp********************
-    // obstacles.push_back(Obstacle(2, 3, 3, 0));
-    // obstacles.push_back(Obstacle(6, 5, 1, 270));
-    obstacles.push_back(Obstacle(3, 10, 9, 90));
-    // obstacles.push_back(Obstacle(5, 13, 14, 90));
-    // Map map(obstacles);
-    // map.printMap();
-    // map.findVertexByCoor(15.0, 10)->printVertex();
-    // map.findVertexByGrid(10, 3)->printVertex();
-    // cout << map.isValidCoor(0, 0) << endl;
-    // cout << map.isValidGrid(1, 300000) << endl;
-
-    //************** test action.cpp****************
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 7, 7, 0));
-    // obstacles.push_back(Obstacle(2, 3, 3, 0));
-    // Map map(obstacles);
-    // map.printMap();
-    // Vertex* initPosition = new Vertex(7, 8);
-    // State* initState = new State(initPosition, false, 180, nullptr);
-    // initState->printState();
-    // ActionStraight* aforward = new ActionStraight(1);
-    // ActionStraight* areverse = new ActionStraight(-1);
-    // ActionDetect* ad = new ActionDetect(2);
-    // ActionTurn* at = new ActionTurn(-90);
-    // aforward->takeAction(initState, map)->printState();
-    // map.printMap();
-    // cout << areverse->takeAction(initState, map) << endl;
-    // map.printMap();
-    // cout << ad->takeAction(initState, map) << endl;
-    // map.printMap();
-    // cout << at->takeAction(initState, map) << endl;
-    // map.printMap();
-
-    //**************** test asearch.cpp ***************
-    // Vertex* initPosition = new Vertex(4, 2);
-    // State* initState = new State(initPosition, false, 90, nullptr);
-    // aStar* astar = new aStar(obstacles);
-    
-    // float pathCost = 0;
-    // vector<State*> resultStates;
-    // astar->search(*initState, obstacles[0], &pathCost, &resultStates);
-    
-    // cout << "-----------path--------------" << endl;
-    // for(int i = 0; i < resultStates.size(); i++){
-    //     resultStates[i]->printState();
-    // }
-    // cout << pathCost << endl;
-
-    //*******************test pathPlanning.cpp ****************
-    ShortestPath sp(obstacles);
-    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
-    cout << result.size() << endl;
-    for(int i = 0; i < result.size(); i++){
-        cout << "Obstacle-------------------------" << endl;
-        result[i].first.printObstacle();
-        vector<State*> states = result[i].second;
-        for(int j = 0; j < states.size(); j++){
-            states[j]->printState();
-        }
+    for(int i = 0; i < 4; i++){
+        astar->changeObstacleFace(obs, (obs.face_direction + 90)%360);  // make robot turn anticlockwise
+        obs.face_direction = (obs.face_direction + 90)%360;
+        newInitState = new State(newInitState->position, 0, newInitState->face_direction, newInitState);
+        newInitState = astar->search(newInitState, obs, &distance, &subgoalStates);
+        states.insert(states.end(), subgoalStates.begin(), subgoalStates.end());
+    }
+    for(int i = 0; i < states.size(); i++){
+        states[i]->printState();
     }
 }
+
+
+// int main(){
+//     vector<Obstacle> obstacles;
+//     obstacles.push_back(Obstacle(1, 4, 9, 270));
+//     obstacles.push_back(Obstacle(3, 10, 9, 90));
+//     ShortestPath sp(obstacles);
+//     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+//     cout << result.size() << endl;
+//     for(int i = 0; i < result.size(); i++){
+//         cout << "Obstacle-------------------------" << endl;
+//         result[i].first.printObstacle();
+//         vector<State*> states = result[i].second;
+//         for(int j = 0; j < states.size(); j++){
+//             states[j]->printState();
+//         }
+//     }
+// }

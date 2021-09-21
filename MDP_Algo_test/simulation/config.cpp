@@ -31,6 +31,17 @@ Map::Map(vector<Obstacle> obstacles): Map::Map(){
     }
 }
 
+void Map::addObstacle(Obstacle* o){
+    obstacles.push_back(*o);
+    int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
+    grids[o->xGrid][o->yGrid]->is_obstacle = true;
+    for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
+        for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
+            grids[o->xGrid + j][o->yGrid + k]->is_border = grids[o->xGrid + j][o->yGrid + k]->is_obstacle? false: true;
+        }
+    }
+}
+
 /*
 // JX comment out (13/9/2021) as I am assuming that obstacles will be placed in square grids precisely. If not, need calculations
 //adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
