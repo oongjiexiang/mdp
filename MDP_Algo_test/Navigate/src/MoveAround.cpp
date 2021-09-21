@@ -1,8 +1,8 @@
-#include "component.h"
-#include "config.h"
-#include "action.h"
-#include "asearch.h"
-#include "pathPlanning.h"
+#include "../../Simulation/component.h"
+#include "../../Simulation/config.h"
+#include "../../Simulation/action.h"
+#include "../../Simulation/asearch.h"
+#include "../../Simulation/pathPlanning.h"
 #include <iostream>
 
 using namespace std;
