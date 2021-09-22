@@ -15,7 +15,9 @@
                 // "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\checklistNavigate.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\actionFormulator.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\spiral.cpp",
-                "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\testMain.cpp",
+                // "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\testMain.cpp",
+                "${workspaceFolder}\\MDP_Algo_test\\Network Stuff\\NetworkClass.cpp",
+                "${workspaceFolder}\\MDP_Algo_test\\Network Stuff\\main.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],

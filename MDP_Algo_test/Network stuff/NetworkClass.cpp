@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
-#include <NetworkClass.h>
+#include "NetworkClass.h"
 #include <vector>
 #include "action.h"
 

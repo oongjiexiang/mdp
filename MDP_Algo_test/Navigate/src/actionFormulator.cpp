@@ -54,4 +54,5 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
     for(int i = 0; i < actions.size(); i++){
         actions[i]->printAction();
     }
+    return actions;
 }

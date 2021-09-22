@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include "NetworkClass.h"
+#include "../Simulation/action.h"
+#include "../Simulation/pathPlanning.h"
 
 using namespace std;
 
@@ -41,6 +43,25 @@ int main()
 //    printf("%d\n",static_cast<int>(vector1.size()));
     //ZY: set vector1 = vector produced by a*/spiral
     //vector<State> = vector1 = {};
+
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 4, 9, 270));
+    obstacles.push_back(Obstacle(3, 10, 9, 90));
+    Vertex* initPosition = new Vertex(4, 2);
+    State* initState = new State(initPosition, false, 90, nullptr);
+    aStar* astar = new aStar(obstacles);
+    
+    float pathCost = 0;
+    vector<State*> resultStates;
+    astar->search(initState, obstacles[0], &pathCost, &resultStates);
+
+    vector<State> vector1;
+    for(int i = 0; i < resultStates.size(); i++){
+        resultStates[i]->printState();
+        vector1.push_back(*resultStates[i]);
+    }
+
+
     n.sendPath(vector1);
     retMessage = n.decodeMessage();
     printf("%s",retMessage.c_str());
