@@ -14,6 +14,8 @@
 #include <vector>
 #include "action.h"
 
+#pragma comment(lib, "Ws2_32.lib")
+
 class Network{
     public:
     std::string serverIP; //ip address of the server
@@ -28,7 +30,7 @@ class Network{
     int sendMessage(std::string formattedMessage);
     void endConnection();
     bool messageSender(std::string message, int targetNumber);
-    std::string sendPath(std::vector<State> vectorOfStates);
+    std::string sendPath(std::vector<State>& vectorOfStates);
     std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
 
 };

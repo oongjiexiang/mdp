@@ -13,6 +13,8 @@
 #include <vector>
 #include "action.h"
 
+#pragma comment(lib, "Ws2_32.lib")
+
 using namespace std;
 char receiveBuffer[4096];
 
@@ -169,7 +171,7 @@ bool Network::messageSender(string message, int targetNumber){
 }
 
 
-string Network::sendPath(vector<State> vectorOfStates){
+string Network::sendPath(vector<State>& vectorOfStates){
     int currentStateIndex,vectorSize, facingDirection0, facingDirection1;
     float x0, x1, y0, y1;
     string andMsg = "";
@@ -187,11 +189,12 @@ string Network::sendPath(vector<State> vectorOfStates){
             facingDirection1 = vectorOfStates[currentStateIndex+1].face_direction;
             stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
             andMsg = ""; // convert x0,x1,y0,y1,facingdirection0, facingdireion1 to string and put in this format (x0,y0,fd0),(x1,y1,fd1)
-            messageSender(andMsg,1);
-            messageSender(stmMsg,2);
+            printf("%s\n",stmMsg.c_str());
+            //messageSender(andMsg,1);
+            //messageSender(stmMsg,2);
         }
         else{
-            retMsg = messageSender(rpiMsg,3);
+            //retMsg = messageSender(rpiMsg,3);
         }
 
     }
@@ -208,45 +211,129 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
     string reverse10 = "f";
     string turnRight = "i";
     string turnLeft = "j";
+    int x,y;
+    x = x1-x0;
+    y = y1-y0;
     //forward or reverse
     if(facingDirection0 == facingDirection1){
         if(facingDirection0 == 0){ //face east
-            if(x1 - x0 > 0){//x1 and x0 should not be equal in this case, if a movement action is required
+            //check if y changes
+            if(y < 0){ //turn right when facing east
+                return turnRight;
+            }
+            if(y > 0){ //turn left when facing east
+                return turnLeft;
+            }
+            if(x > 0){//forwarwd motion
                 return forward10;
             }
-            if(x1 - x0 < 0){
+            if(x < 0){//reverse motion
                 return reverse10;
             }
         }
         if(facingDirection0 == 180){ //face south
-            if(x1 - x0 > 0){//x1 and x0 should not be equal in this case, if a movement action is required
+            //check if y changes
+            if(y < 0){ //turn left when facing east
+                return turnLeft;
+            }
+            if(y > 0){ //turn right when facing east
+                return turnRight;
+            }
+            if(x > 0){//x1 and x0 should not be equal in this case, if a movement action is required
                 return reverse10;
             }
-            if(x1 - x0 < 0){
+            if(x < 0){
                 return forward10;
             }
         }
         if(facingDirection0 == 90){ //face north
-            if(y1 - y0 > 0){//y1 and y0 should not be equal in this case, if a movement action is required
+            //check if x changes first
+            if(x < 0){ //turn left when facing east
+                return turnLeft;
+            }
+            if(x > 0){ //turn right when facing east
+                return turnRight;
+            }
+            if(y > 0){//y1 and y0 should not be equal in this case, if a movement action is required
                 return forward10;
             }
-            if(y1 - y0 < 0){
+            if(y < 0){
                 return reverse10;
             }
         }
         if(facingDirection0 == 270){
-            if(y1 - y0 > 0){//y1 and y0 should not be equal in this case, if a movement action is required
+            //check if x changes first
+            if(x<0){ //turn right when facing east
+                return turnRight;
+            }
+            if(x>0){ //turn left when facing east
+                return turnLeft;
+            }
+            if(y > 0){//y1 and y0 should not be equal in this case, if a movement action is required
                 return reverse10;
             }
-            if(y1 - y0 < 0){
+            if(y < 0){
                 return forward10;
             }
         }
     }
-
+    //if facing opposite directions
+    //for now assume that it only requires a turning motion
+    if((facingDirection0+180)%360 == facingDirection1){
+        if(facingDirection0 == 0){ //face east
+            //check if y changes
+            if(y < 0){ //turn right when facing east
+                return turnRight+turnRight;
+            }
+            if(y > 0){ //turn left when facing east
+                return turnLeft+turnLeft;
+            }
+            if(x!=0){ //assume to turn right by default
+                return turnRight+turnRight;
+            }
+        }
+        if(facingDirection0 == 180){ //face south
+            //check if y changes
+            if(y < 0){ //turn left when facing east
+                return turnLeft+turnLeft;
+            }
+            if(y > 0){ //turn right when facing east
+                return turnRight+turnRight;
+            }
+            if(x!=0){ //assume to turn right by default
+                return turnRight+turnRight;
+            }
+        }
+        if(facingDirection0 == 90){ //face north
+            //check if x changes first
+            if(x < 0){ //turn left when facing east
+                return turnLeft+turnLeft;
+            }
+            if(x > 0){ //turn right when facing east
+                return turnRight+turnRight;
+            }
+            if(y!=0){ //assume to turn right by default
+                return turnRight+turnRight;
+            }
+        }
+        if(facingDirection0 == 270){
+            //check if x changes first
+            if(x<0){ //turn right when facing east
+                return turnRight+turnRight;
+            }
+            if(x>0){ //turn left when facing east
+                return turnLeft+turnLeft;
+            }
+            if(x!=0){ //assume to turn right by default
+                return turnRight+turnRight;
+            }
+        }
+    }
+    //if facing direction differs by + 90, turn left
     if((facingDirection0+90)%360 == facingDirection1){
         return turnLeft;
     }
+    //if facing direction differs by -90, turn right
     if((facingDirection0-90)%360 == facingDirection1){
         return turnRight;
     }
