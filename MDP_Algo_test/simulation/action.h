@@ -74,4 +74,17 @@ class ActionDetect : public Action{
         void printAction();
 };
 
+class ActionTurn2By4 : public Action{
+    int turnAngle;
+    int cost = 4;  // need to use mathematical calculation
+    public:
+        ActionTurn2By4(int turnAngle);
+        State* takeAction(State* initState, Map& maps);
+
+        int getCost(State* initState, Map maps, Obstacle o);
+
+        // debug
+        void printAction();
+};
+
 #endif

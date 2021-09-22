@@ -18,8 +18,8 @@ ShortestPath::ShortestPath(vector<Obstacle> obstacles): obstacles(obstacles){
 vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
     vector<vector<double>> pathDistanceList;
     vector<vector<ActionListPerObstacle>> pathSolutionList;
-    permutation(pathDistanceList, pathSolutionList);
-
+    if(!permutation(pathDistanceList, pathSolutionList)) return vector<ActionListPerObstacle>();    // if no Hamiltonian path, return an empty vector
+    
     int minPathIndex = 0;
     double minPathDist = DBL_MAX;
     for(int i = 0; i < pathDistanceList.size(); i++){
@@ -35,7 +35,7 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
     return pathSolutionList[minPathIndex];
 }
 
-void ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<vector<ActionListPerObstacle>>& pathSolutionList){
+bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<vector<ActionListPerObstacle>>& pathSolutionList){
     vector<int> goal_ids;
     for(int i = 0; i < obstacles.size(); i++){
         goal_ids.push_back(i);
@@ -60,10 +60,15 @@ void ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
             initState = astar.search(initState, obstacles[goal_ids[i]], &buffer.first, &buffer.second);
             onePermuteSolution.push_back(make_pair(obstacles[goal_ids[i]], buffer.second));
             onePermuteSubDistance.push_back(buffer.first);
+            if(initState == nullptr){   // if no complete Hamiltonian path
+                return false;
+            }
         }
+        
         pathDistanceList.push_back(onePermuteSubDistance);
         pathSolutionList.push_back(onePermuteSolution);
         // }
     // + 1 because first position is always initial point with id = 0
     }while(next_permutation(goal_ids.begin(), goal_ids.end())); 
+    return true;
 }

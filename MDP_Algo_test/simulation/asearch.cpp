@@ -61,8 +61,10 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     ActionStraight* forward = new ActionStraight(1);
     ActionStraight* reverse = new ActionStraight(-1);
     ActionDetect* detect = new ActionDetect(obstacle.id);
-    ActionTurn* left = new ActionTurn(90);
-    ActionTurn* right = new ActionTurn(-90);
+    // ActionTurn* left = new ActionTurn(90);
+    // ActionTurn* right = new ActionTurn(-90);
+    ActionTurn2By4* left = new ActionTurn2By4(90);
+    ActionTurn2By4* right = new ActionTurn2By4(-90);
 
     possibleActions.clear();
     possibleActions.push_back(forward);

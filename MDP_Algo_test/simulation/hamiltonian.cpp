@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QFormLayout>
+#include <QMessageBox>
 #include <QLabel>
 #include <QComboBox>
 #include <QTimer>
@@ -140,20 +141,25 @@ void Hamiltonian::startHamiltonianCalculation(){
     simulate();
 }
 void Hamiltonian::simulate(){
-    controlButtons[1]->setEnabled(true);
-
     vector<Obstacle> simulateObstacles;
     for(int i = 0; i < obstacles.size(); i++){
         simulateObstacles.push_back(*obstacles[i]);
     }
     ShortestPath sp(simulateObstacles);
     results = sp.hamiltonianPath();
-    
-    vector<State*> states = results[showingObstacle].second;
-    curState = states[showingStep++];
-    nextState = states[showingStep];
+    if(results.size() > 0){
+        controlButtons[1]->setEnabled(true);
+        vector<State*> states = results[showingObstacle].second;
+        curState = states[showingStep++];
+        nextState = states[showingStep];
 
-    displayRobotLocation();
+        displayRobotLocation();
+    }
+    else{
+        QMessageBox msgBox;
+        msgBox.setText("Some obstacles are unreachable. No Hamiltonian path solution");
+        msgBox.exec();
+    }
 }
 
 void Hamiltonian::displayNextStep(){

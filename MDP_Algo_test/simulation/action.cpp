@@ -205,4 +205,79 @@ void ActionDetect::printAction(){
 }
 
 
+// -------------------Turning Action Updated----------------------
+ActionTurn2By4::ActionTurn2By4(int turnAngle){
+    // if(turnAngle < 0) this->turnAngle = turnAngle + 360;
+    // else this->turnAngle = turnAngle;
+    this->turnAngle = turnAngle;
+}
+    
+State* ActionTurn2By4::takeAction(State* initState, Map& maps){
+    // assume that turnAngle is always 90 or -90
+    Vertex* newPosition;
+    int newXGrid, newYGrid;
+
+    int faceDirection = initState->face_direction;
+    int curXGrid = initState->position->xGrid;
+    int curYGrid = initState->position->yGrid;
+    vector<vector<Vertex*>> grids = maps.getVertexArray();
+
+    // 1. find new state
+    switch(faceDirection){
+        case 0:
+            newXGrid = curXGrid + 2;
+            newYGrid = curYGrid + 4*turnAngle/abs(turnAngle);
+            
+        break;
+        case 90:
+            newXGrid = curXGrid - 4*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid + 2;
+        break;
+        case 180:
+            newXGrid = curXGrid - 2;
+            newYGrid = curYGrid - 4*turnAngle/abs(turnAngle);
+        break;
+        case 270:
+            newXGrid = curXGrid + 4*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid - 2;
+        break;
+        default:
+            cout << "faceDirection is not straight, but = " << faceDirection << endl;
+            return nullptr;
+    }
+
+    // 2. check if new position and surrounding grids are safe
+    if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;   // check if new grid is valid
+    newPosition = grids[newXGrid][newYGrid];
+    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){    // check if all other neighbouring grids exist and are available
+        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
+            if(!maps.isAvailableGrid(i, j)) return nullptr;
+        }
+    }
+
+    // 3. perform action since it can be taken
+    // update map
+    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
+        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
+            maps.getVertexArray()[i][j]->safe = true;
+        }
+    }
+
+    // introduce new state
+    int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
+    int newObstacleSeen = initState->obstacleSeen;
+    
+    State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
+    return endState;
+}
+
+int ActionTurn2By4::getCost(State* initState, Map maps, Obstacle o){
+    return cost;
+}
+
+// debug ActionTurn
+void ActionTurn2By4::printAction(){
+    cout << "TURN: turnAngle = " << turnAngle << endl;
+}
+
 

@@ -21,6 +21,7 @@ class ShortestPath{
         vector<ActionListPerObstacle> hamiltonianPath();
 
         // calculates each combination of A* between two obstacles and with the initial point
-        void permutation(vector<vector<double>>& pathDistanceList, vector<vector<ActionListPerObstacle>>& pathSolutionList);
+        // returns false if there is no Hamiltonian path
+        bool permutation(vector<vector<double>>& pathDistanceList, vector<vector<ActionListPerObstacle>>& pathSolutionList);
 };
 #endif
