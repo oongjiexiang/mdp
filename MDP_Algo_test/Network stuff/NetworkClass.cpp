@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <string>
 #include <NetworkClass.h>
+#include <vector>
+#include "action.h"
 
 using namespace std;
 char receiveBuffer[4096];
@@ -85,6 +87,7 @@ string Network::encodeMessage(int targetDevice, string unformattedMessage){
 int Network::sendMessage(string formattedMessage){
     //set current message to formatted message
     message = formattedMessage;
+    string retMessage = "";
     if(formattedMessage.compare("ERROR")==0){
         printf("Error, message is not properly formatted!");
         closesocket(ConnectSocket);
@@ -100,6 +103,7 @@ int Network::sendMessage(string formattedMessage){
         return 1;
     }
     //get return messages from server
+
     do{
         checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
         if(checker>0) //bytes are being received
@@ -111,7 +115,7 @@ int Network::sendMessage(string formattedMessage){
             printf("receive failed: %d\n", WSAGetLastError());
             break;
         }
-    }while(checker!=0);
+    }while(checker<=0);
 
     return 0;
 }
@@ -132,7 +136,7 @@ string Network::decodeMessage(){
 //sends multiple messages, message should be in the format of single char commands with no spacing in between them and ending in '\n'
 //eg. "aaab\n"
 //if true, all actions from the message are completed, if false, there was an error, resend
-bool Network::messageSender(string message){
+bool Network::messageSender(string message, int targetNumber){
     //read the list of commands
     //send 1 command at a time to RPi
     //wait for ready msg from STM/Rpi
@@ -144,22 +148,11 @@ bool Network::messageSender(string message){
     string encodedMsg = "";
     string reply = "";
     while(true){
-        checkMsg = message.substr(i,2);
+        checkMsg = message.substr(i,1);
         if(checkMsg.compare("\n")==0 || i > 4096){
             return true;
         }
         readMsg = message.substr(i,1);
-        receiverNumberString = message.substr(i+1,1);
-        //3 cases for which subteam to send the message to 1 AND, 2 STM, 3 RPI
-        if(receiverNumberString.compare("1")==0){
-            receiverNumber=1;
-        }
-        if(receiverNumberString.compare("2")==0){
-            receiverNumber=2;
-        }
-        if(receiverNumberString.compare("3")==0){
-            receiverNumber=3;
-        }
         //parameter 1 = send to STM
         encodedMsg = encodeMessage(receiverNumber,readMsg);
         if(encodedMsg.compare("ERROR")){
@@ -167,13 +160,100 @@ bool Network::messageSender(string message){
         }
         sendMessage(encodedMsg);
         reply = decodeMessage();
-        while(reply.compare("r")!=0){
+        while(reply.compare("R")!=0){
             printf("Waiting for ready, current msg: %s\n",reply.c_str());
         }
         i++;
     }
     return true;
 }
+
+
+string Network::sendPath(vector<State> vectorOfStates){
+    int currentStateIndex,vectorSize, facingDirection0, facingDirection1;
+    float x0, x1, y0, y1;
+    string andMsg = "";
+    string stmMsg = "";
+    string rpiMsg = ""; //fixed as only 1 msg to detect
+    string retMsg = "";
+    vectorSize = static_cast<int>(vectorOfStates.size());
+    for(currentStateIndex = 0; currentStateIndex<vectorSize; currentStateIndex++){
+        if(currentStateIndex!=vectorSize-1){
+            x0 = vectorOfStates[currentStateIndex].position->x_left;
+            x1 = vectorOfStates[currentStateIndex+1].position->x_left;
+            y0 = vectorOfStates[currentStateIndex].position->y_low;
+            y1 = vectorOfStates[currentStateIndex+1].position->y_low;
+            facingDirection0 = vectorOfStates[currentStateIndex].face_direction;
+            facingDirection1 = vectorOfStates[currentStateIndex+1].face_direction;
+            stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
+            andMsg = ""; // convert x0,x1,y0,y1,facingdirection0, facingdireion1 to string and put in this format (x0,y0,fd0),(x1,y1,fd1)
+            messageSender(andMsg,1);
+            messageSender(stmMsg,2);
+        }
+        else{
+            retMsg = messageSender(rpiMsg,3);
+        }
+
+    }
+    return retMsg;
+
+
+}
+
+
+//given two states' x, y and facing direction, return the action to be sent to STM
+string Network::calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1){
+    //define the actions according to the command list
+    string forward10 = "b";
+    string reverse10 = "f";
+    string turnRight = "i";
+    string turnLeft = "j";
+    //forward or reverse
+    if(facingDirection0 == facingDirection1){
+        if(facingDirection0 == 0){ //face east
+            if(x1 - x0 > 0){//x1 and x0 should not be equal in this case, if a movement action is required
+                return forward10;
+            }
+            if(x1 - x0 < 0){
+                return reverse10;
+            }
+        }
+        if(facingDirection0 == 180){ //face south
+            if(x1 - x0 > 0){//x1 and x0 should not be equal in this case, if a movement action is required
+                return reverse10;
+            }
+            if(x1 - x0 < 0){
+                return forward10;
+            }
+        }
+        if(facingDirection0 == 90){ //face north
+            if(y1 - y0 > 0){//y1 and y0 should not be equal in this case, if a movement action is required
+                return forward10;
+            }
+            if(y1 - y0 < 0){
+                return reverse10;
+            }
+        }
+        if(facingDirection0 == 270){
+            if(y1 - y0 > 0){//y1 and y0 should not be equal in this case, if a movement action is required
+                return reverse10;
+            }
+            if(y1 - y0 < 0){
+                return forward10;
+            }
+        }
+    }
+
+    if((facingDirection0+90)%360 == facingDirection1){
+        return turnLeft;
+    }
+    if((facingDirection0-90)%360 == facingDirection1){
+        return turnRight;
+    }
+    printf("Error");
+    return"";
+}
+
 
 //call this once you are done sending and receiving messages from the server
 void Network::endConnection(){

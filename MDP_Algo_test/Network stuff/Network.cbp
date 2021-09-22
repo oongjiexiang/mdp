@@ -38,6 +38,12 @@
 		</Linker>
 		<Unit filename="NetworkClass.cpp" />
 		<Unit filename="NetworkClass.h" />
+		<Unit filename="action.cpp" />
+		<Unit filename="action.h" />
+		<Unit filename="component.cpp" />
+		<Unit filename="component.h" />
+		<Unit filename="config.cpp" />
+		<Unit filename="config.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

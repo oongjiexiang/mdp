@@ -11,7 +11,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
-
+#include <vector>
+#include "action.h"
 
 class Network{
     public:
@@ -26,7 +27,10 @@ class Network{
     std::string decodeMessage();
     int sendMessage(std::string formattedMessage);
     void endConnection();
-    bool messageSender(std::string message);
+    bool messageSender(std::string message, int targetNumber);
+    std::string sendPath(std::vector<State> vectorOfStates);
+    std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
+
 };
 
 #endif

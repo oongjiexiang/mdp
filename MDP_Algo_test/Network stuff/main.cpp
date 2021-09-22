@@ -10,7 +10,11 @@ int main()
     //int port =5180;
     int checker=0;
     //message stored as a string of commands with no characters in between
-    string message="fhggh\n";
+    string message0="b\n";
+    string message1="i\n";
+    string message2="j\n";
+    string message3="f\n";
+    string longMsg = "bijf\n";
     //other messages to try
     //"jjjj" turn in a circle
     // "bijbii"
@@ -22,10 +26,22 @@ int main()
         printf("error during initialization");
         return 1;
     }
-    message = n.encodeMessage(1, message);
 
+    message0 = n.encodeMessage(2, message0);
+    checker = n.sendMessage(message0);
+    printf("Msg 1 sent");
 
-    checker = n.sendMessage(message);
+    message1 = n.encodeMessage(2, message1);
+    checker = n.sendMessage(message1);
+
+    message2 = n.encodeMessage(2, message2);
+    checker = n.sendMessage(message2);
+
+    message3 = n.encodeMessage(2, message3);
+    checker = n.sendMessage(message3);
+
+    checker = n.messageSender(longMsg,2);
+
     if(checker == 1){
         printf("error during send message");
         return 1;
