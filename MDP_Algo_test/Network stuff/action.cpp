@@ -75,7 +75,7 @@ ActionTurn::ActionTurn(int turnAngle){
     // else this->turnAngle = turnAngle;
     this->turnAngle = turnAngle;
 }
-    
+
 State* ActionTurn::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
     Vertex* newPosition;
@@ -91,7 +91,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
         case 0:
             newXGrid = curXGrid + 1;
             newYGrid = curYGrid + turnAngle/abs(turnAngle);
-            
+
         break;
         case 90:
             newXGrid = curXGrid - turnAngle/abs(turnAngle);
@@ -130,7 +130,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
     // introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
     int newObstacleSeen = initState->obstacleSeen;
-    
+
     State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
     return endState;
 }
@@ -159,7 +159,7 @@ ActionDetect::ActionDetect(int obsId){
 State* ActionDetect::takeAction(State* initState, Map& maps){
     vector<Obstacle>& obstacles = maps.getObstacles();
     Vertex position = *(initState->position);
-    
+
     for(int i = 0; i < obstacles.size(); i++){
         Obstacle& o = obstacles[i];
         int faceDirection = initState->face_direction;
@@ -181,7 +181,7 @@ State* ActionDetect::takeAction(State* initState, Map& maps){
             default:
                 correctOrientation = false;
         }
-        if(correctOrientation && euclidean(position.xGrid, position.yGrid, o.xGrid, o.yGrid) <= MAX_IMAGE_VIEW_DISTANCE_GRID){ 
+        if(correctOrientation && euclidean(position.xGrid, position.yGrid, o.xGrid, o.yGrid) <= MAX_IMAGE_VIEW_DISTANCE_GRID){
             obstacleId = o.id;
             imageDetected = true;
             State* endState = new State(initState->position, obstacleId, initState->face_direction, initState);

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-// robot 
+// robot
 const int ROBOT_INIT_Y_GRID = 1;
 const int ROBOT_INIT_X_GRID = 1;
 const int ROBOT_INIT_FACEDIRECTION = 90;
@@ -17,17 +17,17 @@ const float AREA_LENGTH = 200;
 const float START_COST = FLT_MAX;
 const float UNIT_LENGTH = 10;
 const int Y_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH;
-const int X_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH; 
+const int X_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH;
 const float OBSTACLE_LENGTH = 10;
 const float BOUNDARY_SIZE = 10;    // originally 15. Temporarily changed to 15 for Qt testing
 
 //used for obstacle avoidance
 class Vertex{
-    public: 
+    public:
         int xGrid, yGrid;
         float x_right, x_left, y_high, y_low;
         bool is_obstacle, is_border, safe;
-        
+
         Vertex(int xGrid, int yGrid);
         void printVertex();
 };

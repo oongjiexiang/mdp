@@ -16,7 +16,7 @@ class State{
         float gCost, hCost;
         State* prevState;
         State(Vertex* position, int obstacleSeen, int face_direction, State* prevState);
-        
+
         // debug
         void printState();
 };
