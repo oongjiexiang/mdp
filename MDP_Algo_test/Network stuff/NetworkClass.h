@@ -11,7 +11,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
+#include "action.h"
 
+#pragma comment(lib, "Ws2_32.lib")
 
 class Network{
     public:
@@ -20,13 +23,16 @@ class Network{
     int checker;
     std::string message;//u8 encodes the string us utf-8 format
     int bufferLength; //change this later
-    Network(std::string ipAddr, int portNo);
+    Network();
     int initializeConnection();
     std::string encodeMessage(int targetDevice, std::string unformattedMessage);
     std::string decodeMessage();
     int sendMessage(std::string formattedMessage);
     void endConnection();
-    bool messageSender(std::string message, Network n, int receiverNumber);
+    bool messageSender(std::string message, int targetNumber);
+    std::string sendPath(std::vector<State>& vectorOfStates);
+    std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
+
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include<vector>
 #include<math.h>
 #include "component.h"
+#include "action.h"
 
 
 //find the location where the robot should move to in order to search for image
@@ -42,7 +43,7 @@ bool boundingBox(double pX0, double pX1, double pY0, double pY1, double oX0, dou
 //call this twice and swap the lines
 bool linesStraddle(double x0, double x1, double x2, double x3, double y0, double y1, double y2, double y3){
     double equation1, equation2;
-    equation1 = ((x3 - x0) * (y1-y0)) - ((y3 - y0) * (x1-x0));
+    equation1 = ((x2 - x0) * (y1-y0)) - ((y2 - y0) * (x1-x0));
     equation2 = ((x3 - x0) * (y1-y0)) - ((y3 - y0) * (x1-x0));
 
     //if the 2 equations have different signs, it means the 2 points of the second line are on two different sides of the first line
@@ -72,12 +73,40 @@ bool checkIntersect(Vertex vertex, double initPathX, double initPathY, double en
         return false;
     }
     //test if vertex border intersects with path
-    intersect = linesStraddle(initPathX, endPathX, vertex.x_left, vertex.x_right, initPathY, endPathY, vertex.y_low, vertex.y_high);
+    intersect = linesStraddle(initPathX, endPathX, vertex.x_left, vertex.x_right, initPathY, endPathY, vertex.y_low, vertex.y_low);
     if(intersect){
         return true;
     }
     //test if path intersects with border
-    intersect = linesStraddle(vertex.x_left, vertex.x_right, initPathX, endPathX, vertex.y_low, vertex.y_high, initPathY, endPathY);
+    intersect = linesStraddle(vertex.x_left, vertex.x_right, initPathX, endPathX, vertex.y_low, vertex.y_low, initPathY, endPathY);
+    if(intersect){
+        return true;
+    }
+        //test if vertex border intersects with path
+    intersect = linesStraddle(initPathX, endPathX, vertex.x_left, vertex.x_right, initPathY, endPathY, vertex.y_high, vertex.y_high);
+    if(intersect){
+        return true;
+    }
+    //test if path intersects with border
+    intersect = linesStraddle(vertex.x_left, vertex.x_right, initPathX, endPathX, vertex.y_high, vertex.y_high, initPathY, endPathY);
+    if(intersect){
+        return true;
+    }
+    intersect = linesStraddle(initPathX, endPathX, vertex.x_right, vertex.x_right, initPathY, endPathY, vertex.y_low, vertex.y_high);
+    if(intersect){
+        return true;
+    }
+    //test if path intersects with border
+    intersect = linesStraddle(vertex.x_right, vertex.x_right, initPathX, endPathX, vertex.y_low, vertex.y_high, initPathY, endPathY);
+    if(intersect){
+        return true;
+    }
+    intersect = linesStraddle(initPathX, endPathX, vertex.x_left, vertex.x_left, initPathY, endPathY, vertex.y_low, vertex.y_high);
+    if(intersect){
+        return true;
+    }
+    //test if path intersects with border
+    intersect = linesStraddle(vertex.x_left, vertex.x_left, initPathX, endPathX, vertex.y_low, vertex.y_high, initPathY, endPathY);
     if(intersect){
         return true;
     }
@@ -94,6 +123,19 @@ bool curveIntersects(double robotCenterX, double robotCenterY, double oX0, doubl
     //draw part of the circle using x=rcos(theta), y=rsin(theta) in radians for theta = 0 to turning angle r. turning radius = 21 * turningAngle/90
     //check for each x,y position, does it fall in the bounding box of any obstacles
     double circleCenterX, circleCenterY, tempX, tempY, a, b, c, discriminant, sqrtdisc, root1, root2, startOfValidAngle, endOfValidAngle,checkAngle;
+    //if keep all angles within 0-359 range
+    if(facingDirection < 0){
+        facingDirection = facingDirection + 359;
+    }
+    if(facingDirection>359){
+        facingDirection = facingDirection - 359;
+    }
+    if(turningAngle < 0){
+        turningAngle = turningAngle + 359;
+    }
+    if(turningAngle >359){
+        turningAngle = turningAngle - 359;
+    }
 
     //convert facing direction and turning angle to radian
     facingDirection = facingDirection/180 * M_PI;
@@ -117,6 +159,7 @@ bool curveIntersects(double robotCenterX, double robotCenterY, double oX0, doubl
         startOfValidAngle = facingDirection-(0.5*M_PI); //offset angle from facing direction by negative 90 degrees to start from the right side of the cirle
         endOfValidAngle = startOfValidAngle+turningAngle;
     }
+
     //apply rotation of facingDirection
     tempX = circleCenterX*cos(facingDirection) - circleCenterY*sin(facingDirection);
     tempY = circleCenterX*sin(facingDirection) + circleCenterY*cos(facingDirection);
@@ -152,7 +195,7 @@ bool curveIntersects(double robotCenterX, double robotCenterY, double oX0, doubl
     root1 = (-b +sqrtdisc)/(2*a);
     root2 = (-b -sqrtdisc)/(2*a);
     //if the roots are within the valid root range
-    if(root1 <0 && root1 >0){
+    if(root1 <1 && root1 >0){
         //check if the intersects are within the turning angle
         tempX = oX0 + root1*(oX1 - oX0);
         tempY = oY0 + root1*(oY1 - oY0);
@@ -164,7 +207,7 @@ bool curveIntersects(double robotCenterX, double robotCenterY, double oX0, doubl
             return true;//intersection occurs within the turning path
         }
     }
-    if(root2 <0 && root2 >0){
+    if(root2 <1 && root2 >0){
     //check if the intersects are within the turning angle
         tempX = oX0 + root2*(oX1 - oX0);
         tempY = oY0 + root2*(oY1 - oY0);
@@ -229,30 +272,53 @@ std::string aroundObstacleTillDetect(char imageDetected, Vertex targetVertex, Ro
     return instructions;
 }
 
-//The samplingPoints is the number of points that you check on the circle.
-//(Eg. if sampling points = 10 and turning angle = 90, you will sample 10 points on the circle to check if they intersect with the vertex).
-//This is to let you choose if you want to sample all angles from 0 to 90 for accuracy or sample half of the points for speed. (More samples = longer runtime).
-bool gridOnCurve(Vertex vertex, int initRow, int initCol, std::string turnDirection, double turnRadius, double turnAngle, int samplingPoints, double faceDirection){
-    //assuming turn radius = 34
-    double angleSection;
-    double x,y,offsetX,offsetY;
-    offsetX = 0;
-    offsetY = 0;
-    //convert to radian
-    turnAngle=turnAngle/180;
-    angleSection = turnAngle/samplingPoints;
-    offsetX = turnRadius*cos(faceDirection);
-    offsetY = turnRadius*sin(faceDirection);
-
-    for(int i =0;i<=samplingPoints;i++){
-        x = turnRadius*cos(angleSection*i)+offsetX; //10 is the grid size, can be adjusted
-        y = turnRadius*sin(angleSection*i)+offsetY;
-        if(vertex.x_left<x && vertex.x_right>x && vertex.y_high>y && vertex.y_low<y){
-            return true;
+/*
+std::string translateAction(Action currentAction){
+    //converts the action class stored in the action array into a string message to be sent
+    //encode 1 action followed by the target subteam, either 1:AND, 2:STM, 3:RPI
+    std::string message="";
+    ActionTurn actionTurn;
+    ActionStraight actionStraight;
+    ActionDetect actionDetect;
+    if(dynamic_cast<actionTurn*>(currentAction) != nullptr){
+        if(currentAction.getTravel > 0){
+            message = "i2";
         }
+        if(currentAction.getTravel < 0){
+            message = "j2";
+        }
+        if(currentAction.getTravel == 0){
+            return "ERROR";
+        }
+        //assuming negative turn angle == right
+        //get turn angle
+        //if turn angle positive msg = "i2"(turn left 90), send to STM
+        //if turn angle negative msg = "j2"(turn right 90), send to STM
+
     }
-    return false;
+    if(dynamic_cast<actionStraight*>(currentAction) != nullptr){
+        if(currentAction.getTravel > 0){
+            message = "b2";
+        }
+        if(currentAction.getTravel < 0){
+            message = "f2";
+        }
+        if(currentAction.getTravel == 0){
+            return "ERROR";
+        }
+        //assuming positive == forward
+        //get travel distance
+        //if travel distance positive msg = "b2"(forward 10cm)
+        //if travel distance negative msg = "f2"(reverse 10cm)
+    }
+    if(dynamic_cast<actionDetect*>(currentAction) != nullptr){
+        message = "k3"; //detect, RPI
+    }
+
+    return message;
 }
+*/
+
 
 //----------------- maybe can delete--------------------
 /*
