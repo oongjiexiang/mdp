@@ -16,7 +16,7 @@ SOURCES += \
     config.cpp \
     action.cpp \
     asearch.cpp \
-    pathPlanning.cpp
+    pathPlanning.cpp 
 
 HEADERS += \
     hamiltonian.h \

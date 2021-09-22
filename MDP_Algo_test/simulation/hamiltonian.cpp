@@ -150,6 +150,7 @@ void Hamiltonian::simulate(){
     if(results.size() > 0){
         controlButtons[1]->setEnabled(true);
         vector<State*> states = results[showingObstacle].second;
+
         curState = states[showingStep++];
         nextState = states[showingStep];
 

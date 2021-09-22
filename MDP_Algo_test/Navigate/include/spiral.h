@@ -8,4 +8,4 @@ class Spiral{
         void run();
 };
 
-#endif SPIRAL_H
+#endif

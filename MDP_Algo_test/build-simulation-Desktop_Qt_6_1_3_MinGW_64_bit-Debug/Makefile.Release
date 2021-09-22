@@ -595,6 +595,8 @@ release/hamiltonian.o: ../simulation/hamiltonian.cpp ../simulation/hamiltonian.h
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QFormLayout \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qformlayout.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QLayout \
+		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QMessageBox \
+		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qmessagebox.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QLabel \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qlabel.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtGui/qpicture.h \
