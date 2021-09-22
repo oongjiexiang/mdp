@@ -1,3 +1,6 @@
+#ifndef MOVE_AROUND_H
+#define MOVE_AROUND_H
+
 #include "../../Simulation/asearch.h"
 #include <iostream>
 
@@ -12,3 +15,5 @@ class MoveAround{
         MoveAround(vector<Obstacle> obstacles);
         void generatePath(State* robotInitState, Obstacle obstacle);
 };
+
+#endif

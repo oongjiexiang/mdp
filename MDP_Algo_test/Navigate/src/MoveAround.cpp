@@ -25,21 +25,3 @@ void MoveAround::generatePath(State* robotInitState, Obstacle obstacle){
         states[i]->printState();
     }
 }
-
-
-// int main(){
-//     vector<Obstacle> obstacles;
-//     obstacles.push_back(Obstacle(1, 4, 9, 270));
-//     obstacles.push_back(Obstacle(3, 10, 9, 90));
-//     ShortestPath sp(obstacles);
-//     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
-//     cout << result.size() << endl;
-//     for(int i = 0; i < result.size(); i++){
-//         cout << "Obstacle-------------------------" << endl;
-//         result[i].first.printObstacle();
-//         vector<State*> states = result[i].second;
-//         for(int j = 0; j < states.size(); j++){
-//             states[j]->printState();
-//         }
-//     }
-// }
