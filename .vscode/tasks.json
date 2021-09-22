@@ -12,6 +12,7 @@
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\asearch.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\pathPlanning.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\MoveAround.cpp",
+                "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\checklistNavigate.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\testMain.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
