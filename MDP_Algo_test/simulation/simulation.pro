@@ -9,14 +9,14 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    hamiltonian.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    component.cpp \
-    config.cpp \
-    action.cpp \
-    asearch.cpp \
-    pathPlanning.cpp 
+    src/hamiltonian.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/component.cpp \
+    src/config.cpp \
+    src/action.cpp \
+    src/asearch.cpp \
+    src/pathPlanning.cpp 
 
 HEADERS += \
     hamiltonian.h \
@@ -26,6 +26,8 @@ HEADERS += \
     action.h \
     asearch.h \
     pathPlanning.h 
+
+INCLUDEPATH += $$PWD/include
 
 FORMS += \
     hamiltonian.ui \

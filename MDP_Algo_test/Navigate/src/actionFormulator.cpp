@@ -1,4 +1,4 @@
-#include "../include/actionFormulator.h"
+#include "actionFormulator.h"
 #include <cstdlib>
 
 vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){

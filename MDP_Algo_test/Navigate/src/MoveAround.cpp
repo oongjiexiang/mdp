@@ -1,5 +1,5 @@
-#include "../include/moveAround.h"
-#include "../../Simulation/action.h"
+#include "moveAround.h"
+#include "action.h"
 #include <iostream>
 
 using namespace std;

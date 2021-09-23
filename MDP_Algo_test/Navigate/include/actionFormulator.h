@@ -1,7 +1,7 @@
 #ifndef ACTION_FORMULATOR_H
 #define ACTION_FORMULATOR_H
 
-#include "../../Simulation/action.h"
+#include "action.h"
 
 class ActionFormulator{
     public:

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 #include "NetworkClass.h"
-#include "../Simulation/action.h"
-#include "../Simulation/pathPlanning.h"
+#include "action.h"
+#include "pathPlanning.h"
 
 using namespace std;
 

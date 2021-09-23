@@ -1,5 +1,5 @@
-#include "../include/navigate.h"
-#include "../include/moveAround.h"
+#include "navigate.h"
+#include "moveAround.h"
 #include <iostream>
 
 bool stmDetectsObstacleInFront();
