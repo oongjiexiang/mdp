@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="384dp"
         android:layout_marginLeft="384dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="32dp"
         android:text="Update"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/changeDirectionBtn" />
@@ -85,9 +85,9 @@
         android:id="@+id/autoManualSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
-        android:layout_marginEnd="228dp"
-        android:layout_marginRight="228dp"
+        android:layout_marginTop="156dp"
+        android:layout_marginEnd="232dp"
+        android:layout_marginRight="232dp"
         android:text="MANUAL"
         android:textFontWeight="500"
         android:textOff="@string/manual"
@@ -138,10 +138,21 @@
         android:id="@+id/textView_drag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="404dp"
-        android:layout_marginLeft="404dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginStart="408dp"
+        android:layout_marginLeft="408dp"
+        android:layout_marginTop="84dp"
         android:text="Drag:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_changeObstacle"
+        android:layout_width="114dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="328dp"
+        android:layout_marginLeft="328dp"
+        android:layout_marginTop="116dp"
+        android:text="Change Obstacle:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -151,9 +162,18 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
-        android:layout_marginTop="84dp"
-        android:text="Switch"
+        android:layout_marginTop="80dp"
         app:layout_constraintStart_toEndOf="@+id/textView_drag"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/changeObstacleSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="116dp"
+        app:layout_constraintStart_toEndOf="@+id/textView_changeObstacle"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

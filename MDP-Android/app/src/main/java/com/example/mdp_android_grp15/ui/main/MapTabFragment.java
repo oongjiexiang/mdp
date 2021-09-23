@@ -39,6 +39,7 @@ public class MapTabFragment extends Fragment {
     GridMap gridMap;
 
     Switch dragSwitch;
+    Switch changeObstacleSwitch;
     Spinner spinner_imageID;
     Spinner spinner_imageBearing;
     private static boolean autoUpdate = false;
@@ -47,6 +48,7 @@ public class MapTabFragment extends Fragment {
     static String imageID;
     static String imageBearing;
     static boolean dragStatus;
+    static boolean changeObstacleStatus;
     View.DragShadowBuilder dragShadowBuilder;
 
     public static MapTabFragment newInstance(int index) {
@@ -89,6 +91,7 @@ public class MapTabFragment extends Fragment {
         updateButton = root.findViewById(R.id.updateMapBtn);
 
         dragSwitch = root.findViewById(R.id.dragSwitch);
+        changeObstacleSwitch = root.findViewById(R.id.changeObstacleSwitch);
         spinner_imageID = root.findViewById(R.id.imageIDSpinner);
         spinner_imageBearing = root.findViewById(R.id.bearingSpinner);
         spinner_imageID.setEnabled(false);
@@ -148,6 +151,23 @@ public class MapTabFragment extends Fragment {
                     spinner_imageID.setEnabled(false);
                     spinner_imageBearing.setEnabled(false);
                     gridMap.setSetObstacleStatus(false);
+                    changeObstacleSwitch.setChecked(false);
+                }
+            }
+        });
+
+        // switch for changing obstacle
+        changeObstacleSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                showToast("Changing Obstacle is " + (isChecked ? "on" : "off"));
+                changeObstacleStatus = isChecked;
+                if (changeObstacleStatus == true) {
+                    // disable dragging, imageID and imageBearing and disable setObstacle
+                    spinner_imageID.setEnabled(false);
+                    spinner_imageBearing.setEnabled(false);
+                    gridMap.setSetObstacleStatus(false);
+                    dragSwitch.setChecked(false);
                 }
             }
         });
@@ -227,6 +247,7 @@ public class MapTabFragment extends Fragment {
                     spinner_imageBearing.setEnabled(false);
                 }
 
+                changeObstacleSwitch.setChecked(false);
                 dragSwitch.setChecked(false);
                 showLog("obstacle status = " + gridMap.getSetObstacleStatus());
                 showLog("Exiting obstacleImageBtn");

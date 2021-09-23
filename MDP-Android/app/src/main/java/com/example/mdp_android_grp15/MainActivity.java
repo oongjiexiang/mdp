@@ -358,9 +358,10 @@ public class MainActivity extends AppCompatActivity {
                     x+=1;
                     y+=1;
 
-                    int angle = Integer.parseInt(cmd[2]);
-
-                    gridMap.performAlgoCommand(x, y, angle);
+//                    int angle = Integer.parseInt(cmd[2]);
+                    String direction = cmd[2];
+                    gridMap.performAlgoCommand(x, y, direction);
+//                    gridMap.performAlgoCommand(x, y, angle);
                 } else {
                     String id = cmd[2];
                     printMessage(id);

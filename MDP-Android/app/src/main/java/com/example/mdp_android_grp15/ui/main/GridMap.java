@@ -1,8 +1,11 @@
 package com.example.mdp_android_grp15.ui.main;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,12 +14,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -854,7 +862,10 @@ public class GridMap extends View {
         return true;
     }
 
-    // TODO: add cant set robot if obstacle there, not priority
+    public void callInvalidate() {
+        this.invalidate();
+    }
+
     // added in obstacle id and direction
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -880,6 +891,90 @@ public class GridMap extends View {
                 }
                 DragShadowBuilder dragShadowBuilder = new MyDragShadowBuilder(this);
                 this.startDrag(null, dragShadowBuilder, null, 0);
+            }
+
+            // TODO: for checklist
+            // start change obstacle
+            if (MapTabFragment.changeObstacleStatus) {
+                if (!((1 <= initialColumn && initialColumn <= 20)
+                        && (1 <= initialRow && initialRow <= 20))) {
+                    return false;
+                } else if (ITEM_LIST.get(row - 1)[column - 1] == "") {
+                    return false;
+                } else {
+                    showLog("Enter change obstacle status");
+                    String imageId = ITEM_LIST.get(row -1)[column - 1];
+                    String imageBearing = imageBearings.get(row - 1)[column - 1];
+                    final int tRow = row;
+                    final int tCol = column;
+
+                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(this.getContext());
+                    View mView = ((Activity) this.getContext()).getLayoutInflater()
+                            .inflate(R.layout.activity_dialog_change_obstacle,
+                            null);
+                    mBuilder.setTitle("Change Existing Obstacle ID/Bearing");
+                    final Spinner mIDSpinner = mView.findViewById(R.id.imageIDSpinner2);
+                    final Spinner mBearingSpinner = mView.findViewById(R.id.bearingSpinner2);
+
+                    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                            this.getContext(), R.array.imageID_array,
+                            android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mIDSpinner.setAdapter(adapter);
+                    ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(
+                            this.getContext(), R.array.imageBearing_array,
+                            android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mBearingSpinner.setAdapter(adapter2);
+
+                    // start at current id and bearing
+                    mIDSpinner.setSelection(Integer.parseInt(imageId) - 1);
+                    switch (imageBearing) {
+                        case "North": mBearingSpinner.setSelection(0);
+                            break;
+                        case "South": mBearingSpinner.setSelection(1);
+                            break;
+                        case "East": mBearingSpinner.setSelection(2);
+                            break;
+                        case "West": mBearingSpinner.setSelection(3);
+                    }
+
+                    // do what when user presses ok
+                    mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            String newID = mIDSpinner.getSelectedItem().toString();
+                            String newBearing = mBearingSpinner.getSelectedItem().toString();
+
+                            ITEM_LIST.get(tRow - 1)[tCol - 1] = newID;
+                            imageBearings.get(tRow - 1)[tCol - 1] = newBearing;
+                            showLog("tRow - 1 = " + (tRow - 1));
+                            showLog("tCol - 1 = " + (tCol - 1));
+                            showLog("newID = " + newID);
+                            showLog("newBearing = " + newBearing);
+
+                            callInvalidate();
+                        }
+                    });
+
+                    // dismiss
+                    mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+
+                    mBuilder.setView(mView);
+                    AlertDialog dialog = mBuilder.create();
+                    dialog.show();
+                    Window window =  dialog.getWindow();
+                    WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                    layoutParams.width = 150;
+//                    window.setAttributes(layoutParams);
+                    window.setLayout(layoutParams.WRAP_CONTENT, layoutParams.WRAP_CONTENT);
+                }
+                showLog("Exit change obstacle");
             }
 
             // change robot size and make sure its within the grid
@@ -1708,12 +1803,109 @@ public class GridMap extends View {
 
     }
 
+    // specifically for checklist only
+    public boolean performAlgoCommand(int x, int y, String direction) {
+        if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
+            if (robotDirection.equals("None")) {
+                robotDirection = "up";
+            }
+            switch (direction) {
+                case "North": robotDirection = "up";
+                    break;
+                case "South": robotDirection = "down";
+                    break;
+                case "East": robotDirection = "right";
+                    break;
+                case "West": robotDirection = "left";
+                    break;
+            }
+//            switch (angle) {
+//                case -90: //turn right
+//                    switch (robotDirection) {
+//                        case "up":
+//                            robotDirection = "right";
+//                            break;
+//                        case "right":
+//                            robotDirection = "down";
+//                            break;
+//                        case "left":
+//                            robotDirection = "up";
+//                            break;
+//                        case "down":
+//                            robotDirection = "left";
+//                            break;
+//                    }
+//                    break;
+//                case 180:
+//                    switch (robotDirection) {
+//                        case "up":
+//                            robotDirection = "down";
+//                            break;
+//                        case "right":
+//                            robotDirection = "left";
+//                            break;
+//                        case "left":
+//                            robotDirection = "right";
+//                            break;
+//                        case "down":
+//                            robotDirection = "up";
+//                            break;
+//                    }
+//                    break;
+//                case 90: // turn left
+//                    switch (robotDirection) {
+//                        case "up":
+//                            robotDirection = "left";
+//                            break;
+//                        case "right":
+//                            robotDirection = "up";
+//                            break;
+//                        case "left":
+//                            robotDirection = "down";
+//                            break;
+//                        case "down":
+//                            robotDirection = "right";
+//                            break;
+//                    }
+//                    break;
+//            }
+        } else {
+            return false;
+        }
+
+        MainActivity.printMessage(Integer.toString(curCoord[0]));
+        MainActivity.printMessage(Integer.toString(curCoord[1]));
+
+        // if robot pos was not set initially, don't set as explored before moving to new coord
+        if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
+            // TODO: fix robot tping
+            // check if new x and y is more than just one grid away to see if it's tp or just moving
+            // if just moving then ignore, else tp then do sth
+            if (Math.abs(x - curCoord[0]) > 1 && Math.abs(y - curCoord[1]) > 1) {
+                for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
+                    for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
+                        cells[i][19-j].setType("explored");
+                    }
+                }
+            } else {
+                cells[curCoord[0]][20 - curCoord[1]].setType("explored");
+                cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
+            }
+        }
+        setCurCoord(x,y,robotDirection);    // set new coords and direction
+        canDrawRobot = true;
+        this.invalidate();
+        return true;
+    }
+
+
     /*
     algo communicates with stm alr, so android only needs the coords from algo to update position
     Algo : [(<x coordinate in cm>, <y coordinate in cm>,
             <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
     performs commands received from algo via bluetooth for robot position/movement
      */
+    /*
     public boolean performAlgoCommand(int x, int y, int angle) {
         if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
             if (robotDirection.equals("None")) {
@@ -1797,6 +1989,8 @@ public class GridMap extends View {
         this.invalidate();
         return true;
     }
+
+     */
 
     // currently assuming we receiving coordinates for obstacles too
     public boolean performRpiCommand(int x, int y, String imageID, String imageBearing) {
