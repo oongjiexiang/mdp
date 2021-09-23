@@ -15,6 +15,7 @@ void MoveAround::generatePath(State* robotInitState, Obstacle obstacle){
     State* newInitState = robotInitState;
 
     for(int i = 0; i < 4; i++){
+
         astar->changeObstacleFace(obs, (obs.face_direction + 90)%360);  // make robot turn anticlockwise
         obs.face_direction = (obs.face_direction + 90)%360;
         newInitState = new State(newInitState->position, 0, newInitState->face_direction, newInitState);

@@ -1,15 +1,15 @@
-#include "../include/spiral.h"
+#include "../include/navigate.h"
 #include <iostream>
 
-int TURN_RADIUS_FORWARD_GRID = 1;
-int TURN_RADIUS_HORIZONTAL_GRID = 3;
+int TURN_RADIUS_FORWARD_GRID = 2;
+int TURN_RADIUS_HORIZONTAL_GRID = 4;
 
 bool stmDetectsObstacleInFront();
 float stmCalibrate();
 void rpiCaptureImage();
 void navigateBetweenSTMAndRPi();
 
-void Spiral::run(){
+void Navigate::run(){
     Map grid;
     Vertex* curPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
     State* curState = new State(curPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);

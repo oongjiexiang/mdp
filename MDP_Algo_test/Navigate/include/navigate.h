@@ -3,7 +3,7 @@
 
 #include "moveAround.h"
 
-class Spiral{
+class Navigate{
     public:
         void run();
 };
