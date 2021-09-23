@@ -13,7 +13,7 @@ class MoveAround{
     aStar* astar;
     public:
         MoveAround(vector<Obstacle> obstacles);
-        void generatePath(State* robotInitState, Obstacle obstacle);
+        vector<State*> generatePath(State* robotInitState, Obstacle obstacle);
 };
 
 #endif

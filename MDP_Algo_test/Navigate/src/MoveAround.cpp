@@ -8,7 +8,7 @@ MoveAround::MoveAround(vector<Obstacle> obstacles){
     astar = new aStar(obstacles);
 }
 
-void MoveAround::generatePath(State* robotInitState, Obstacle obstacle){
+vector<State*> MoveAround::generatePath(State* robotInitState, Obstacle obstacle){
     Obstacle obs = obstacle;
     float distance; // Placeholder to keep distance
     vector<State*> subgoalStates;
@@ -22,7 +22,8 @@ void MoveAround::generatePath(State* robotInitState, Obstacle obstacle){
         newInitState = astar->search(newInitState, obs, &distance, &subgoalStates);
         states.insert(states.end(), subgoalStates.begin(), subgoalStates.end());
     }
-    for(int i = 0; i < states.size(); i++){
-        states[i]->printState();
-    }
+    // for(int i = 0; i < states.size(); i++){
+    //     states[i]->printState();
+    // }
+    return states;
 }

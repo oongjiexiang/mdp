@@ -7,8 +7,8 @@
 using namespace std;
 
 // robot 
-const int ROBOT_INIT_Y_GRID = 1;
-const int ROBOT_INIT_X_GRID = 1;
+const int ROBOT_INIT_Y_GRID = 4;
+const int ROBOT_INIT_X_GRID = 10;
 const int ROBOT_INIT_FACEDIRECTION = 90;
 const float ROBOT_OCCUPY_LENGTH = 22;
 
