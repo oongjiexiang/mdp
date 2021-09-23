@@ -1881,21 +1881,32 @@ public class GridMap extends View {
             // TODO: fix robot tping
             // check if new x and y is more than just one grid away to see if it's tp or just moving
             // if just moving then ignore, else tp then do sth
-            if (Math.abs(x - curCoord[0]) > 1 && Math.abs(y - curCoord[1]) > 1) {
+//            if (Math.abs(x - curCoord[0]) > 1 && Math.abs(y - curCoord[1]) > 1) {
+//                for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
+//                    for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
+//                        cells[i][19-j].setType("explored");
+//                    }
+//                }
+//            } else {
+//                cells[curCoord[0]][20 - curCoord[1]].setType("explored");
+//                cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
+//            }
+            if ((x > -1 && x < 21) && (y > -1 && y < 20)) {
                 for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
                     for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
-                        cells[i][19-j].setType("explored");
+                        cells[i][20 - j - 1].setType("explored");
+                        showLog("i = " + i + ", j = " + j);
                     }
                 }
-            } else {
-                cells[curCoord[0]][20 - curCoord[1]].setType("explored");
-                cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
             }
         }
-        setCurCoord(x,y,robotDirection);    // set new coords and direction
-        canDrawRobot = true;
-        this.invalidate();
-        return true;
+        if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            setCurCoord(x, y, robotDirection);    // set new coords and direction
+            canDrawRobot = true;
+            this.invalidate();
+            return true;
+        }
+        return false;
     }
 
 
