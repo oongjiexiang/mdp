@@ -1,0 +1,145 @@
+# depslib dependency file v1.0
+1632453264 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\src\action.cpp
+	"action.h"
+	<cmath>
+	<iostream>
+
+1632411624 c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\include\action.h
+	"component.h"
+	"config.h"
+	<iostream>
+
+1632451531 c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\include\component.h
+	<float.h>
+	<vector>
+
+1632411625 c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\include\config.h
+	<vector>
+	"component.h"
+
+1632453264 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\src\asearch.cpp
+	"config.h"
+	"asearch.h"
+	"math.h"
+	<vector>
+	<cstring>
+	<stdio.h>
+	<iostream>
+	<queue>
+	<stack>
+	<tuple>
+
+1632411625 c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\include\asearch.h
+	"config.h"
+	"math.h"
+	"action.h"
+	<vector>
+	<iostream>
+	<tuple>
+
+1632451531 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\src\component.cpp
+	"component.h"
+	<iostream>
+
+1632411617 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\src\config.cpp
+	<cmath>
+	<stdexcept>
+	<iostream>
+	"component.h"
+	"config.h"
+
+1632411618 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\src\pathplanning.cpp
+	"config.h"
+	"component.h"
+	"action.h"
+	"asearch.h"
+	"pathPlanning.h"
+	<vector>
+	<utility>
+	<algorithm>
+
+1632411630 c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\include\pathplanning.h
+	"component.h"
+	"config.h"
+	"asearch.h"
+	<utility>
+
+1632411618 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulation\src\testmain.cpp
+	"component.h"
+	"config.h"
+	"action.h"
+	"asearch.h"
+	"pathPlanning.h"
+	<iostream>
+
+1632451708 source:c:\users\oongj\desktop\mdp\mdp_algo_test\simulate\main.cpp
+	<iostream>
+
+1632451531 source:c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\src\actionformulator.cpp
+	"actionFormulator.h"
+	<cstdlib>
+
+1632451531 c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\include\actionformulator.h
+	"action.h"
+
+1632451531 source:c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\src\movearound.cpp
+	"moveAround.h"
+	"action.h"
+	<iostream>
+
+1632451531 c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\include\movearound.h
+	"asearch.h"
+	<iostream>
+
+1632451531 source:c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\src\navigate.cpp
+	"navigate.h"
+	"moveAround.h"
+	<iostream>
+
+1632451531 c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\include\navigate.h
+	"moveAround.h"
+
+1632451531 source:c:\users\oongj\desktop\mdp\mdp_algo_test\navigate\src\testmain.cpp
+	"component.h"
+	"config.h"
+	"action.h"
+	"asearch.h"
+	"pathPlanning.h"
+	"moveAround.h"
+	"navigate.h"
+	<iostream>
+
+1632412833 source:c:\users\oongj\desktop\mdp\mdp_algo_test\utilities\src\utilityfunctions.cpp
+	<iostream>
+	<string>
+	<vector>
+	<math.h>
+	"component.h"
+	"action.h"
+
+1632411544 source:c:\users\oongj\desktop\mdp\mdp_algo_test\network_stuff\main.cpp
+	<iostream>
+	<string>
+	"NetworkClass.h"
+	"action.h"
+	"pathPlanning.h"
+
+1632404360 c:\users\oongj\desktop\mdp\mdp_algo_test\network_stuff\networkclass.h
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+	<vector>
+	"action.h"
+
+1632404383 source:c:\users\oongj\desktop\mdp\mdp_algo_test\network_stuff\networkclass.cpp
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+	"NetworkClass.h"
+	<vector>
+	"action.h"
+
