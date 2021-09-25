@@ -18,20 +18,29 @@
 
 class Network{
     public:
-    std::string serverIP; //ip address of the server
-    int portNumber; //listening port on the server
-    int checker;
-    std::string message;//u8 encodes the string us utf-8 format
-    int bufferLength; //change this later
-    Network();
-    int initializeConnection();
-    std::string encodeMessage(int targetDevice, std::string unformattedMessage);
-    std::string decodeMessage();
-    int sendMessage(std::string formattedMessage);
-    void endConnection();
-    bool messageSender(std::string message, int targetNumber);
-    std::string sendPath(std::vector<State>& vectorOfStates);
-    std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
+        std::string serverIP; //ip address of the server
+        int portNumber; //listening port on the server
+        int checker;
+        std::string message;//u8 encodes the string us utf-8 format
+        int bufferLength; //change this later
+        Network();
+        int initializeConnection();
+        std::string encodeMessage(int targetDevice, std::string unformattedMessage);
+        std::string decodeMessage();
+        int sendMessage(std::string formattedMessage);
+        int receiveMessage();
+        std::string sendPath(std::vector<State>& vectorOfStates);
+        int sendReadyToRpi();
+        int sendEndToAndroid();
+        std::string generateAndroidMessage(float x, float y, int facingDirection);
+        std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
+        int convertAndroidMessage(std::string message, std::vector<float> xVector, std::vector<float> yVector, std::vector<int> facingDirection);
+        void endConnection();
+    private:
+        std::string forward10;
+        std::string reverse10;
+        std::string turnRight;
+        std::string turnLeft;
 
 };
 

@@ -17,6 +17,10 @@
 
 using namespace std;
 char receiveBuffer[4096];
+const string forward10 = "b";
+const string reverse10 = "f";
+const string turnRight = "i";
+const string turnLeft = "j";
 
 //create wsaData and socket
 WSADATA wsaData;
@@ -33,7 +37,7 @@ Network::Network(){
     //create wsadata
 }
 
-//call this to initialize the network
+//call this to initialize the network, make sure to call this before any other function
 int Network::initializeConnection(){
     //initialize WSAData as version 2.2
     checker = WSAStartup(MAKEWORD(2,2),&wsaData);
@@ -65,7 +69,7 @@ int Network::initializeConnection(){
     return 0;
 }
 
-//target device 1 for android, 2 for stm, assumes the unformatted message is correct
+//target device 1 for android, 2 for stm, 3 for rpi, assumes the unformatted message is correct
 string Network::encodeMessage(int targetDevice, string unformattedMessage){
     string formattedMessage;
     if(targetDevice==1){
@@ -84,19 +88,17 @@ string Network::encodeMessage(int targetDevice, string unformattedMessage){
     return formattedMessage;
 }
 
-//sends only 1 message to the server and waits for a reply
-//sends message to the server and receives data that is input into the receiveBuffer
-int Network::sendMessage(string formattedMessage){
+//send 1 message to the server
+int Network::sendMessage(string message){
     //set current message to formatted message
-    message = formattedMessage;
-    string retMessage = "";
-    if(formattedMessage.compare("ERROR")==0){
+    if(message.compare("ERROR")==0){
         printf("Error, message is not properly formatted!");
         closesocket(ConnectSocket);
         WSACleanup();
         return 1;
     }
     //send the message to the server
+    printf("Sending %s\n",message.c_str());
     checker = send(ConnectSocket, message.c_str(), message.length(),0);
     if (checker == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
@@ -104,12 +106,20 @@ int Network::sendMessage(string formattedMessage){
         WSACleanup();
         return 1;
     }
-    //get return messages from server
+    else{
+    printf("Message sent\n");
+    }
+    return 0;
+}
 
+//receives message from the server
+int Network::receiveMessage(){
     do{
         checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
-        if(checker>0) //bytes are being received
+        if(checker>0){ //bytes are being received
             printf("Bytes received: %d\n", checker);
+            printf("%s\n",decodeMessage().c_str());
+        }
         else if (checker == 0){ //no more bytes received
             printf("Connection closed\n");
         }
@@ -118,11 +128,10 @@ int Network::sendMessage(string formattedMessage){
             break;
         }
     }while(checker<=0);
-
     return 0;
 }
 
-//decode the message received from the server
+//check the buffer and decode the message received from the server
 string Network::decodeMessage(){
     int i=0;
     char temp='a';
@@ -135,48 +144,24 @@ string Network::decodeMessage(){
     return retMessage;
 }
 
-//sends multiple messages, message should be in the format of single char commands with no spacing in between them and ending in '\n'
-//eg. "aaab\n"
-//if true, all actions from the message are completed, if false, there was an error, resend
-bool Network::messageSender(string message, int targetNumber){
-    //read the list of commands
-    //send 1 command at a time to RPi
-    //wait for ready msg from STM/Rpi
-    int i=0;
-    string readMsg = "";
-    string receiverNumberString = "0";
-    int receiverNumber = 0;
-    string checkMsg = "";
-    string encodedMsg = "";
-    string reply = "";
-    while(true){
-        checkMsg = message.substr(i,1);
-        if(checkMsg.compare("\n")==0 || i > 4096){
-            return true;
-        }
-        readMsg = message.substr(i,1);
-        //parameter 1 = send to STM
-        encodedMsg = encodeMessage(receiverNumber,readMsg);
-        if(encodedMsg.compare("ERROR")){
-            return false;
-        }
-        sendMessage(encodedMsg);
-        reply = decodeMessage();
-        while(reply.compare("R")!=0){
-            printf("Waiting for ready, current msg: %s\n",reply.c_str());
-        }
-        i++;
-    }
-    return true;
+//call this at the beginning to establish connection with the server, so they can send replies
+int Network::sendReadyToRpi(){
+    string message ="";
+    message = encodeMessage(3,"");
+    sendMessage(message);
+    receiveMessage();
+    return 1;
 }
 
-
+//send the steps from a* search to all the other interfaces
 string Network::sendPath(vector<State>& vectorOfStates){
     int currentStateIndex,vectorSize, facingDirection0, facingDirection1;
     float x0, x1, y0, y1;
+    string expectedMsgFromSTM = "a";//a for ready, change this if there are changes from STM side
     string andMsg = "";
     string stmMsg = "";
-    string rpiMsg = ""; //fixed as only 1 msg to detect
+    string rpiMsg = "t"; //fixed as only 1 msg to detect
+    string replyMessage = "";
     string retMsg = "";
     vectorSize = static_cast<int>(vectorOfStates.size());
     for(currentStateIndex = 0; currentStateIndex<vectorSize; currentStateIndex++){
@@ -187,30 +172,91 @@ string Network::sendPath(vector<State>& vectorOfStates){
             y1 = vectorOfStates[currentStateIndex+1].position->y_low;
             facingDirection0 = vectorOfStates[currentStateIndex].face_direction;
             facingDirection1 = vectorOfStates[currentStateIndex+1].face_direction;
+            //create the messages
             stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
-            andMsg = ""; // convert x0,x1,y0,y1,facingdirection0, facingdireion1 to string and put in this format (x0,y0,fd0),(x1,y1,fd1)
-            printf("%s\n",stmMsg.c_str());
-            //messageSender(andMsg,1);
-            //messageSender(stmMsg,2);
+            andMsg = generateAndroidMessage(x1,y1,facingDirection1);
+            printf("Message to STM: %s\n",stmMsg.c_str());
+            printf("Message to Android: %s\n",andMsg.c_str());
+            //encode the messages
+            encodeMessage(2,stmMsg);
+            encodeMessage(1,andMsg);
+            //send the messages to android then STM
+            sendMessage(andMsg);
+            sendMessage(stmMsg);
+            //wait for reply message from STM side
+            do{
+                receiveMessage();
+                replyMessage = decodeMessage();
+            }while(replyMessage.compare(expectedMsgFromSTM)!=0);
         }
         else{
-            //retMsg = messageSender(rpiMsg,3);
+            //once it reaches the last state, ask STM to take a SS
+            encodeMessage(3,rpiMsg);
+            sendMessage(rpiMsg);
+            receiveMessage();
+            retMsg = decodeMessage();
         }
-
     }
+    //returns whether the image was detected or not (y/n)
     return retMsg;
-
-
 }
 
+//end of search, tell android to stop
+int Network::sendEndToAndroid(){
+    string message="";
+    message = encodeMessage(1,"END");
+    sendMessage(message);
+    return 0;
+}
+
+//convert the message android sent
+//message in the format of x,y,F\nx,y,F\n
+int Network::convertAndroidMessage(string message, vector<float> xVector, vector<float> yVector, vector<int> facingDirection){
+    string currentMessage = "";
+    int msgLen = message.length();
+    int i =0;
+    while(i<msgLen){
+        //x value
+        currentMessage = message.substr(i,1);
+        xVector.push_back(stof(currentMessage));
+        //y value
+        currentMessage = message.substr(i+2,1);
+        yVector.push_back(stof(currentMessage));
+        //facing direction
+        currentMessage = message.substr(i+4,1);
+        xVector.push_back(stof(currentMessage));
+
+        i = i + 6;
+    }
+    return 0;
+}
+
+
+//given x,y,facing direction, generate the message to android
+string Network::generateAndroidMessage(float x, float y, int facingDirection){
+    string retMessage ="";
+    //facing east
+    if(facingDirection==0){
+        retMessage = to_string(x) + "," + to_string(y) + ",E";
+    }
+    //facing north
+    if(facingDirection==90){
+        retMessage = to_string(x) + "," + to_string(y) + ",N";
+    }
+    //facing west
+    if(facingDirection==180){
+        retMessage = to_string(x) + "," + to_string(y) + ",W";
+    }
+    //facing south
+    if(facingDirection==270){
+        retMessage = to_string(x) + "," + to_string(y) + ",S";
+    }
+    return retMessage;
+}
 
 //given two states' x, y and facing direction, return the action to be sent to STM
 string Network::calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1){
     //define the actions according to the command list
-    string forward10 = "b";
-    string reverse10 = "f";
-    string turnRight = "i";
-    string turnLeft = "j";
     int x,y;
     x = x1-x0;
     y = y1-y0;
