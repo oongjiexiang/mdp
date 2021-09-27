@@ -65,6 +65,8 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     // ActionTurn* right = new ActionTurn(-90);
     ActionTurn2By4* left = new ActionTurn2By4(90);
     ActionTurn2By4* right = new ActionTurn2By4(-90);
+    ActionReverseTurn2By4* reverseLeft = new ActionReverseTurn2By4(90);
+    ActionReverseTurn2By4* reverseRight = new ActionReverseTurn2By4(-90);
 
     possibleActions.clear();
     possibleActions.push_back(forward);
@@ -72,6 +74,8 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.push_back(detect);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
+    possibleActions.push_back(reverseLeft);
+    possibleActions.push_back(reverseRight);
 }
 
 void aStar::changeObstacleFace(Obstacle obstacle, int newFaceDirection){
@@ -103,10 +107,10 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     generatePossibleActions(dest);  // a. all 5 actions
     Map localMap = *grid;   // b. local map so that the original map is not modified after every search
 
-    bool closedList[X_GRID_COUNT][Y_GRID_COUNT][5];    // c. check if the state is visited (5 actions)
+    bool closedList[X_GRID_COUNT][Y_GRID_COUNT][7];    // c. check if the state is visited (5 actions)
     memset(closedList, false, sizeof(closedList));
 
-    State* cellDetails[X_GRID_COUNT][Y_GRID_COUNT][5];  // d. get the latest state detail at that position and face direction
+    State* cellDetails[X_GRID_COUNT][Y_GRID_COUNT][7];  // d. get the latest state detail at that position and face direction
     memset(cellDetails, false, sizeof(cellDetails));
 
     priority_queue<Tuple, vector<Tuple>, greater<Tuple> > openList; // e. Priority Queue <f-cost, state>

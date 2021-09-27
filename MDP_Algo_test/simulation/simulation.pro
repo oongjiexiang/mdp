@@ -19,13 +19,13 @@ SOURCES += \
     src/pathPlanning.cpp 
 
 HEADERS += \
-    hamiltonian.h \
-    mainwindow.h \
-    component.h \
-    config.h \
-    action.h \
-    asearch.h \
-    pathPlanning.h 
+    include/hamiltonian.h \
+    include/mainwindow.h \
+    include/component.h \
+    include/config.h \
+    include/action.h \
+    include/asearch.h \
+    include/pathPlanning.h
 
 INCLUDEPATH += $$PWD/include
 

@@ -32,6 +32,18 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
             }
         }
     }
+    for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
+        ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
+        Obstacle o = alpo.first;
+        vector<State*> states = alpo.second;
+        cout << "going to obstacle *****************" << endl;
+        o.printObstacle();
+        for(int j = 0; j < states.size(); j++){
+            states[j]->printState();
+        }
+        cout << "obstacle is visited*****************" << endl;
+        cout << endl;
+    }
     return pathSolutionList[minPathIndex];
 }
 

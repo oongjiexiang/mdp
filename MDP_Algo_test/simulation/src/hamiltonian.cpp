@@ -186,13 +186,19 @@ void Hamiltonian::displayRobotLocation(){
     Vertex* initPosition = curState->position;
     for(int i = -1; i <= 1; i++){
         for(int j = -1; j <= 1; j++){
-            buttons[initPosition->xGrid + i][initPosition->yGrid + j]->setStyleSheet(NORMAL);
+            try{
+                buttons.at(initPosition->xGrid + i).at(initPosition->yGrid + j)->setStyleSheet(NORMAL);
+            }
+            catch(out_of_range& e){}
         }
     }
     Vertex* nextPosition = nextState->position;
     for(int i = -1; i <= 1; i++){
         for(int j = -1; j <= 1; j++){
-            buttons[nextPosition->xGrid + i][nextPosition->yGrid + j]->setStyleSheet(ROBOT);
+            try{
+                buttons.at(nextPosition->xGrid + i).at(nextPosition->yGrid + j)->setStyleSheet(ROBOT);
+            }
+            catch(out_of_range& e){}
         }
     }
     switch(nextState->face_direction){
