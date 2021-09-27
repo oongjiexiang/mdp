@@ -46,9 +46,6 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
                 actions.push_back(new ActionTurn(90*sign));
             }
         }
-        if(states[i-1]->obstacleSeen == 0 && states[i]->obstacleSeen != 0){
-            actions.push_back(new ActionDetect(states[i]->obstacleSeen));
-        }
     }
 
     for(int i = 0; i < actions.size(); i++){

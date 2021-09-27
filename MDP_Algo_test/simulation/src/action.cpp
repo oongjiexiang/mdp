@@ -18,14 +18,13 @@ float euclidean(float x1, float y1, float x2, float y2){
 
 
 // State
-State::State(Vertex* position, int obstacleSeen, int face_direction, State* prevState):
-    position(position), obstacleSeen(obstacleSeen), face_direction(face_direction), prevState(prevState){}
+State::State(Vertex* position, int face_direction, State* prevState):
+    position(position), face_direction(face_direction), prevState(prevState){}
 
 // debug State
 void State::printState(){
     cout << "--------------State---------------\n\t";
     position->printVertex();
-    cout << "\tobstacleSeen: " << obstacleSeen << endl;
     cout << "\tfaceDirection: " << face_direction << endl;
     cout << "--------------End State---------------" << endl;
 }
@@ -39,7 +38,6 @@ ActionStraight::ActionStraight(float travelDistGrid): travelDistGrid(travelDistG
 
 State* ActionStraight::takeAction(State* initState, Map& maps){
     Vertex curPosition = *(initState->position);
-    int newObstacleSeen = initState->obstacleSeen;
 
     int moveGridDistance = (int)(travelDistGrid);
     int newYGrid = curPosition.yGrid + moveGridDistance*(int)(sin(M_PI/180*initState->face_direction));
@@ -54,7 +52,7 @@ State* ActionStraight::takeAction(State* initState, Map& maps){
 
     // 2. generate new state
     Vertex* newPosition = new Vertex(newXGrid, newYGrid);
-    State* endState = new State(newPosition, newObstacleSeen, initState->face_direction, initState);
+    State* endState = new State(newPosition, initState->face_direction, initState);
 
     return endState;
 }
@@ -129,9 +127,8 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
 
     // introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
-    int newObstacleSeen = initState->obstacleSeen;
     
-    State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
+    State* endState = new State(newPosition, newFaceDirection, initState);
     return endState;
 }
 
@@ -142,66 +139,6 @@ int ActionTurn::getCost(State* initState, Map maps, Obstacle o){
 // debug ActionTurn
 void ActionTurn::printAction(){
     cout << "TURN: turnAngle = " << turnAngle << endl;
-}
-
-
-// -----------------Detect Action------------------
-ActionDetect::ActionDetect(){
-    imageDetected = false;
-    obstacleId = 0;
-}
-
-ActionDetect::ActionDetect(int obsId){
-    imageDetected = false;
-    obstacleId = obsId;
-}
-
-State* ActionDetect::takeAction(State* initState, Map& maps){
-    vector<Obstacle>& obstacles = maps.getObstacles();
-    Vertex position = *(initState->position);
-    
-    for(int i = 0; i < obstacles.size(); i++){
-        Obstacle& o = obstacles[i];
-        int faceDirection = initState->face_direction;
-        bool correctOrientation = false;
-
-        switch(faceDirection){
-            case 0:
-                correctOrientation = (o.face_direction == 180 && o.xGrid > position.xGrid && o.yGrid == position.yGrid);
-            break;
-            case 90:
-                correctOrientation = (o.face_direction == 270 && o.yGrid > position.yGrid && o.xGrid == position.xGrid);
-            break;
-            case 180:
-                correctOrientation = (o.face_direction == 0 && o.xGrid < position.xGrid && o.yGrid == position.yGrid);
-            break;
-            case 270:
-                correctOrientation = (o.face_direction == 90 && o.yGrid < position.yGrid && o.xGrid == position.xGrid);
-            break;
-            default:
-                correctOrientation = false;
-        }
-        if(correctOrientation && euclidean(position.xGrid, position.yGrid, o.xGrid, o.yGrid) <= MAX_IMAGE_VIEW_DISTANCE_GRID){ 
-            obstacleId = o.id;
-            imageDetected = true;
-            State* endState = new State(initState->position, obstacleId, initState->face_direction, initState);
-            return endState;
-        }
-    }
-    return nullptr;
-}
-
-void ActionDetect::setObstacleId(int obstacleId){
-    this->obstacleId = obstacleId;
-}
-
-int ActionDetect::getCost(State* initState, Map maps, Obstacle o){
-    return cost;
-}
-
-// debug ActionDetect
-void ActionDetect::printAction(){
-    cout << "DETECT: obstacleId = " << obstacleId << (imageDetected? "detected": "!detected") << endl;
 }
 
 
@@ -265,9 +202,8 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
 
     // introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
-    int newObstacleSeen = initState->obstacleSeen;
     
-    State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
+    State* endState = new State(newPosition, newFaceDirection, initState);
     return endState;
 }
 
@@ -341,9 +277,8 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
 
     // introduce new state
     int newFaceDirection = (faceDirection - (int)turnAngle + 360)%360;
-    int newObstacleSeen = initState->obstacleSeen;
     
-    State* endState = new State(newPosition, newObstacleSeen, newFaceDirection, initState);
+    State* endState = new State(newPosition, newFaceDirection, initState);
     return endState;
 }
 

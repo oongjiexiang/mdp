@@ -9,7 +9,7 @@ void rpiCaptureImage();
 void Navigate::run(){
     Map grid;
     Vertex* curPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
-    State* curState = new State(curPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);
+    State* curState = new State(curPosition, ROBOT_INIT_FACEDIRECTION, nullptr);
 
     // Initialise possible actions
     Action* forward = new ActionStraight(1);

@@ -7,10 +7,11 @@
 using namespace std;
 
 // robot 
-const int ROBOT_INIT_Y_GRID = 4;
-const int ROBOT_INIT_X_GRID = 10;
+const int ROBOT_INIT_Y_GRID = 1;
+const int ROBOT_INIT_X_GRID = 1;
 const int ROBOT_INIT_FACEDIRECTION = 90;
 const float ROBOT_OCCUPY_LENGTH = 22;
+const int ROBOT_VIEWING = 20;
 
 // map
 const float AREA_LENGTH = 200;
@@ -20,6 +21,7 @@ const int Y_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH;
 const int X_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH; 
 const float OBSTACLE_LENGTH = 10;
 const float BOUNDARY_SIZE = 10;    // originally 15. Temporarily changed to 15 for Qt testing
+const int ROBOT_VIEWING_GRID_LENGTH = ROBOT_VIEWING/UNIT_LENGTH;
 
 //used for obstacle avoidance
 class Vertex{

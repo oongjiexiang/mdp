@@ -25,7 +25,10 @@ Map::Map(vector<Obstacle> obstacles): Map::Map(){
         grids[o.xGrid][o.yGrid]->is_obstacle = true;
         for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
             for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
-                grids[o.xGrid + j][o.yGrid + k]->is_border = grids[o.xGrid + j][o.yGrid + k]->is_obstacle? false: true;
+                try{
+                    grids.at(o.xGrid + j).at(o.yGrid + k)->is_border = grids.at(o.xGrid + j).at(o.yGrid + k)->is_obstacle? false: true;
+                }
+                catch(out_of_range& e){}
             }
         }
     }

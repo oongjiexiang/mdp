@@ -11,11 +11,10 @@ using namespace std;
 class State{
     public:
         Vertex* position;
-        int obstacleSeen = 0;
         int face_direction;
         float gCost, hCost;
         State* prevState;
-        State(Vertex* position, int obstacleSeen, int face_direction, State* prevState);
+        State(Vertex* position, int face_direction, State* prevState);
         
         // debug
         void printState();
@@ -52,22 +51,6 @@ class ActionTurn : public Action{
         ActionTurn(int turnAngle);
         State* takeAction(State* initState, Map& maps);
 
-        int getCost(State* initState, Map maps, Obstacle o);
-
-        // debug
-        void printAction();
-};
-
-class ActionDetect : public Action{
-    bool imageDetected;
-    int obstacleId;
-    int cost = 1;
-    public:
-        ActionDetect();
-        ActionDetect(int obsId);
-        State* takeAction(State* initState, Map& maps);
-
-        void setObstacleId(int obstacleId);
         int getCost(State* initState, Map maps, Obstacle o);
 
         // debug

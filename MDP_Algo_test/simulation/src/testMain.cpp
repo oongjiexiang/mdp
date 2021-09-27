@@ -23,7 +23,7 @@ int main(){
     //***************** test config.cpp********************
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
     // obstacles.push_back(Obstacle(6, 5, 1, 270));
-    obstacles.push_back(Obstacle(3, 10, 9, 90));
+    // obstacles.push_back(Obstacle(3, 6, 9, 0));
     // obstacles.push_back(Obstacle(5, 13, 14, 90));
     // Map map(obstacles);
     // map.printMap();
@@ -34,7 +34,7 @@ int main(){
 
     //************** test action.cpp****************
     // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 7, 7, 0));
+    obstacles.push_back(Obstacle(1, 7, 7, 0));
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
     // Map map(obstacles);
     // map.printMap();
@@ -55,13 +55,13 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    // Vertex* initPosition = new Vertex(4, 2);
-    // State* initState = new State(initPosition, false, 90, nullptr);
+    // Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
+    // State* initState = new State(initPosition, 90, nullptr);
     // aStar* astar = new aStar(obstacles);
     
     // float pathCost = 0;
     // vector<State*> resultStates;
-    // astar->search(*initState, obstacles[0], &pathCost, &resultStates);
+    // astar->search(initState, obstacles[0], &pathCost, &resultStates);
     
     // cout << "-----------path--------------" << endl;
     // for(int i = 0; i < resultStates.size(); i++){

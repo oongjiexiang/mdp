@@ -18,7 +18,7 @@ vector<State*> MoveAround::generatePath(State* robotInitState, Obstacle obstacle
 
         astar->changeObstacleFace(obs, (obs.face_direction + 90)%360);  // make robot turn anticlockwise
         obs.face_direction = (obs.face_direction + 90)%360;
-        newInitState = new State(newInitState->position, 0, newInitState->face_direction, newInitState);
+        newInitState = new State(newInitState->position, newInitState->face_direction, newInitState);
         newInitState = astar->search(newInitState, obs, &distance, &subgoalStates);
         states.insert(states.end(), subgoalStates.begin(), subgoalStates.end());
     }

@@ -16,10 +16,10 @@ class aStar{
     Map* grid; 
     vector<Action*> possibleActions;
 
-    bool isDestination(const State& curState, const Obstacle& obstacle);
+    bool isDestination(const State& curState, const State& goalState);
     
     // A Utility Function to calculate the 'h' heuristics.
-    float calculateHValue(State& curState, Obstacle& obstacle);
+    float calculateHValue(State& curState, State& goalState);
     
     // Encapsulate g cost calculation
     float calculateGValue(State& curState, Action* action, Map& localMap, Obstacle& obstacle);
@@ -29,6 +29,8 @@ class aStar{
 
     // We can include more actions available for the robot. Currently there are 5
     void generatePossibleActions(Obstacle obstacle);
+
+    State* generateGoalState(Obstacle obstacle);
     
     public:
         aStar();

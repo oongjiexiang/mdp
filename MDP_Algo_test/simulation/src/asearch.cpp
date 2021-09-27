@@ -11,15 +11,58 @@
 using namespace std;
 
 
-bool aStar::isDestination(const State& curState, const Obstacle& obstacle){
-    return (curState.obstacleSeen == obstacle.id);
+aStar::aStar(){
+    grid = new Map();
+}
+
+aStar::aStar(vector<Obstacle> obstacles){
+    grid = new Map(obstacles);
+}
+
+void aStar::generatePossibleActions(Obstacle obstacle){
+    ActionStraight* forward = new ActionStraight(1);
+    ActionStraight* reverse = new ActionStraight(-1);
+    // ActionTurn* left = new ActionTurn(90);
+    // ActionTurn* right = new ActionTurn(-90);
+    ActionTurn2By4* left = new ActionTurn2By4(90);
+    ActionTurn2By4* right = new ActionTurn2By4(-90);
+    ActionReverseTurn2By4* reverseLeft = new ActionReverseTurn2By4(90);
+    ActionReverseTurn2By4* reverseRight = new ActionReverseTurn2By4(-90);
+
+    possibleActions.clear();
+    possibleActions.push_back(forward);
+    possibleActions.push_back(reverse);
+    possibleActions.push_back(left);
+    possibleActions.push_back(right);
+    possibleActions.push_back(reverseLeft);
+    possibleActions.push_back(reverseRight);
+}
+
+State* aStar::generateGoalState(Obstacle obstacle){
+    int goalXGrid = obstacle.xGrid + ((int)cos(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
+    int goalYGrid = obstacle.yGrid + ((int)sin(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
+    Vertex* goalPosition = grid->findVertexByGrid(goalXGrid, goalYGrid);
+    int goalFaceDirection = (obstacle.face_direction + 180)%360;
+    State* goalState = new State(goalPosition, goalFaceDirection, nullptr);
+    
+    // debug
+    cout << "ROBOT_VIEWING_GRID_LENGTH = " << ROBOT_VIEWING_GRID_LENGTH << endl;
+    cout << cos(M_PI/180*obstacle.face_direction) << " " << sin(M_PI/180*obstacle.face_direction) << endl;
+    cout << "goal state is" << endl;
+    goalState->printState();
+    return goalState;
+}
+
+bool aStar::isDestination(const State& curState, const State& goalState){
+    return (curState.position->xGrid == goalState.position->xGrid && 
+        curState.position->yGrid == goalState.position->yGrid && 
+        curState.face_direction == goalState.face_direction);
 }
 
 // A Utility Function to calculate the 'h' heuristics.
-float aStar::calculateHValue(State& curState, Obstacle& obstacle){  // tochange
+float aStar::calculateHValue(State& curState, State& goalState){  // tochange
     float hCost = 0;
-    Vertex* finalState = grid->findVertexByGrid(obstacle.xGrid, obstacle.yGrid);
-    hCost = hCost + abs(finalState->xGrid - curState.position->xGrid) + abs(finalState->yGrid - curState.position->yGrid);
+    hCost = hCost + abs(goalState.position->xGrid - curState.position->xGrid) + abs(goalState.position->yGrid - curState.position->yGrid);
     return hCost;
 }
 
@@ -49,34 +92,8 @@ float aStar::tracePath(State* goalState, vector<State*>* states){
     return states->back()->gCost;
 }
 
-aStar::aStar(){
-    grid = new Map();
-}
 
-aStar::aStar(vector<Obstacle> obstacles){
-    grid = new Map(obstacles);
-}
 
-void aStar::generatePossibleActions(Obstacle obstacle){
-    ActionStraight* forward = new ActionStraight(1);
-    ActionStraight* reverse = new ActionStraight(-1);
-    ActionDetect* detect = new ActionDetect(obstacle.id);
-    // ActionTurn* left = new ActionTurn(90);
-    // ActionTurn* right = new ActionTurn(-90);
-    ActionTurn2By4* left = new ActionTurn2By4(90);
-    ActionTurn2By4* right = new ActionTurn2By4(-90);
-    ActionReverseTurn2By4* reverseLeft = new ActionReverseTurn2By4(90);
-    ActionReverseTurn2By4* reverseRight = new ActionReverseTurn2By4(-90);
-
-    possibleActions.clear();
-    possibleActions.push_back(forward);
-    possibleActions.push_back(reverse);
-    possibleActions.push_back(detect);
-    possibleActions.push_back(left);
-    possibleActions.push_back(right);
-    possibleActions.push_back(reverseLeft);
-    possibleActions.push_back(reverseRight);
-}
 
 void aStar::changeObstacleFace(Obstacle obstacle, int newFaceDirection){
     vector<Obstacle>& obstacles = grid->getObstacles();
@@ -89,6 +106,9 @@ void aStar::changeObstacleFace(Obstacle obstacle, int newFaceDirection){
 }
 
 State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states){
+    // Find the goal state
+    State* goalState = generateGoalState(dest);
+
     // 1. Check if this search definitely fails
     // Either the source or the destination is blocked
     if (!grid->isAvailableGrid(initState->position->xGrid, initState->position->yGrid)){
@@ -97,7 +117,7 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     }
 
     // If the destination cell is the same as source cell
-    if (isDestination(*initState, dest)) {
+    if (isDestination(*initState, *goalState)) {
         printf("We already detected %d at (%d, %d)\n", dest.id, dest.xGrid, dest.yGrid);
         return nullptr;
     }
@@ -107,10 +127,10 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     generatePossibleActions(dest);  // a. all 5 actions
     Map localMap = *grid;   // b. local map so that the original map is not modified after every search
 
-    bool closedList[X_GRID_COUNT][Y_GRID_COUNT][7];    // c. check if the state is visited (5 actions)
+    bool closedList[X_GRID_COUNT][Y_GRID_COUNT][6];    // c. check if the state is visited (5 actions)
     memset(closedList, false, sizeof(closedList));
 
-    State* cellDetails[X_GRID_COUNT][Y_GRID_COUNT][7];  // d. get the latest state detail at that position and face direction
+    State* cellDetails[X_GRID_COUNT][Y_GRID_COUNT][6];  // d. get the latest state detail at that position and face direction
     memset(cellDetails, false, sizeof(cellDetails));
 
     priority_queue<Tuple, vector<Tuple>, greater<Tuple> > openList; // e. Priority Queue <f-cost, state>
@@ -142,7 +162,7 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
             if(neighbourState == nullptr) continue;
             
             // if action sees the image, proceed to trace path
-            if(isDestination(*neighbourState, dest)){
+            if(isDestination(*neighbourState, *goalState)){
                 neighbourState->gCost = calculateGValue(*source, possibleActions[i], localMap, dest);
                 *pathCost = tracePath(neighbourState, states);
                 return neighbourState;
@@ -163,7 +183,7 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
             if(!closedList[neighbourPosition->xGrid][neighbourPosition->yGrid][neighbourFaceDirection]){
                 float gNew, hNew, fNew;
                 gNew = calculateGValue(*source, possibleActions[i], localMap, dest);
-                hNew = calculateHValue(*neighbourState, dest);
+                hNew = calculateHValue(*neighbourState, *goalState);
                 fNew = gNew + hNew;
                 
                 if(newlySeenState || neighbourState->gCost + neighbourState->hCost > fNew){

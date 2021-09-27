@@ -164,7 +164,7 @@ void Hamiltonian::simulate(){
 }
 
 void Hamiltonian::displayNextStep(){
-    if(showingStep >= results[showingObstacle].second.size()){
+    if(showingStep > results[showingObstacle].second.size()){
         if(showingObstacle == results.size() - 1){
             controlButtons[1]->setEnabled(false);
             return;

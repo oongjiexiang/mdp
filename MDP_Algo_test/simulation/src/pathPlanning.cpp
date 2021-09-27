@@ -65,7 +65,7 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         cout << float(iteration_debug++)/totalPermutation << "%" << endl;
         // initial state
         Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
-        State* initState = new State(robotInitPosition, 0, ROBOT_INIT_FACEDIRECTION, nullptr);
+        State* initState = new State(robotInitPosition, ROBOT_INIT_FACEDIRECTION, nullptr);
 
         // compute the Hamiltonian path
         for(int i = 0; i < goal_ids.size(); i++){
