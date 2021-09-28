@@ -29,19 +29,15 @@ class Network{
         std::string decodeMessage();
         int sendMessage(std::string formattedMessage);
         int receiveMessage();
-        std::string sendPath(std::vector<State>& vectorOfStates);
-        int sendReadyToRpi();
+        bool sendPath(std::vector<State*>& vectorOfStates, int noOfStates);
+        std::string sendReadyToRpi();
+        bool sendTakePhoto();
         int sendEndToAndroid();
         std::string generateAndroidMessage(float x, float y, int facingDirection);
         std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
-        int convertAndroidMessage(std::string message, std::vector<float> xVector, std::vector<float> yVector, std::vector<int> facingDirection);
+        int readAndGenerateObstacles(vector<Obstacle>& obstacles);
+        int convertAndroidMessage(std::string message, std::vector<float>& xVector, std::vector<float>& yVector, std::vector<int>& facingDirection);
         void endConnection();
-    private:
-        std::string forward10;
-        std::string reverse10;
-        std::string turnRight;
-        std::string turnLeft;
-
 };
 
 #endif

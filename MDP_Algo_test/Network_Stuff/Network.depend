@@ -72,3 +72,19 @@
 	"component.h"
 	"config.h"
 
+1632580232 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\network_stuff\main.cpp
+	<iostream>
+	<string>
+	"NetworkClass.h"
+	"action.h"
+	"pathPlanning.h"
+
+1632711428 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\network_stuff\networkclass.h
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+	<vector>
+	"action.h"
+

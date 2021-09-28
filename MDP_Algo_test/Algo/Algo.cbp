@@ -39,6 +39,10 @@
 			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Navigate/include" />
 			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Network_Stuff/include" />
 			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Utilities/include" />
+			<Add directory="../Navigate/include" />
+			<Add directory="../Network_Stuff/include" />
+			<Add directory="../simulation/include" />
+			<Add directory="../Utilities/include" />
 		</Compiler>
 		<Unit filename="../Navigate/include/MoveAround.h" />
 		<Unit filename="../Navigate/include/actionFormulator.h" />

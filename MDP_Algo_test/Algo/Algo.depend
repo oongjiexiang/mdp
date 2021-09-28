@@ -143,3 +143,137 @@
 	<vector>
 	"action.h"
 
+1632757946 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\navigate\src\actionformulator.cpp
+	"actionFormulator.h"
+	<cstdlib>
+
+1632757946 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\navigate\src\movearound.cpp
+	"moveAround.h"
+	"action.h"
+	<iostream>
+
+1632757946 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\navigate\src\navigate.cpp
+	"navigate.h"
+	"moveAround.h"
+	<iostream>
+
+1632758557 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\network_stuff\main.cpp
+	<iostream>
+	<string>
+	"NetworkClass.h"
+	"action.h"
+	"pathPlanning.h"
+	"component.h"
+	"config.h"
+	"asearch.h"
+	<iostream>
+
+1632754743 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\network_stuff\networkclass.h
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+	<vector>
+	"action.h"
+
+1632758611 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\network_stuff\networkclass.cpp
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdlib.h>
+	<stdio.h>
+	<string>
+	<chrono>
+	<thread>
+	<vector>
+	"action.h"
+	"NetworkClass.h"
+
+1632757946 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\utilities\src\utilityfunctions.cpp
+	<iostream>
+	<string>
+	<vector>
+	<math.h>
+	"component.h"
+	"action.h"
+
+1632757946 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\navigate\include\actionformulator.h
+	"action.h"
+
+1632580232 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\network_stuff\include\action.h
+	"component.h"
+	"config.h"
+	<iostream>
+
+1632757947 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\include\component.h
+	<float.h>
+	<vector>
+
+1632757947 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\include\config.h
+	<vector>
+	"component.h"
+
+1632757946 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\navigate\include\movearound.h
+	"asearch.h"
+	<iostream>
+
+1632757947 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\include\asearch.h
+	"config.h"
+	"math.h"
+	"action.h"
+	<vector>
+	<iostream>
+	<tuple>
+
+1632757947 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\include\action.h
+	"component.h"
+	"config.h"
+	<iostream>
+
+1632757946 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\navigate\include\navigate.h
+	"moveAround.h"
+
+1632757947 c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\include\pathplanning.h
+	"component.h"
+	"config.h"
+	"asearch.h"
+	<utility>
+
+1632757947 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\src\asearch.cpp
+	"config.h"
+	"asearch.h"
+	"math.h"
+	<vector>
+	<cstring>
+	<stdio.h>
+	<iostream>
+	<queue>
+	<stack>
+	<tuple>
+
+1632757947 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\src\component.cpp
+	"component.h"
+	<iostream>
+
+1632757947 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\src\config.cpp
+	<cmath>
+	<stdexcept>
+	<iostream>
+	"component.h"
+	"config.h"
+
+1632757947 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\src\action.cpp
+	"action.h"
+	<cmath>
+	<iostream>
+
+1632757947 source:c:\users\ngzhi\desktop\mdp\github\mdp_algo_test\simulation\src\pathplanning.cpp
+	"config.h"
+	"component.h"
+	"action.h"
+	"asearch.h"
+	"pathPlanning.h"
+	<vector>
+	<utility>
+	<algorithm>
+

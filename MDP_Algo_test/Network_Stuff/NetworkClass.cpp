@@ -9,18 +9,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
-#include "NetworkClass.h"
+#include <chrono>
+#include <thread>
 #include <vector>
 #include "action.h"
+#include "NetworkClass.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
 using namespace std;
 char receiveBuffer[4096];
-const string forward10 = "b";
-const string reverse10 = "f";
-const string turnRight = "i";
-const string turnLeft = "j";
 
 //create wsaData and socket
 WSADATA wsaData;
@@ -98,7 +96,7 @@ int Network::sendMessage(string message){
         return 1;
     }
     //send the message to the server
-    printf("Sending %s\n",message.c_str());
+    printf("Sending %s",message.c_str());
     checker = send(ConnectSocket, message.c_str(), message.length(),0);
     if (checker == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
@@ -106,14 +104,14 @@ int Network::sendMessage(string message){
         WSACleanup();
         return 1;
     }
-    else{
-    printf("Message sent\n");
-    }
+    printf("Message sent.\n");
     return 0;
 }
 
 //receives message from the server
 int Network::receiveMessage(){
+    //clear buffer before receive
+    receiveBuffer[0]='\0';
     do{
         checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
         if(checker>0){ //bytes are being received
@@ -144,61 +142,73 @@ string Network::decodeMessage(){
     return retMessage;
 }
 
-//call this at the beginning to establish connection with the server, so they can send replies
-int Network::sendReadyToRpi(){
-    string message ="";
-    message = encodeMessage(3,"");
-    sendMessage(message);
-    receiveMessage();
-    return 1;
-}
-
-//send the steps from a* search to all the other interfaces
-string Network::sendPath(vector<State>& vectorOfStates){
-    int currentStateIndex,vectorSize, facingDirection0, facingDirection1;
+//send the steps from a* search to android and stm
+bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates){
+    int currentStateIndex, facingDirection0, facingDirection1;
     float x0, x1, y0, y1;
-    string expectedMsgFromSTM = "a";//a for ready, change this if there are changes from STM side
+    string expectedMsgFromSTM = "R";//a for ready, change this if there are changes from STM side
     string andMsg = "";
     string stmMsg = "";
-    string rpiMsg = "t"; //fixed as only 1 msg to detect
     string replyMessage = "";
-    string retMsg = "";
-    vectorSize = static_cast<int>(vectorOfStates.size());
-    for(currentStateIndex = 0; currentStateIndex<vectorSize; currentStateIndex++){
-        if(currentStateIndex!=vectorSize-1){
-            x0 = vectorOfStates[currentStateIndex].position->x_left;
-            x1 = vectorOfStates[currentStateIndex+1].position->x_left;
-            y0 = vectorOfStates[currentStateIndex].position->y_low;
-            y1 = vectorOfStates[currentStateIndex+1].position->y_low;
-            facingDirection0 = vectorOfStates[currentStateIndex].face_direction;
-            facingDirection1 = vectorOfStates[currentStateIndex+1].face_direction;
-            //create the messages
-            stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
-            andMsg = generateAndroidMessage(x1,y1,facingDirection1);
-            printf("Message to STM: %s\n",stmMsg.c_str());
-            printf("Message to Android: %s\n",andMsg.c_str());
-            //encode the messages
-            encodeMessage(2,stmMsg);
-            encodeMessage(1,andMsg);
-            //send the messages to android then STM
-            sendMessage(andMsg);
-            sendMessage(stmMsg);
-            //wait for reply message from STM side
-            do{
-                receiveMessage();
-                replyMessage = decodeMessage();
-            }while(replyMessage.compare(expectedMsgFromSTM)!=0);
-        }
-        else{
-            //once it reaches the last state, ask STM to take a SS
-            encodeMessage(3,rpiMsg);
-            sendMessage(rpiMsg);
+    //maybe can make it noOfStates -2 since the last state is invalid and the second last state is a detect state
+    for(currentStateIndex = 0; currentStateIndex < (noOfStates-1); currentStateIndex++){
+        x0 = vectorOfStates[currentStateIndex]->position->x_left;
+        x1 = vectorOfStates[currentStateIndex+1]->position->x_left;
+        y0 = vectorOfStates[currentStateIndex]->position->y_low;
+        y1 = vectorOfStates[currentStateIndex+1]->position->y_low;
+        facingDirection0 = vectorOfStates[currentStateIndex]->face_direction;
+        facingDirection1 = vectorOfStates[currentStateIndex+1]->face_direction;
+        //create the messages
+        printf("\nx0 %f, y0 %f, facingDirection0 %d | x1 %f, y1 %f, facingDirection1 %d\n",x0,y0,facingDirection0,x1,y1,facingDirection1);
+        stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
+        andMsg = generateAndroidMessage(x1,y1,facingDirection1);
+//        printf("Message to STM: %s\n",stmMsg.c_str());
+//        printf("Message to Android: %s\n",andMsg.c_str());
+        //encode the messages
+        stmMsg = encodeMessage(2,stmMsg);
+        andMsg = encodeMessage(1,andMsg);
+        sendMessage(andMsg);
+        //send the messages to android then STM
+        sendMessage(stmMsg);
+        //wait for reply message from STM side
+        do{
             receiveMessage();
-            retMsg = decodeMessage();
-        }
+            replyMessage = decodeMessage();
+            if(replyMessage.substr(0,1)==(expectedMsgFromSTM)){
+                break;
+            }
+        }while(true);//change back to true later
+        replyMessage="";
+        //wait for 500ms before sending running the next loop to prevent spamming
+        this_thread::sleep_for(500ms);
     }
-    //returns whether the image was detected or not (y/n)
-    return retMsg;
+    return true;
+}
+
+//call this at the beginning to establish connection with the server, so they can send replies
+string Network::sendReadyToRpi(){
+    string message ="";
+//    message = encodeMessage(3,"");
+//    sendMessage(message);
+    receiveMessage();
+    message = decodeMessage();
+    return message;
+}
+
+//send a message to RPI to take photo
+bool Network::sendTakePhoto(){
+    string msg ="";
+    printf("\nRequesting RPI to take photo.\n");
+    msg = encodeMessage(3,"t");
+    sendMessage(msg);
+    receiveMessage();
+    msg = decodeMessage();
+    if(msg.compare("y")==0){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 //end of search, tell android to stop
@@ -206,27 +216,93 @@ int Network::sendEndToAndroid(){
     string message="";
     message = encodeMessage(1,"END");
     sendMessage(message);
-    return 0;
+    return 1;
+}
+
+//wait and read the message from android to generate obstacles
+int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
+    vector<float> xVector;
+    vector<float> yVector;
+    vector<int> fVector;
+    int noOfObstacles = 0;
+    string msg = "";
+    string messageFromAndroid = "";
+    //only android sends messages longer than 1 character, check that message received is from android
+    while(true){
+        receiveMessage();
+        msg = decodeMessage();
+        if(msg.length()>2){
+            printf("received message: %s\n", msg.c_str());
+            messageFromAndroid = msg;
+            break;
+        }
+    }
+    //test message, remove later
+    messageFromAndroid = "5,9,S\n7,14,W\n12,9,E\n15,15,S\n15,4,W\n";
+    //convert android message and create obstacles
+    convertAndroidMessage(messageFromAndroid,xVector,yVector,fVector);
+    //generate the obstacles and store them into the obstacle array
+    noOfObstacles = static_cast<int>(xVector.size());
+    //test to print the first set of obstacle
+    printf("%d,%f,%f,%d",noOfObstacles,xVector[0],yVector[0],fVector[0]);
+    for(int i=0; i < noOfObstacles; i++){
+        obstacles.push_back(Obstacle(i+1,xVector[i],yVector[i],fVector[i]));
+    }
+    return 1;
 }
 
 //convert the message android sent
 //message in the format of x,y,F\nx,y,F\n
-int Network::convertAndroidMessage(string message, vector<float> xVector, vector<float> yVector, vector<int> facingDirection){
+int Network::convertAndroidMessage(string message, vector<float>& xVector, vector<float>& yVector, vector<int>& facingDirection){
+    string currentValue = "";
     string currentMessage = "";
+    float newFloatValue;
+    int newIntValue;
     int msgLen = message.length();
-    int i =0;
-    while(i<msgLen){
-        //x value
-        currentMessage = message.substr(i,1);
-        xVector.push_back(stof(currentMessage));
-        //y value
-        currentMessage = message.substr(i+2,1);
-        yVector.push_back(stof(currentMessage));
-        //facing direction
-        currentMessage = message.substr(i+4,1);
-        xVector.push_back(stof(currentMessage));
+    int positionCounter = 0; // 0 = x, 1 = y
 
-        i = i + 6;
+    //loop through the message
+    for(int i = 0; i < msgLen; i++){
+        currentValue = message.substr(i,1);
+        //if newline character, end of facing direction, start new loop
+        if(currentValue.compare("\n")==0){
+            if(currentMessage=="N"){
+                currentMessage = "90";
+            }
+            if(currentMessage=="S"){
+                currentMessage = "270";
+            }
+            if(currentMessage=="E"){
+                currentMessage = "0";
+            }
+            if(currentMessage=="W"){
+                currentMessage = "180";
+            }
+            newIntValue = stoi(currentMessage);
+            facingDirection.push_back(newIntValue);
+            positionCounter = 0;
+            currentMessage = "";
+        }
+        else if(currentValue.compare(",")==0){
+            //values of x
+            if(positionCounter==0){
+                newFloatValue = stof(currentMessage);
+                xVector.push_back(newFloatValue);
+            }
+            //values of y
+            if(positionCounter==1){
+                newFloatValue = stof(currentMessage);
+                yVector.push_back(newFloatValue);
+            }
+        //increment position counter each time a "," is encountered and empty the currentMessage
+        positionCounter++;
+        currentMessage = "";
+        }
+        //only append the character if it is NOT a "," or "\n"
+        else{
+            //append the new character that was read to the end of the current message
+            currentMessage = currentMessage + currentValue;
+        }
     }
     return 0;
 }
@@ -237,19 +313,27 @@ string Network::generateAndroidMessage(float x, float y, int facingDirection){
     string retMessage ="";
     //facing east
     if(facingDirection==0){
-        retMessage = to_string(x) + "," + to_string(y) + ",E";
+        int xInt = static_cast<int>(x);
+        int yInt = static_cast<int>(y);
+        retMessage = to_string(xInt) + "," + to_string(yInt) + ",E";
     }
     //facing north
     if(facingDirection==90){
-        retMessage = to_string(x) + "," + to_string(y) + ",N";
+        int xInt = static_cast<int>(x);
+        int yInt = static_cast<int>(y);
+        retMessage = to_string(xInt) + "," + to_string(yInt) + ",N";
     }
     //facing west
     if(facingDirection==180){
-        retMessage = to_string(x) + "," + to_string(y) + ",W";
+        int xInt = static_cast<int>(x);
+        int yInt = static_cast<int>(y);
+        retMessage = to_string(xInt) + "," + to_string(yInt) + ",W";
     }
     //facing south
     if(facingDirection==270){
-        retMessage = to_string(x) + "," + to_string(y) + ",S";
+        int xInt = static_cast<int>(x);
+        int yInt = static_cast<int>(y);
+        retMessage = to_string(xInt) + "," + to_string(yInt) + ",S";
     }
     return retMessage;
 }
@@ -257,6 +341,10 @@ string Network::generateAndroidMessage(float x, float y, int facingDirection){
 //given two states' x, y and facing direction, return the action to be sent to STM
 string Network::calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1){
     //define the actions according to the command list
+    string forward10 = "b";
+    string reverse10 = "f";
+    string turnRight = "j";
+    string turnLeft = "i";
     int x,y;
     x = x1-x0;
     y = y1-y0;
