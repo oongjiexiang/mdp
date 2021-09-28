@@ -19,7 +19,7 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
     vector<vector<double>> pathDistanceList;
     vector<vector<ActionListPerObstacle>> pathSolutionList;
     if(!permutation(pathDistanceList, pathSolutionList)) return vector<ActionListPerObstacle>();    // if no Hamiltonian path, return an empty vector
-    
+
     int minPathIndex = 0;
     double minPathDist = DBL_MAX;
     for(int i = 0; i < pathDistanceList.size(); i++){
@@ -64,7 +64,7 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         SearchResult buffer;
         cout << float(iteration_debug++)/totalPermutation << "%" << endl;
         // initial state
-        Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
+        Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
         State* initState = new State(robotInitPosition, ROBOT_INIT_FACEDIRECTION, nullptr);
 
         // compute the Hamiltonian path
@@ -76,11 +76,11 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
                 return false;
             }
         }
-        
+
         pathDistanceList.push_back(onePermuteSubDistance);
         pathSolutionList.push_back(onePermuteSolution);
         // }
     // + 1 because first position is always initial point with id = 0
-    }while(next_permutation(goal_ids.begin(), goal_ids.end())); 
+    }while(next_permutation(goal_ids.begin(), goal_ids.end()));
     return true;
 }

@@ -34,8 +34,8 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.push_back(reverse);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
-    possibleActions.push_back(reverseLeft);
-    possibleActions.push_back(reverseRight);
+    //possibleActions.push_back(reverseLeft);
+    //possibleActions.push_back(reverseRight);
 }
 
 State* aStar::generateGoalState(Obstacle obstacle){
@@ -44,18 +44,18 @@ State* aStar::generateGoalState(Obstacle obstacle){
     Vertex* goalPosition = grid->findVertexByGrid(goalXGrid, goalYGrid);
     int goalFaceDirection = (obstacle.face_direction + 180)%360;
     State* goalState = new State(goalPosition, goalFaceDirection, nullptr);
-    
+
     // debug
-    cout << "ROBOT_VIEWING_GRID_LENGTH = " << ROBOT_VIEWING_GRID_LENGTH << endl;
-    cout << cos(M_PI/180*obstacle.face_direction) << " " << sin(M_PI/180*obstacle.face_direction) << endl;
-    cout << "goal state is" << endl;
-    goalState->printState();
+    //cout << "ROBOT_VIEWING_GRID_LENGTH = " << ROBOT_VIEWING_GRID_LENGTH << endl;
+    //cout << cos(M_PI/180*obstacle.face_direction) << " " << sin(M_PI/180*obstacle.face_direction) << endl;
+    //cout << "goal state is" << endl;
+    //goalState->printState();
     return goalState;
 }
 
 bool aStar::isDestination(const State& curState, const State& goalState){
-    return (curState.position->xGrid == goalState.position->xGrid && 
-        curState.position->yGrid == goalState.position->yGrid && 
+    return (curState.position->xGrid == goalState.position->xGrid &&
+        curState.position->yGrid == goalState.position->yGrid &&
         curState.face_direction == goalState.face_direction);
 }
 
@@ -68,10 +68,10 @@ float aStar::calculateHValue(State& curState, State& goalState){  // tochange
 
 // Encapsulate g cost calculation
 float aStar::calculateGValue(State& curState, Action* action, Map& localMap, Obstacle& obstacle){
-    return curState.gCost + action->getCost(&curState, localMap, obstacle); 
+    return curState.gCost + action->getCost(&curState, localMap, obstacle);
 }
 // A Utility Function to trace the path from the source to destination
-float aStar::tracePath(State* goalState, vector<State*>* states){ 
+float aStar::tracePath(State* goalState, vector<State*>* states){
     stack<State*> Path;
     State* next_node = goalState;
 
@@ -137,7 +137,7 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
 
     // for indexing purposes. For cellDetails, 0 degree to 0, 90 corresponds to 1, 180 to 2, -90 to 3
     int faceDirection = (int)(initState->face_direction)/90;
-    
+
     // 3. Set up initial state
     Vertex* position = initState->position;
     position->safe = true;
@@ -157,10 +157,10 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
         // start finding next states/ neighbours
         for(int i = 0; i < possibleActions.size(); i++){
             State* neighbourState = possibleActions[i]->takeAction(source, localMap);
-            
+
             // if action fails to be taken, skip
             if(neighbourState == nullptr) continue;
-            
+
             // if action sees the image, proceed to trace path
             if(isDestination(*neighbourState, *goalState)){
                 neighbourState->gCost = calculateGValue(*source, possibleActions[i], localMap, dest);
@@ -185,7 +185,7 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
                 gNew = calculateGValue(*source, possibleActions[i], localMap, dest);
                 hNew = calculateHValue(*neighbourState, *goalState);
                 fNew = gNew + hNew;
-                
+
                 if(newlySeenState || neighbourState->gCost + neighbourState->hCost > fNew){
                     openList.push(Tuple(fNew, neighbourState));
                     neighbourState->gCost = gNew;

@@ -17,43 +17,34 @@ int main()
     int checker=0;
     string retMessage="";
 
-
     Network n;
-    checker = n.initializeConnection();
+    //checker = n.initializeConnection();
     if(checker == 1){
         printf("error during initialization");
         return 1;
     }
     vector<Obstacle> obstacles;
-
     //message from android to obstacles
     n.readAndGenerateObstacles(obstacles);
-    //hardcoded values of obstacles
-    //obstacles.push_back(Obstacle(1, 5, 9, 270));
-    //obstacles.push_back(Obstacle(2, 7, 14, 180));
-    //obstacles.push_back(Obstacle(3, 12, 9, 0));
-    //obstacles.push_back(Obstacle(4, 15, 15, 270));
-    //obstacles.push_back(Obstacle(5, 15, 4, 180));
     int stateSize;
     ShortestPath sp(obstacles);
+    //generate paths
     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
     int resultSize = static_cast<int>(result.size());
     cout << resultSize << endl;
-    for(int i = 0; i < resultSize; i++){
+    vector<State*> states;
+    for(int i = 0; i < 1; i++){
         cout << "Obstacle-------------------------" << endl;
         result[i].first.printObstacle();
-        vector<State*> states = result[i].second;
+        states = result[i].second;
         stateSize = static_cast<int>(states.size());
         printf("states size %d",stateSize);
         n.sendPath(states,stateSize);
         //states[j]->printState();
         n.sendTakePhoto();
     }
-    n.sendEndToAndroid();
-//    printf("photo taken: %s\n",photoTaken ? "true":"false");
-//    retMessage = n.decodeMessage();
-//    printf("%s",retMessage.c_str());
-    n.endConnection();
+    //n.sendEndToAndroid();
+//    n.endConnection();
     return 0;
 }
 
@@ -81,3 +72,10 @@ int main()
 //        printf("%d\n",initState->face_direction);
 //        photoTaken = n.sendPath(vector1);
 //    }
+
+    //hardcoded values of obstacles
+    //obstacles.push_back(Obstacle(1, 5, 9, 270));
+    //obstacles.push_back(Obstacle(2, 7, 14, 180));
+    //obstacles.push_back(Obstacle(3, 12, 9, 0));
+    //obstacles.push_back(Obstacle(4, 15, 15, 270));
+    //obstacles.push_back(Obstacle(5, 15, 4, 180));

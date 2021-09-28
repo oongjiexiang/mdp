@@ -31,8 +31,8 @@ Network::Network(){
     Network::portNumber = 5180;
     Network::checker =0;
     Network::message = "test message";
-    Network::bufferLength = 4096; //change this later
-    //create wsadata
+    Network::bufferLength = 4096;
+    memset(receiveBuffer,'\n',sizeof(char)*bufferLength); //initialize buffer with '\n' characters
 }
 
 //call this to initialize the network, make sure to call this before any other function
@@ -111,30 +111,46 @@ int Network::sendMessage(string message){
 //receives message from the server
 int Network::receiveMessage(){
     //clear buffer before receive
-    receiveBuffer[0]='\0';
+    memset(receiveBuffer,'\n',sizeof(char)*bufferLength);
     do{
+        //receive message from server
         checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
         if(checker>0){ //bytes are being received
             printf("Bytes received: %d\n", checker);
             printf("%s\n",decodeMessage().c_str());
         }
         else if (checker == 0){ //no more bytes received
-            printf("Connection closed\n");
+            //printf("Connection closed\n");
         }
         else{ //something went wrong{
             printf("receive failed: %d\n", WSAGetLastError());
             break;
         }
     }while(checker<=0);
+    // joel testing
+//    do{
+//        checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
+//        if(checker>0){ //bytes are being received
+//            printf("Bytes received: %d\n", checker);
+//            printf("%s\n",decodeMessage().c_str());
+//        }
+//        else if (checker == 0){ //no more bytes received
+//            //printf("Connection closed\n");
+//        }
+//        else{ //something went wrong{
+//            printf("receive failed: %d\n", WSAGetLastError());
+//            break;
+//        }
+//    }while(checker<=0);
     return 0;
 }
 
 //check the buffer and decode the message received from the server
 string Network::decodeMessage(){
     int i=0;
-    char temp='a';
+    char temp=receiveBuffer[0];
     string retMessage="";
-    while(temp!='\n' || i < 4096){
+    while(temp!='\n' && i < 4096){
         temp = receiveBuffer[i];
         retMessage = retMessage+temp;
         i++;
@@ -162,8 +178,6 @@ bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates){
         printf("\nx0 %f, y0 %f, facingDirection0 %d | x1 %f, y1 %f, facingDirection1 %d\n",x0,y0,facingDirection0,x1,y1,facingDirection1);
         stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
         andMsg = generateAndroidMessage(x1,y1,facingDirection1);
-//        printf("Message to STM: %s\n",stmMsg.c_str());
-//        printf("Message to Android: %s\n",andMsg.c_str());
         //encode the messages
         stmMsg = encodeMessage(2,stmMsg);
         andMsg = encodeMessage(1,andMsg);
@@ -171,16 +185,18 @@ bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates){
         //send the messages to android then STM
         sendMessage(stmMsg);
         //wait for reply message from STM side
-        do{
+        while(true){
             receiveMessage();
             replyMessage = decodeMessage();
+            printf("reply message %s", replyMessage.c_str());
             if(replyMessage.substr(0,1)==(expectedMsgFromSTM)){
                 break;
             }
-        }while(true);//change back to true later
+            this_thread::sleep_for(100ms);
+        }
         replyMessage="";
         //wait for 500ms before sending running the next loop to prevent spamming
-        this_thread::sleep_for(500ms);
+        //this_thread::sleep_for(5000ms);
     }
     return true;
 }
@@ -188,8 +204,8 @@ bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates){
 //call this at the beginning to establish connection with the server, so they can send replies
 string Network::sendReadyToRpi(){
     string message ="";
-//    message = encodeMessage(3,"");
-//    sendMessage(message);
+    //message = encodeMessage(3,"t");
+    //sendMessage(message);
     receiveMessage();
     message = decodeMessage();
     return message;
@@ -228,17 +244,21 @@ int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
     string msg = "";
     string messageFromAndroid = "";
     //only android sends messages longer than 1 character, check that message received is from android
+//    testing buffer
+//    receiveBuffer[1]='a';
+//    receiveBuffer[0]='b';
+//    receiveBuffer[2]='a';
+    //test message, remove later
+    messageFromAndroid = "5,9,S\n7,14,W\n12,9,E\n15,15,S\n15,4,W\n";
     while(true){
         receiveMessage();
         msg = decodeMessage();
         if(msg.length()>2){
-            printf("received message: %s\n", msg.c_str());
             messageFromAndroid = msg;
             break;
         }
     }
-    //test message, remove later
-    messageFromAndroid = "5,9,S\n7,14,W\n12,9,E\n15,15,S\n15,4,W\n";
+
     //convert android message and create obstacles
     convertAndroidMessage(messageFromAndroid,xVector,yVector,fVector);
     //generate the obstacles and store them into the obstacle array
@@ -264,6 +284,10 @@ int Network::convertAndroidMessage(string message, vector<float>& xVector, vecto
     //loop through the message
     for(int i = 0; i < msgLen; i++){
         currentValue = message.substr(i,1);
+        //skip R from stm
+        if(currentValue.compare("R")==0){
+            continue;
+        }
         //if newline character, end of facing direction, start new loop
         if(currentValue.compare("\n")==0){
             if(currentMessage=="N"){
@@ -397,10 +421,10 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
         }
         if(facingDirection0 == 270){
             //check if x changes first
-            if(x<0){ //turn right when facing east
+            if(x < 0){ //turn right when facing east
                 return turnRight;
             }
-            if(x>0){ //turn left when facing east
+            if(x > 0){ //turn left when facing east
                 return turnLeft;
             }
             if(y > 0){//y1 and y0 should not be equal in this case, if a movement action is required
@@ -417,49 +441,49 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
         if(facingDirection0 == 0){ //face east
             //check if y changes
             if(y < 0){ //turn right when facing east
-                return turnRight+turnRight;
+                return turnRight;
             }
             if(y > 0){ //turn left when facing east
-                return turnLeft+turnLeft;
+                return turnLeft;
             }
             if(x!=0){ //assume to turn right by default
-                return turnRight+turnRight;
+                return turnRight;
             }
         }
         if(facingDirection0 == 180){ //face south
             //check if y changes
             if(y < 0){ //turn left when facing east
-                return turnLeft+turnLeft;
+                return turnLeft;
             }
             if(y > 0){ //turn right when facing east
-                return turnRight+turnRight;
+                return turnRight;
             }
             if(x!=0){ //assume to turn right by default
-                return turnRight+turnRight;
+                return turnRight;
             }
         }
         if(facingDirection0 == 90){ //face north
             //check if x changes first
             if(x < 0){ //turn left when facing east
-                return turnLeft+turnLeft;
+                return turnLeft;
             }
             if(x > 0){ //turn right when facing east
-                return turnRight+turnRight;
+                return turnRight;
             }
             if(y!=0){ //assume to turn right by default
-                return turnRight+turnRight;
+                return turnRight;
             }
         }
         if(facingDirection0 == 270){
             //check if x changes first
             if(x<0){ //turn right when facing east
-                return turnRight+turnRight;
+                return turnRight;
             }
             if(x>0){ //turn left when facing east
-                return turnLeft+turnLeft;
+                return turnLeft;
             }
-            if(x!=0){ //assume to turn right by default
-                return turnRight+turnRight;
+            if(y!=0){ //assume to turn right by default
+                return turnRight;
             }
         }
     }
@@ -467,8 +491,8 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
     if((facingDirection0+90)%360 == facingDirection1){
         return turnLeft;
     }
-    //if facing direction differs by -90, turn right
-    if((facingDirection0-90)%360 == facingDirection1){
+    //if facing direction differs by -270, turn right
+    if((facingDirection0+270)%360 == facingDirection1){
         return turnRight;
     }
     printf("Error");
