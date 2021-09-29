@@ -156,17 +156,6 @@ void Hamiltonian::simulate(){
         nextState = states[showingStep];
 
         displayRobotLocation();
-
-        // debug start
-        ActionFormulator* af = new FormulatorSmooth();
-        vector<State*> debugStates;
-        for(int i = 0; i < results.size(); i++){
-            Obstacle o = results[i].first;
-            debugStates.insert(debugStates.end(), results[i].second.begin(), results[i].second.end());
-        }
-        cout << "converting" << endl;
-        af->convertToActualActions(debugStates);
-        // debug end
     }
     else{
         QMessageBox msgBox;

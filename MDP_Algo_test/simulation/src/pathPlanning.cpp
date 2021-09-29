@@ -63,7 +63,7 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         vector<ActionListPerObstacle> onePermuteSolution;
         vector<double> onePermuteSubDistance;
         SearchResult buffer;
-        cout << float(iteration_debug++)/totalPermutation << "%" << endl;
+        cout << float(iteration_debug++)/totalPermutation*100 << "%" << endl;
         // initial state
         Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID); 
         State* initState = new State(robotInitPosition, ROBOT_INIT_FACEDIRECTION, nullptr);

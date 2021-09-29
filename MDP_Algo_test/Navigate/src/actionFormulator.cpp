@@ -56,23 +56,18 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
             }
         }
         else if(states[i-1]->face_direction == 270){
-            cout << "in 270 view" << endl;  // debug
             if(abs(initPosition->yGrid - nextPosition->yGrid) == 1){
                 actions.push_back(new ActionStraight(initPosition->yGrid - nextPosition->yGrid));
             }
             else if(initPosition->yGrid == nextPosition->yGrid + TURN_FORWARD_LENGTH){
-                cout << "inity > nexty" << endl;
                 int sign = (nextPosition->xGrid - initPosition->xGrid)/abs(nextPosition->xGrid - initPosition->xGrid);
                 actions.push_back(new ActionTurn2By4(90*sign));
             }
             else if(initPosition->yGrid == nextPosition->yGrid - TURN_FORWARD_LENGTH){
-                cout << "inity < nexty" << endl;
                 int sign = (nextPosition->xGrid - initPosition->xGrid)/abs(nextPosition->xGrid - initPosition->xGrid);
                 actions.push_back(new ActionReverseTurn2By4(90*sign));
             }
         }
-        // debug
-        actions[actions.size() - 1]->printAction();
     }
 
     for(int i = 0; i < actions.size(); i++){
