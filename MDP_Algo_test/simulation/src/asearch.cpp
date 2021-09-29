@@ -45,11 +45,6 @@ State* aStar::generateGoalState(Obstacle obstacle){
     int goalFaceDirection = (obstacle.face_direction + 180)%360;
     State* goalState = new State(goalPosition, goalFaceDirection, nullptr);
     
-    // debug
-    cout << "ROBOT_VIEWING_GRID_LENGTH = " << ROBOT_VIEWING_GRID_LENGTH << endl;
-    cout << cos(M_PI/180*obstacle.face_direction) << " " << sin(M_PI/180*obstacle.face_direction) << endl;
-    cout << "goal state is" << endl;
-    goalState->printState();
     return goalState;
 }
 

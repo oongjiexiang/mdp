@@ -26,12 +26,13 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
         double pathDist = 0;
         for(int j = 0; j < pathDistanceList[i].size(); j++){
             pathDist+=pathDistanceList[i][j];
-            if(minPathDist > pathDist){
-                minPathDist = pathDist;
-                minPathIndex = i;
-            }
+        }
+        if(minPathDist > pathDist){
+            minPathDist = pathDist;
+            minPathIndex = i;
         }
     }
+    cout << "min path = " << minPathDist << endl;
     for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
         ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
         Obstacle o = alpo.first;
