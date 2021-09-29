@@ -95,7 +95,7 @@ int main(){
     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
 
     // print results
-    ActionFormulator* af = new FormulatorSmooth();
+    ActionFormulator* af = new FormulatorShorten();
     vector<State*> states;
     for(int i = 0; i < result.size(); i++){
         Obstacle o = result[i].first;

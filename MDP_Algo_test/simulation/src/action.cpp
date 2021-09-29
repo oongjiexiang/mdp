@@ -61,6 +61,10 @@ int ActionStraight::getCost(State* initState, Map maps, Obstacle o){
     return cost;
 }
 
+int ActionStraight::getTravelDistGrid(){
+    return travelDistGrid;
+}
+
 // debug ActionStraight
 void ActionStraight::printAction(){
     if(travelDistGrid > 0) cout << "FORWARD: travelDistGrid = " << travelDistGrid << endl;

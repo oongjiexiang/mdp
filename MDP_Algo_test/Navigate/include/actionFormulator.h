@@ -13,4 +13,9 @@ class FormulatorSmooth : public ActionFormulator{
         vector<Action*> convertToActualActions(vector<State*> states);
 };
 
+class FormulatorShorten : public FormulatorSmooth{
+    public:
+        vector<Action*> convertToActualActions(vector<State*> states);
+};
+
 #endif

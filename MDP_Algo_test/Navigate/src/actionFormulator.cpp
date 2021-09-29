@@ -70,6 +70,32 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
         }
     }
 
+    // for(int i = 0; i < actions.size(); i++){
+    //     actions[i]->printAction();
+    // }
+    return actions;
+}
+
+vector<Action*> FormulatorShorten::convertToActualActions(vector<State*> states){
+    vector<Action*> actionsRaw = FormulatorSmooth::convertToActualActions(states);
+    vector<Action*> actions;
+    int accumulatedStraightDistance = 0;
+
+    ActionStraight* as;
+    for(int i = 0; i < actionsRaw.size(); i++){
+        as = dynamic_cast<ActionStraight*>(actionsRaw[i]);
+        if(as == nullptr){
+            if(accumulatedStraightDistance != 0){
+                as = new ActionStraight(accumulatedStraightDistance);
+                actions.push_back(as);
+                accumulatedStraightDistance = 0;
+            }
+            actions.push_back(actionsRaw[i]);
+        }
+        else{
+            accumulatedStraightDistance+=as->getTravelDistGrid();
+        }
+    }  
     for(int i = 0; i < actions.size(); i++){
         actions[i]->printAction();
     }

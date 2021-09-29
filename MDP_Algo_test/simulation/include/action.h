@@ -42,6 +42,7 @@ class ActionStraight : public Action{
         State* takeAction(State* initState, Map& maps);
 
         int getCost(State* initState, Map maps, Obstacle o);
+        int getTravelDistGrid();
 
         // debug
         void printAction();
