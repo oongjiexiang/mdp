@@ -40,6 +40,8 @@ import java.nio.charset.Charset;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import static com.example.mdp_android_grp15.ui.main.ControlFragment.timerHandler;
+
 public class MainActivity extends AppCompatActivity {
 
     // Declaration Variables
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static Context context;
 
     private static GridMap gridMap;
+    private ControlFragment controlFragment;
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
     static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice, exploreTime;
     static Button f1, f2;
@@ -123,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
         yAxisTextView = findViewById(R.id.yAxisTextView);
         directionAxisTextView = findViewById(R.id.directionAxisTextView);
 
-        // Timer
-
+        // ControlFragment for Timer
+        controlFragment = new ControlFragment();
 
         // initialize ITEM_LIST and imageBearings strings
         for (int i = 0; i < 20; i++) {
@@ -346,6 +349,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    // message handler
+    // alg sends x,y,robotDirection
+    // alg sends ALG,<obstacle id>
+    // rpi sends RPI,<image id>
     BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -353,43 +360,66 @@ public class MainActivity extends AppCompatActivity {
             showLog("receivedMessage: message --- " + message);
 
             if(message.contains(",")) {
-
-
-                //String[] cmd = message.split("[(,)]");
                 String[] cmd = message.split(",");
-                float x = Integer.parseInt(cmd[0]);
-                float y = Integer.parseInt(cmd[1]);
 
-                int a = Math.round(x);
-                int b = Math.round(y);
-                a = a/10;
-                b = b/10;
+                // check if string is cmd sent by ALG/RPI to get obstacle/image id
+                if (cmd[0].equals("ALG") || cmd[0].equals("RPI")) {
+                    String obstacleID = cmd[0].equals("ALG") ? cmd[1] : "";
+                    String imageID = cmd[0].equals("RPI") ? cmd[1] : "";
 
-                if (cmd.length == 3) {
-                    a+=1;
-                    b+=1;
+                    // call update fn only when both IDs are obtained
+                    if (!(obstacleID.equals("") || imageID.equals(""))) {
+                        gridMap.updateIDFromRpi(obstacleID, imageID);
+                    }
+                } else {
+
+                    // alg sends in cm and float e.g. 100.0,100.0,N
+                    float x = Integer.parseInt(cmd[0]);
+                    float y = Integer.parseInt(cmd[1]);
+
+                    // process received figures to pass into our fn
+                    int a = Math.round(x);
+                    int b = Math.round(y);
+                    a = a / 10;
+                    b = b / 10;
+
+                    // update robot pos from cmds sent by algo
+                    if (cmd.length == 3) {
+                        a += 1;
+                        b += 1;
 
 //                    int angle = Integer.parseInt(cmd[2]);
-                    String direction = cmd[2];
-                    gridMap.performAlgoCommand(a, b, direction);
+                        String direction = cmd[2];
+                        gridMap.performAlgoCommand(a, b, direction);
 //                    gridMap.performAlgoCommand(x, y, angle);
-                } else {
-                    String id = cmd[2];
-                    printMessage(id);
-                    String image = cmd[3];
-                    printMessage(image);
-                    gridMap.performRpiCommand(a, b, id, image);
+                    }
+                    // TODO: do we even need this branch anymore?
+                    else {
+                        String id = cmd[2];
+                        printMessage(id);
+                        String image = cmd[3];
+                        printMessage(image);
+                        gridMap.performRpiCommand(a, b, id, image);
+                    }
                 }
             }
-            else if(message.length() == 1 && message.length() == 2){
-                gridMap.updateIDFromRpi();
-            }
-//            else if(message.equals("END"))
-//            {
-//                ControlFragment.timerHandler.removeCallbacks(timerRunnableExplore);
+//            else if(message.length() == 1 && message.length() == 2){
+//                gridMap.updateIDFromRpi();
 //            }
-
-
+            // TODO: stop timer when receive "END" message
+            else if (message.equals("END")) {
+                // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
+                // end the corresponding timer
+                if (controlFragment.exploreButton.isChecked()) {
+                    controlFragment.exploreButton.setChecked(false);
+                    robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
+                    timerHandler.removeCallbacks(controlFragment.timerRunnableExplore);
+                } else if (controlFragment.fastestButton.isChecked()) {
+                    controlFragment.fastestButton.setChecked(false);
+                    robotStatusTextView.setText("Fastest Car Stopped");
+                    timerHandler.removeCallbacks(controlFragment.timerRunnableFastest);
+                }
+            }
 
             try {
                 if (message.length() > 7 && message.substring(2,6).equals("grid")) {

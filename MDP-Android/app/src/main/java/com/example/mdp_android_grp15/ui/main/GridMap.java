@@ -895,7 +895,6 @@ public class GridMap extends View {
                 this.startDrag(null, dragShadowBuilder, null, 0);
             }
 
-            // TODO: for checklist
             // start change obstacle
             if (MapTabFragment.changeObstacleStatus) {
                 if (!((1 <= initialColumn && initialColumn <= 20)
@@ -996,7 +995,6 @@ public class GridMap extends View {
                         }
                     }
                     // don't set robot if obstacles are there
-
                     int[] startCoord = this.getStartCoord();
 
                     if (startCoord[0] >= 2 && startCoord[1] >= 2) {
@@ -1067,43 +1065,10 @@ public class GridMap extends View {
                     ITEM_LIST.get(row - 1)[column - 1] = imageID;
                     imageBearings.get(row - 1)[column - 1] = imageBearing;
 
-                /*
-                add border colour to grid on the side image is on (N,S,E or W)
-                 */
-//                    switch (imageBearing) {
-//                        case "North":
-//                            imageBearings.get(row - 1)[column - 1] = "North";
-//                            break;
-//                        case "South":
-//                            imageBearings.get(row - 1)[column - 1] = "South";
-//                            break;
-//                        case "East":
-//                            imageBearings.get(row - 1)[column - 1] = "East";
-//                            break;
-//                        case "West":
-//                            imageBearings.get(row - 1)[column - 1] = "West";
-//                            break;
-//                    }
-
-
-
-                /* test boundaries of cells
-                showLog("row = " + row + ", column = " + column);
-                showLog("ITEM_LIST(" + String.valueOf(19-(row-1)) + ")[" + String.valueOf(column-1) + "] = " + ITEM_LIST.get(19-(row-1))[column-1]);
-                showLog("startX = " + (cells[column][row].startX));
-                showLog("endX = " + (cells[column][row].endX));
-                showLog("startY = " + (cells[row][column].startY));
-                showLog("endY = " + (cells[row][column].endY));
-                showLog("endX - startX = " + (cells[column][row].endX + cells[column][row].startX));
-                showLog("endY - startY = " + (cells[column][row].endY + cells[column][row].startY));
-                showLog("(cells[col][row].endX - cells[col][row].startX) / 2 = " + (cells[column][row].endX - cells[column][row].startX) / 2);
-                */
-
                     // this function affects obstacle turning too
                     this.setObstacleCoord(column, row);
                     showLog(commandMsgGenerator(ADD_OBSTACLE));
                     //MainActivity.printMessage(commandMsgGenerator(ADD_OBSTACLE));
-
                 }
                 this.invalidate();
                 return true;
@@ -1811,12 +1776,10 @@ public class GridMap extends View {
 
     }
 
-    // specifically for checklist only
+    // week 8 req to update robot pos when alg sends updates
     public boolean performAlgoCommand(int x, int y, String direction) {
         if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
-            if (robotDirection.equals("None")) {
-                robotDirection = "up";
-            }
+            robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
             switch (direction) {
                 case "N": robotDirection = "up";
                     break;
@@ -1827,81 +1790,17 @@ public class GridMap extends View {
                 case "W": robotDirection = "left";
                     break;
             }
-//            switch (angle) {
-//                case -90: //turn right
-//                    switch (robotDirection) {
-//                        case "up":
-//                            robotDirection = "right";
-//                            break;
-//                        case "right":
-//                            robotDirection = "down";
-//                            break;
-//                        case "left":
-//                            robotDirection = "up";
-//                            break;
-//                        case "down":
-//                            robotDirection = "left";
-//                            break;
-//                    }
-//                    break;
-//                case 180:
-//                    switch (robotDirection) {
-//                        case "up":
-//                            robotDirection = "down";
-//                            break;
-//                        case "right":
-//                            robotDirection = "left";
-//                            break;
-//                        case "left":
-//                            robotDirection = "right";
-//                            break;
-//                        case "down":
-//                            robotDirection = "up";
-//                            break;
-//                    }
-//                    break;
-//                case 90: // turn left
-//                    switch (robotDirection) {
-//                        case "up":
-//                            robotDirection = "left";
-//                            break;
-//                        case "right":
-//                            robotDirection = "up";
-//                            break;
-//                        case "left":
-//                            robotDirection = "down";
-//                            break;
-//                        case "down":
-//                            robotDirection = "right";
-//                            break;
-//                    }
-//                    break;
-//            }
         } else {
             return false;
         }
 
-
         // if robot pos was not set initially, don't set as explored before moving to new coord
         if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
-            // TODO: fix robot tping
-            // check if new x and y is more than just one grid away to see if it's tp or just moving
-            // if just moving then ignore, else tp then do sth
-//            if (Math.abs(x - curCoord[0]) > 1 && Math.abs(y - curCoord[1]) > 1) {
-//                for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
-//                    for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
-//                        cells[i][19-j].setType("explored");
-//                    }
-//                }
-//            } else {
-//                cells[curCoord[0]][20 - curCoord[1]].setType("explored");
-//                cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
-//            }
             if ((x > -1 && x < 21) && (y > -1 && y < 20)) {
                 for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
                     for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
                         cells[i][20 - j - 1].setType("explored");
-                        showLog("i = " + i + ", j = " + j);
+//                        showLog("i = " + i + ", j = " + j);
                     }
                 }
             }
@@ -1915,100 +1814,7 @@ public class GridMap extends View {
         return false;
     }
 
-
-    /*
-    algo communicates with stm alr, so android only needs the coords from algo to update position
-    Algo : [(<x coordinate in cm>, <y coordinate in cm>,
-            <heading direction in degree, -90 right, 90 left, 180 about-turn>)]
-    performs commands received from algo via bluetooth for robot position/movement
-     */
-    /*
-    public boolean performAlgoCommand(int x, int y, int angle) {
-        if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
-            if (robotDirection.equals("None")) {
-                robotDirection = "up";
-            }
-            switch (angle) {
-                case -90: //turn right
-                    switch (robotDirection) {
-                        case "up":
-                            robotDirection = "right";
-                            break;
-                        case "right":
-                            robotDirection = "down";
-                            break;
-                        case "left":
-                            robotDirection = "up";
-                            break;
-                        case "down":
-                            robotDirection = "left";
-                            break;
-                    }
-                    break;
-                case 180:
-                    switch (robotDirection) {
-                        case "up":
-                            robotDirection = "down";
-                            break;
-                        case "right":
-                            robotDirection = "left";
-                            break;
-                        case "left":
-                            robotDirection = "right";
-                            break;
-                        case "down":
-                            robotDirection = "up";
-                            break;
-                    }
-                    break;
-                case 90: // turn left
-                    switch (robotDirection) {
-                        case "up":
-                            robotDirection = "left";
-                            break;
-                        case "right":
-                            robotDirection = "up";
-                            break;
-                        case "left":
-                            robotDirection = "down";
-                            break;
-                        case "down":
-                            robotDirection = "right";
-                            break;
-                    }
-                    break;
-            }
-        } else {
-            return false;
-        }
-
-        MainActivity.printMessage(Integer.toString(curCoord[0]));
-        MainActivity.printMessage(Integer.toString(curCoord[1]));
-
-        // if robot pos was not set initially, don't set as explored before moving to new coord
-        if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
-            // TODO: fix robot tping
-            // check if new x and y is more than just one grid away to see if it's tp or just moving
-            // if just moving then ignore, else tp then do sth
-            if (Math.abs(x - curCoord[0]) > 1 && Math.abs(y - curCoord[1]) > 1) {
-                for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
-                    for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
-                        cells[i][19-j].setType("explored");
-                    }
-                }
-            } else {
-                cells[curCoord[0]][20 - curCoord[1]].setType("explored");
-                cells[curCoord[0] - 1][20 - curCoord[1]].setType("explored");
-            }
-        }
-        setCurCoord(x,y,robotDirection);    // set new coords and direction
-        canDrawRobot = true;
-        this.invalidate();
-        return true;
-    }
-
-     */
-
+    // TODO: useless fn also?
     // currently assuming we receiving coordinates for obstacles too
     public boolean performRpiCommand(int x, int y, String imageID, String imageBearing) {
         if (!((-1 < x && x < 20) && (-1 < y && y < 20))) {
@@ -2021,70 +1827,7 @@ public class GridMap extends View {
 
         // curCoord[0] = col, curCoord[1] = row (havent convert)
         // item_list.get(initialrow - 1)[initialcol - 1] (initialrow is converted alr)
-        switch (imageID) {
-            case "1": ITEM_LIST.get(y)[x] = "1";
-                break;
-            case "2": ITEM_LIST.get(y)[x] = "2";
-                break;
-            case "3": ITEM_LIST.get(y)[x] = "3";
-                break;
-            case "4": ITEM_LIST.get(y)[x] = "4";
-                break;
-            case "5": ITEM_LIST.get(y)[x] = "5";
-                break;
-            case "6": ITEM_LIST.get(y)[x] = "6";
-                break;
-            case "7": ITEM_LIST.get(y)[x] = "7";
-                break;
-            case "8": ITEM_LIST.get(y)[x] = "8";
-                break;
-            case "9": ITEM_LIST.get(y)[x] = "9";
-                break;
-            case "10": ITEM_LIST.get(y)[x] = "10";
-                break;
-            case "11": ITEM_LIST.get(y)[x] = "11";
-                break;
-            case "12": ITEM_LIST.get(y)[x] = "12";
-                break;
-            case "13": ITEM_LIST.get(y)[x] = "13";
-                break;
-            case "14": ITEM_LIST.get(y)[x] = "14";
-                break;
-            case "15": ITEM_LIST.get(y)[x] = "15";
-                break;
-            case "16": ITEM_LIST.get(y)[x] = "16";
-                break;
-            case "17": ITEM_LIST.get(y)[x] = "17";
-                break;
-            case "18": ITEM_LIST.get(y)[x] = "18";
-                break;
-            case "19": ITEM_LIST.get(y)[x] = "19";
-                break;
-            case "20": ITEM_LIST.get(y)[x] = "20";
-                break;
-            case "21": ITEM_LIST.get(y)[x] = "21";
-                break;
-            case "22": ITEM_LIST.get(y)[x] = "22";
-                break;
-            case "23": ITEM_LIST.get(y)[x] = "23";
-                break;
-            case "24": ITEM_LIST.get(y)[x] = "24";
-                break;
-            case "25": ITEM_LIST.get(y)[x] = "25";
-                break;
-            case "26": ITEM_LIST.get(y)[x] = "26";
-                break;
-            case "27": ITEM_LIST.get(y)[x] = "27";
-                break;
-            case "28": ITEM_LIST.get(y)[x] = "28";
-                break;
-            case "29": ITEM_LIST.get(y)[x] = "29";
-                break;
-            case "30": ITEM_LIST.get(y)[x] = "30";
-                break;
-            default: ITEM_LIST.get(y)[x] = "";
-        }
-
+        ITEM_LIST.get(y)[x] = imageID;
         switch (imageBearing) {
             case "N": imageBearings.get(y)[x] = "North";
                 break;
@@ -2112,6 +1855,7 @@ public class GridMap extends View {
         return message;
     }*/
 
+    // week 8 req to send algo obstacle info
     public String getObstacles() {
         String msg = "ALG|";
 
@@ -2120,30 +1864,19 @@ public class GridMap extends View {
             msg +=  (Float.toString((float) (obstacleCoord.get(i)[0] + 0.5)) + ","
                     + Float.toString((float) (obstacleCoord.get(i)[1] + 0.5)) + ","
                     + imageBearings.get(obstacleCoord.get(i)[1])[obstacleCoord.get(i)[0]].charAt(0)
-                    + ";"
-            );
+                    + ";");
 
-
-
-            showLog("obstacleCoord.get(i)[0] + 0.5 = " + Float.toString((float) (obstacleCoord.get(i)[0] + 0.5)));
-            showLog("obstacleCoord.get(i)[1] + 0.5 = " + Float.toString((float) (obstacleCoord.get(i)[1] + 0.5)));
+//            showLog("obstacleCoord.get(i)[0] + 0.5 = " + Float.toString((float) (obstacleCoord.get(i)[0] + 0.5)));
+//            showLog("obstacleCoord.get(i)[1] + 0.5 = " + Float.toString((float) (obstacleCoord.get(i)[1] + 0.5)));
         }
         msg += "\n";
-
-//        showLog(msg);
         return msg;
     }
 
-
-
-
-
-    // use initialRow initialCol bah..
-    // return true/false to algo
+    // checklist req
     public String commandMsgGenerator (int command) {
         String msg = "";
         switch (command) {
-            // inform STM bout all?
             case ADD_OBSTACLE:
                 // format: <target component>|<command>,<image id>,<obstacle coord>,<face direction>
                 msg = "ADD_OBSTACLE,"
@@ -2178,90 +1911,11 @@ public class GridMap extends View {
         return msg;
     }
 
+    // wk 8 task
     public boolean updateIDFromRpi(String obstacleID, String imageID) {
-        int x, y;
-
-        x = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[0];
-        y = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[1];
-
-//        for (int i = 0; i < obstacleCoord.size(); i++) {
-//            if (Math.abs(curCoord[0] - obstacleCoord.get(i)[0]) > 3 ||
-//                    Math.abs(curCoord[1] - obstacleCoord.get(i)[1]) > 3) {
-//                continue;
-//            } else {
-//                x = obstacleCoord.get(i)[0];
-//                y = obstacleCoord.get(i)[1];
-//            }
-//        }
-//
-//        if (x == -99 || y == -99) {
-//            showLog("x and y are invalid");
-//            return false;
-//        }
-        switch (imageID) {
-            case "1": ITEM_LIST.get(y)[x] = "1";
-                break;
-            case "2": ITEM_LIST.get(y)[x] = "2";
-                break;
-            case "3": ITEM_LIST.get(y)[x] = "3";
-                break;
-            case "4": ITEM_LIST.get(y)[x] = "4";
-                break;
-            case "5": ITEM_LIST.get(y)[x] = "5";
-                break;
-            case "6": ITEM_LIST.get(y)[x] = "6";
-                break;
-            case "7": ITEM_LIST.get(y)[x] = "7";
-                break;
-            case "8": ITEM_LIST.get(y)[x] = "8";
-                break;
-            case "9": ITEM_LIST.get(y)[x] = "9";
-                break;
-            case "10": ITEM_LIST.get(y)[x] = "10";
-                break;
-            case "11": ITEM_LIST.get(y)[x] = "11";
-                break;
-            case "12": ITEM_LIST.get(y)[x] = "12";
-                break;
-            case "13": ITEM_LIST.get(y)[x] = "13";
-                break;
-            case "14": ITEM_LIST.get(y)[x] = "14";
-                break;
-            case "15": ITEM_LIST.get(y)[x] = "15";
-                break;
-            case "16": ITEM_LIST.get(y)[x] = "16";
-                break;
-            case "17": ITEM_LIST.get(y)[x] = "17";
-                break;
-            case "18": ITEM_LIST.get(y)[x] = "18";
-                break;
-            case "19": ITEM_LIST.get(y)[x] = "19";
-                break;
-            case "20": ITEM_LIST.get(y)[x] = "20";
-                break;
-            case "21": ITEM_LIST.get(y)[x] = "21";
-                break;
-            case "22": ITEM_LIST.get(y)[x] = "22";
-                break;
-            case "23": ITEM_LIST.get(y)[x] = "23";
-                break;
-            case "24": ITEM_LIST.get(y)[x] = "24";
-                break;
-            case "25": ITEM_LIST.get(y)[x] = "25";
-                break;
-            case "26": ITEM_LIST.get(y)[x] = "26";
-                break;
-            case "27": ITEM_LIST.get(y)[x] = "27";
-                break;
-            case "28": ITEM_LIST.get(y)[x] = "28";
-                break;
-            case "29": ITEM_LIST.get(y)[x] = "29";
-                break;
-            case "30": ITEM_LIST.get(y)[x] = "30";
-                break;
-            default: ITEM_LIST.get(y)[x] = "";
-        }
-
+        int x = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[0];
+        int y = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[1];
+        ITEM_LIST.get(y)[x] = imageID;
         this.invalidate();
         return true;
     }
