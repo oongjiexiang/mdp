@@ -26,16 +26,6 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
         double pathDist = 0;
         for(int j = 0; j < pathDistanceList[i].size(); j++){
             pathDist+=pathDistanceList[i][j];
-<<<<<<< HEAD
-
-        }
-        if(minPathDist > pathDist){
-                minPathDist = pathDist;
-                minPathIndex = i;
-            }
-    }
-
-=======
         }
         if(minPathDist > pathDist){
             minPathDist = pathDist;
@@ -43,7 +33,6 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
         }
     }
     cout << "min path = " << minPathDist << endl;
->>>>>>> 8243d16acc28100e3909e9a7907fdcba1f97a4df
     for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
         ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
         Obstacle o = alpo.first;
