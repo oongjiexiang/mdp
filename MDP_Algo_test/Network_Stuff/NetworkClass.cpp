@@ -67,7 +67,7 @@ int Network::initializeConnection(){
     return 0;
 }
 
-//target device 1 for android, 2 for stm, 3 for rpi, assumes the unformatted message is correct
+//encodes the message, target device 1 for android, 2 for stm, 3 for rpi, assumes the unformatted message is correct
 string Network::encodeMessage(int targetDevice, string unformattedMessage){
     string formattedMessage;
     if(targetDevice==1){
@@ -110,14 +110,16 @@ int Network::sendMessage(string message){
 
 //receives message from the server
 int Network::receiveMessage(){
-    //clear buffer before receive
-    memset(receiveBuffer,'\n',sizeof(char)*bufferLength);
     do{
+        //clear buffer before receive
+        memset(receiveBuffer,'\n',sizeof(char)*bufferLength);
         //receive message from server
         checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
+
+        printf("%c",receiveBuffer[0]);
         if(checker>0){ //bytes are being received
             printf("Bytes received: %d\n", checker);
-            printf("%s\n",decodeMessage().c_str());
+            printf("Message received: %s\n",decodeMessage().c_str());
         }
         else if (checker == 0){ //no more bytes received
             //printf("Connection closed\n");
@@ -127,21 +129,6 @@ int Network::receiveMessage(){
             break;
         }
     }while(checker<=0);
-    // joel testing
-//    do{
-//        checker = recv(ConnectSocket, receiveBuffer,bufferLength,0);
-//        if(checker>0){ //bytes are being received
-//            printf("Bytes received: %d\n", checker);
-//            printf("%s\n",decodeMessage().c_str());
-//        }
-//        else if (checker == 0){ //no more bytes received
-//            //printf("Connection closed\n");
-//        }
-//        else{ //something went wrong{
-//            printf("receive failed: %d\n", WSAGetLastError());
-//            break;
-//        }
-//    }while(checker<=0);
     return 0;
 }
 
@@ -162,11 +149,14 @@ string Network::decodeMessage(){
 bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates){
     int currentStateIndex, facingDirection0, facingDirection1;
     float x0, x1, y0, y1;
-    string expectedMsgFromSTM = "R";//a for ready, change this if there are changes from STM side
+    string currentExpectedMsg = "";
+    string expectedMsgFromSTM0 = "R";//a for ready, change this if there are changes from STM side
+    string expectedMsgFromSTM1 = "r";
+    int expectedMessage = 0;
     string andMsg = "";
     string stmMsg = "";
     string replyMessage = "";
-    //maybe can make it noOfStates -2 since the last state is invalid and the second last state is a detect state
+    //noOfStates-1 as last state+1 is OOB
     for(currentStateIndex = 0; currentStateIndex < (noOfStates-1); currentStateIndex++){
         x0 = vectorOfStates[currentStateIndex]->position->x_left;
         x1 = vectorOfStates[currentStateIndex+1]->position->x_left;
@@ -182,33 +172,29 @@ bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates){
         stmMsg = encodeMessage(2,stmMsg);
         andMsg = encodeMessage(1,andMsg);
         sendMessage(andMsg);
-        //send the messages to android then STM
         sendMessage(stmMsg);
+
         //wait for reply message from STM side
         while(true){
+            replyMessage="";
+            if(expectedMessage==0){
+                currentExpectedMsg=expectedMsgFromSTM0;
+                expectedMessage=1;
+            }
+            else{
+                currentExpectedMsg=expectedMsgFromSTM0;
+                expectedMessage=0;
+            }
             receiveMessage();
             replyMessage = decodeMessage();
-            printf("reply message %s", replyMessage.c_str());
-            if(replyMessage.substr(0,1)==(expectedMsgFromSTM)){
+            printf("reply message %s\ncurrent expectedMsg %s", replyMessage.c_str(),currentExpectedMsg.c_str());
+            if(replyMessage.substr(0,1)==(currentExpectedMsg)){
                 break;
             }
-            this_thread::sleep_for(100ms);
         }
         replyMessage="";
-        //wait for 500ms before sending running the next loop to prevent spamming
-        //this_thread::sleep_for(5000ms);
     }
     return true;
-}
-
-//call this at the beginning to establish connection with the server, so they can send replies
-string Network::sendReadyToRpi(){
-    string message ="";
-    //message = encodeMessage(3,"t");
-    //sendMessage(message);
-    receiveMessage();
-    message = decodeMessage();
-    return message;
 }
 
 //send a message to RPI to take photo
@@ -228,6 +214,15 @@ bool Network::sendTakePhoto(){
 }
 
 //end of search, tell android to stop
+int Network::sendObstacleIdToAndroid(int obstacleId){
+    string sObstacleId = to_string(obstacleId);
+    string message="algo,"+sObstacleId;
+    message = encodeMessage(1,message);
+    sendMessage(message);
+    return 1;
+}
+
+//end of search, tell android to stop
 int Network::sendEndToAndroid(){
     string message="";
     message = encodeMessage(1,"END");
@@ -235,48 +230,43 @@ int Network::sendEndToAndroid(){
     return 1;
 }
 
-//wait and read the message from android to generate obstacles
+//wait and read the message from android to generate the obstacles
 int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
-    vector<float> xVector;
-    vector<float> yVector;
+    vector<int> xVector;
+    vector<int> yVector;
     vector<int> fVector;
     int noOfObstacles = 0;
     string msg = "";
-    string messageFromAndroid = "";
-    //only android sends messages longer than 1 character, check that message received is from android
-//    testing buffer
-//    receiveBuffer[1]='a';
-//    receiveBuffer[0]='b';
-//    receiveBuffer[2]='a';
     //test message, remove later
-    messageFromAndroid = "5,9,S\n7,14,W\n12,9,E\n15,15,S\n15,4,W\n";
+    //msg = "5,9,S;7,14,W;12,9,E;15,15,S;15,4,W;\n";
     while(true){
         receiveMessage();
         msg = decodeMessage();
-        if(msg.length()>2){
-            messageFromAndroid = msg;
-            break;
+        //convert android message and create obstacles
+        convertAndroidMessage(msg,xVector,yVector,fVector);
+        //xVector will only have a size greater than 0 when a message from android has been converted
+        //if the message only contains 'R' from STM, keep reading, if message from android read, break
+        if(xVector.size()>0){
+             break;
         }
     }
 
-    //convert android message and create obstacles
-    convertAndroidMessage(messageFromAndroid,xVector,yVector,fVector);
     //generate the obstacles and store them into the obstacle array
     noOfObstacles = static_cast<int>(xVector.size());
+    printf("%d number of obstacles",noOfObstacles);
     //test to print the first set of obstacle
-    printf("%d,%f,%f,%d",noOfObstacles,xVector[0],yVector[0],fVector[0]);
     for(int i=0; i < noOfObstacles; i++){
+        printf("\n%d,%d,%d,%d\n",i,xVector[i],yVector[i],fVector[i]);
         obstacles.push_back(Obstacle(i+1,xVector[i],yVector[i],fVector[i]));
     }
     return 1;
 }
 
-//convert the message android sent
+//convert the message telling us the locations of the obstacles android sent
 //message in the format of x,y,F\nx,y,F\n
-int Network::convertAndroidMessage(string message, vector<float>& xVector, vector<float>& yVector, vector<int>& facingDirection){
+int Network::convertAndroidMessage(string message, vector<int>& xVector, vector<int>& yVector, vector<int>& facingDirection){
     string currentValue = "";
     string currentMessage = "";
-    float newFloatValue;
     int newIntValue;
     int msgLen = message.length();
     int positionCounter = 0; // 0 = x, 1 = y
@@ -284,12 +274,15 @@ int Network::convertAndroidMessage(string message, vector<float>& xVector, vecto
     //loop through the message
     for(int i = 0; i < msgLen; i++){
         currentValue = message.substr(i,1);
-        //skip R from stm
-        if(currentValue.compare("R")==0){
+        //skip R and r from stm
+        if( currentValue.compare("\n")==0){
+            return 0;
+        }
+        if(currentValue.compare("R")==0 || currentValue.compare("r")==0){
             continue;
         }
         //if newline character, end of facing direction, start new loop
-        if(currentValue.compare("\n")==0){
+        if(currentValue.compare(";")==0){ //handle r case
             if(currentMessage=="N"){
                 currentMessage = "90";
             }
@@ -302,21 +295,23 @@ int Network::convertAndroidMessage(string message, vector<float>& xVector, vecto
             if(currentMessage=="W"){
                 currentMessage = "180";
             }
+            if(currentMessage.length()>0){
             newIntValue = stoi(currentMessage);
             facingDirection.push_back(newIntValue);
             positionCounter = 0;
             currentMessage = "";
+            }
         }
         else if(currentValue.compare(",")==0){
             //values of x
             if(positionCounter==0){
-                newFloatValue = stof(currentMessage);
-                xVector.push_back(newFloatValue);
+                newIntValue = stof(currentMessage)-0.5;
+                xVector.push_back(newIntValue);
             }
             //values of y
             if(positionCounter==1){
-                newFloatValue = stof(currentMessage);
-                yVector.push_back(newFloatValue);
+                newIntValue = stof(currentMessage)-0.5;
+                yVector.push_back(newIntValue);
             }
         //increment position counter each time a "," is encountered and empty the currentMessage
         positionCounter++;
@@ -369,6 +364,8 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
     string reverse10 = "f";
     string turnRight = "j";
     string turnLeft = "i";
+    string reverseRight = "s";
+    string reverseLeft = "t";
     int x,y;
     x = x1-x0;
     y = y1-y0;
@@ -435,7 +432,7 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
             }
         }
     }
-    //if facing opposite directions
+    //if facing opposite directions, should not happen
     //for now assume that it only requires a turning motion
     if((facingDirection0+180)%360 == facingDirection1){
         if(facingDirection0 == 0){ //face east
@@ -489,11 +486,129 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
     }
     //if facing direction differs by + 90, turn left
     if((facingDirection0+90)%360 == facingDirection1){
-        return turnLeft;
+        if(facingDirection0 == 0){ //face east
+            //check if y changes
+            if(y < 0){
+                return reverseRight;
+            }
+            if(y > 0){
+                return turnLeft;
+            }
+            if(x > 0){
+                return reverseRight;
+            }
+            if(x < 0){
+                return turnLeft;
+            }
+        }
+        if(facingDirection0 == 90){
+            //check if y changes
+            if(y < 0){
+                return reverseRight;
+            }
+            if(y > 0){
+                return turnLeft;
+            }
+            if(x > 0){
+                return turnLeft;
+            }
+            if(x < 0){
+                return reverseRight;
+            }
+        }
+        if(facingDirection0 == 180){
+            //check if y changes
+            if(y < 0){
+                return turnLeft;
+            }
+            if(y > 0){
+                return reverseRight;
+            }
+            if(x > 0){
+                return reverseRight;
+            }
+            if(x < 0){
+                return turnLeft;
+            }
+        }
+        if(facingDirection0 == 270){
+            //check if y changes
+            if(y < 0){
+                return reverseRight;
+            }
+            if(y > 0){
+                return turnLeft;
+            }
+            if(x > 0){
+                return turnLeft;
+            }
+            if(x < 0){
+                return reverseRight;
+            }
+        }
     }
     //if facing direction differs by -270, turn right
     if((facingDirection0+270)%360 == facingDirection1){
-        return turnRight;
+        if(facingDirection0 == 0){
+            //check if y changes
+            if(y < 0){
+                return turnRight;
+            }
+            if(y > 0){
+                return reverseLeft;
+            }
+            if(x > 0){
+                return reverseLeft;
+            }
+            if(x < 0){
+                return turnRight;
+            }
+        }
+        if(facingDirection0 == 90){
+            //check if y changes
+            if(y < 0){
+                return reverseLeft;
+            }
+            if(y > 0){
+                return turnRight;
+            }
+            if(x > 0){
+                return turnRight;
+            }
+            if(x < 0){
+                return reverseLeft;
+            }
+        }
+        if(facingDirection0 == 180){
+            //check if y changes
+            if(y < 0){
+                return reverseLeft;
+            }
+            if(y > 0){
+                return turnRight;
+            }
+            if(x > 0){
+                return reverseLeft;
+            }
+            if(x < 0){
+                return turnRight;
+            }
+        }
+        if(facingDirection0 == 270){
+            //check if y changes
+            if(y < 0){
+                return turnRight;
+            }
+            if(y > 0){
+                return reverseLeft;
+            }
+            if(x > 0){
+                return reverseLeft;
+            }
+            if(x < 0){
+                return turnRight;
+            }
+        }
     }
     printf("Error");
     return"";

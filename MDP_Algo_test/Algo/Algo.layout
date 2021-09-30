@@ -2,42 +2,24 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="..\Network_Stuff\main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1228" topLine="18" />
-		</Cursor>
-	</File>
-	<File name="..\Network_Stuff\NetworkClass.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3981" topLine="149" />
-		</Cursor>
-		<Folding>
-			<Collapse line="335" />
-		</Folding>
-	</File>
-	<File name="..\Simulation\src\pathPlanning.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1346" topLine="27" />
-		</Cursor>
-	</File>
-	<File name="..\Network_Stuff\NetworkClass.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="15" />
-		</Cursor>
-	</File>
-	<File name="..\Simulation\src\asearch.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1107" topLine="18" />
-		</Cursor>
-	</File>
 	<File name="..\Simulation\src\action.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1595" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="..\Navigate\src\actionFormulator.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\Network_Stuff\NetworkClass.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="0" />
+			<Cursor1 position="9408" topLine="238" />
+		</Cursor>
+	</File>
+	<File name="..\Navigate\src\navigate.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="632" topLine="44" />
+		</Cursor>
+	</File>
+	<File name="..\Network_Stuff\NetworkClass.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1281" topLine="14" />
 		</Cursor>
 	</File>
 	<File name="..\Navigate\src\MoveAround.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -45,9 +27,29 @@
 			<Cursor1 position="772" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="..\Navigate\src\navigate.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\Simulation\src\config.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="632" topLine="44" />
+			<Cursor1 position="587" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\Simulation\src\asearch.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3590" topLine="97" />
+		</Cursor>
+	</File>
+	<File name="..\Simulation\src\pathPlanning.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="555" topLine="60" />
+		</Cursor>
+	</File>
+	<File name="..\Network_Stuff\main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="300" topLine="23" />
+		</Cursor>
+	</File>
+	<File name="..\Navigate\src\actionFormulator.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

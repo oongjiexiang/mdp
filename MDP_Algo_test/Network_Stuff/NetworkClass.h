@@ -18,11 +18,11 @@
 
 class Network{
     public:
-        std::string serverIP; //ip address of the server
-        int portNumber; //listening port on the server
+        std::string serverIP;
+        int portNumber;
         int checker;
-        std::string message;//u8 encodes the string us utf-8 format
-        int bufferLength; //change this later
+        std::string message;
+        int bufferLength;
         Network();
         int initializeConnection();
         std::string encodeMessage(int targetDevice, std::string unformattedMessage);
@@ -30,13 +30,13 @@ class Network{
         int sendMessage(std::string formattedMessage);
         int receiveMessage();
         bool sendPath(std::vector<State*>& vectorOfStates, int noOfStates);
-        std::string sendReadyToRpi();
         bool sendTakePhoto();
+        int sendObstacleIdToAndroid(int obstacleId);
         int sendEndToAndroid();
         std::string generateAndroidMessage(float x, float y, int facingDirection);
         std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
         int readAndGenerateObstacles(vector<Obstacle>& obstacles);
-        int convertAndroidMessage(std::string message, std::vector<float>& xVector, std::vector<float>& yVector, std::vector<int>& facingDirection);
+        int convertAndroidMessage(std::string message, std::vector<int>& xVector, std::vector<int>& yVector, std::vector<int>& facingDirection);
         void endConnection();
 };
 
