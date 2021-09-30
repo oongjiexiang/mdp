@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.mdp_android_grp15.MainActivity;
+import com.example.mdp_android_grp15.ui.main.GridMap;
 import com.example.mdp_android_grp15.R;
 
 import static android.content.Context.SENSOR_SERVICE;
@@ -56,7 +57,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
 
     // Timer
-    static Handler timerHandler = new Handler();
+    public static Handler timerHandler = new Handler();
 
     Runnable timerRunnableExplore = new Runnable() {
         @Override
@@ -223,12 +224,16 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             public void onClick(View v) {
                 showLog("Clicked exploreToggleBtn");
                 ToggleButton exploreToggleBtn = (ToggleButton) v;
+
+
                 if (exploreToggleBtn.getText().equals("EXPLORE")) {
                     showToast("Exploration timer stop!");
                     robotStatusTextView.setText("Exploration Stopped");
                     timerHandler.removeCallbacks(timerRunnableExplore);
                 }
                 else if (exploreToggleBtn.getText().equals("STOP")) {
+                    String msg = gridMap.getObstacles();
+                    MainActivity.printMessage(msg);
                     showToast("Exploration timer start!");
 //                    MainActivity.printMessage("ES|");
                     robotStatusTextView.setText("Exploration Started");
