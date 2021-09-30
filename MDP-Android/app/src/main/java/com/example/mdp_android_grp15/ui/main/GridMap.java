@@ -801,7 +801,7 @@ public class GridMap extends View {
             ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
             imageBearings.get(initialRow-1)[initialColumn-1] = "";
             showLog(commandMsgGenerator(REMOVE_OBSTACLE));
-            MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
+//            MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
         }
         // drop within gridmap
         else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
@@ -809,7 +809,8 @@ public class GridMap extends View {
             endRow = this.convertRow((int) (dragEvent.getY() / cellSize));
 
             // if the currently dragged cell is empty, do nothing
-            if (ITEM_LIST.get(initialRow-1)[initialColumn-1] == "" || imageBearings.get(initialRow-1)[initialColumn-1] == "") {
+            if (ITEM_LIST.get(initialRow-1)[initialColumn-1].equals("")
+                    && imageBearings.get(initialRow-1)[initialColumn-1].equals("")) {
                 showLog("Cell is empty");
             }
             // if dropped within gridmap but outside drawn grids, remove obstacle from lists
@@ -822,7 +823,7 @@ public class GridMap extends View {
                 ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
                 imageBearings.get(initialRow-1)[initialColumn-1] = "";
                 showLog(commandMsgGenerator(REMOVE_OBSTACLE));
-                MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
+//                MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
             }
             // if dropped within gridmap, shift it to new position unless already got existing
             else if ((1 <= initialColumn && initialColumn <= 20)
@@ -848,7 +849,7 @@ public class GridMap extends View {
                     }
                     cells[initialColumn][20 - initialRow].setType("unexplored");
                     showLog(commandMsgGenerator(MOVE_OBSTACLE));
-                    MainActivity.printMessage(commandMsgGenerator(MOVE_OBSTACLE));
+//                    MainActivity.printMessage(commandMsgGenerator(MOVE_OBSTACLE));
                 }
             } else {
                 showLog("Drag event failed.");
@@ -886,7 +887,8 @@ public class GridMap extends View {
                 if (!((1 <= initialColumn && initialColumn <= 20)
                         && (1 <= initialRow && initialRow <= 20))) {
                     return false;
-                } else if (ITEM_LIST.get(row - 1)[column - 1] == "") {
+                } else if (ITEM_LIST.get(row - 1)[column - 1].equals("")
+                    && imageBearings.get(row - 1)[column - 1].equals("")) {
                     return false;
                 }
                 DragShadowBuilder dragShadowBuilder = new MyDragShadowBuilder(this);
@@ -899,7 +901,8 @@ public class GridMap extends View {
                 if (!((1 <= initialColumn && initialColumn <= 20)
                         && (1 <= initialRow && initialRow <= 20))) {
                     return false;
-                } else if (ITEM_LIST.get(row - 1)[column - 1] == "") {
+                } else if (ITEM_LIST.get(row - 1)[column - 1] == ""
+                        && imageBearings.get(row - 1)[column - 1] == "") {
                     return false;
                 } else {
                     showLog("Enter change obstacle status");
@@ -911,7 +914,7 @@ public class GridMap extends View {
                     AlertDialog.Builder mBuilder = new AlertDialog.Builder(this.getContext());
                     View mView = ((Activity) this.getContext()).getLayoutInflater()
                             .inflate(R.layout.activity_dialog_change_obstacle,
-                            null);
+                                    null);
                     mBuilder.setTitle("Change Existing Obstacle ID/Bearing");
                     final Spinner mIDSpinner = mView.findViewById(R.id.imageIDSpinner2);
                     final Spinner mBearingSpinner = mView.findViewById(R.id.bearingSpinner2);
@@ -928,7 +931,11 @@ public class GridMap extends View {
                     mBearingSpinner.setAdapter(adapter2);
 
                     // start at current id and bearing
-                    mIDSpinner.setSelection(Integer.parseInt(imageId) - 1);
+                    if (imageId.equals("")) {
+                        mIDSpinner.setSelection(0);
+                    } else {
+                        mIDSpinner.setSelection(Integer.parseInt(imageId) - 1);
+                    }
                     switch (imageBearing) {
                         case "North": mBearingSpinner.setSelection(0);
                             break;
@@ -1010,6 +1017,7 @@ public class GridMap extends View {
                 if(direction.equals("None")) {
                     direction = "up";
                 }
+                //getRobotSetpoint(column, row);
                 try {
                     int directionInt = 0;
                     if(direction.equals("up")){
@@ -1021,7 +1029,7 @@ public class GridMap extends View {
                     } else if(direction.equals("down")) {
                         directionInt = 2;
                     }
-                    MainActivity.printMessage("starting " + "(" + String.valueOf(row-1) + ","
+                    showLog("starting " + "(" + String.valueOf(row-1) + ","
                             + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1052,7 +1060,7 @@ public class GridMap extends View {
             if (setObstacleStatus) {
                 if ((1 <= row && row <= 20) && (1 <= column && column <= 20)) {
                     // get user input from spinners in MapTabFragment static values
-                    String imageID = MapTabFragment.imageID;
+                    String imageID = (MapTabFragment.imageID).equals("Nil") ? "" : MapTabFragment.imageID;
                     String imageBearing = MapTabFragment.imageBearing;
 
                     // after init, at stated column and row, add the id to use as ref to update the grid
@@ -1094,7 +1102,7 @@ public class GridMap extends View {
                     // this function affects obstacle turning too
                     this.setObstacleCoord(column, row);
                     showLog(commandMsgGenerator(ADD_OBSTACLE));
-                    MainActivity.printMessage(commandMsgGenerator(ADD_OBSTACLE));
+                    //MainActivity.printMessage(commandMsgGenerator(ADD_OBSTACLE));
 
                 }
                 this.invalidate();
@@ -1810,13 +1818,13 @@ public class GridMap extends View {
                 robotDirection = "up";
             }
             switch (direction) {
-                case "North": robotDirection = "up";
+                case "N": robotDirection = "up";
                     break;
-                case "South": robotDirection = "down";
+                case "S": robotDirection = "down";
                     break;
-                case "East": robotDirection = "right";
+                case "E": robotDirection = "right";
                     break;
-                case "West": robotDirection = "left";
+                case "W": robotDirection = "left";
                     break;
             }
 //            switch (angle) {
@@ -1873,8 +1881,6 @@ public class GridMap extends View {
             return false;
         }
 
-        MainActivity.printMessage(Integer.toString(curCoord[0]));
-        MainActivity.printMessage(Integer.toString(curCoord[1]));
 
         // if robot pos was not set initially, don't set as explored before moving to new coord
         if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
@@ -2006,11 +2012,11 @@ public class GridMap extends View {
     // currently assuming we receiving coordinates for obstacles too
     public boolean performRpiCommand(int x, int y, String imageID, String imageBearing) {
         if (!((-1 < x && x < 20) && (-1 < y && y < 20))) {
-            MainActivity.printMessage("target coord out of bounds");
+            showLog("target coord out of bounds");
             return false;
         }
         if (imageID == null || imageBearing == null) {
-            MainActivity.printMessage("null imageid/bearing");
+            showLog("null imageid/bearing");
         }
 
         // curCoord[0] = col, curCoord[1] = row (havent convert)
@@ -2096,6 +2102,42 @@ public class GridMap extends View {
         return true;
     }
 
+        /*public String getRobotSetpoint(int x, int y)
+    {
+        x= x-1;
+        String message = "";
+        //String direction = getRobotDirection();
+        message = "ALG|" + x + "," + y + "\n";
+        //MainActivity.printMessage(message);
+        return message;
+    }*/
+
+    public String getObstacles() {
+        String msg = "ALG|";
+
+        for (int i = 0; i < obstacleCoord.size(); i++) {
+            showLog("i = " + Integer.toString(i));
+            msg +=  (Float.toString((float) (obstacleCoord.get(i)[0] + 0.5)) + ","
+                    + Float.toString((float) (obstacleCoord.get(i)[1] + 0.5)) + ","
+                    + imageBearings.get(obstacleCoord.get(i)[1])[obstacleCoord.get(i)[0]].charAt(0)
+                    + ";"
+            );
+
+
+
+            showLog("obstacleCoord.get(i)[0] + 0.5 = " + Float.toString((float) (obstacleCoord.get(i)[0] + 0.5)));
+            showLog("obstacleCoord.get(i)[1] + 0.5 = " + Float.toString((float) (obstacleCoord.get(i)[1] + 0.5)));
+        }
+        msg += "\n";
+
+//        showLog(msg);
+        return msg;
+    }
+
+
+
+
+
     // use initialRow initialCol bah..
     // return true/false to algo
     public String commandMsgGenerator (int command) {
@@ -2104,36 +2146,125 @@ public class GridMap extends View {
             // inform STM bout all?
             case ADD_OBSTACLE:
                 // format: <target component>|<command>,<image id>,<obstacle coord>,<face direction>
-                msg = "STM|ADD_OBSTACLE,"
+                msg = "ADD_OBSTACLE,"
                         + ITEM_LIST.get(initialRow - 1)[initialColumn - 1] + ","
                         + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
                         + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0) + "\n";
                 break;
             case REMOVE_OBSTACLE:
                 // format: <target component>|<command>,<image id>,<obstacle coord>
-                msg = "STM|REMOVE_OBSTACLE,"
+                msg = "REMOVE_OBSTACLE,"
                         + oldItem + ","
                         + "(" + (initialColumn - 1) + "," + (initialRow - 1) + ")" + "\n";
                 break;
             case MOVE_OBSTACLE:
                 // format: <target component>|<command>,<old coord>,<new coord>
-                msg = "STM|MOVE_OBSTACLE,"
+                msg = "MOVE_OBSTACLE,"
                         + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
                         + "(" + (endColumn - 1) + "," + (endRow - 1) + ")" + "\n";
                 break;
             case ROBOT_MOVING:
                 // format: <target component>|<command>,<string>
-                msg = "STM|MSG," + "Move robot" + "\n";
+                msg = "MSG," + "Move robot" + "\n";
                 break;
             case START_AUTO_MOVE:
                 // format: <target component>|<command>,<string>
-                msg = "STM|MSG," + "Start auto movement." + "\n";
+                msg = "MSG," + "Start auto movement." + "\n";
                 break;
             case START_FASTEST_CAR:
                 // format: <target component>|<command>,<string>
-                msg = "STM|MSG," + "Start fastest car." + "\n";
+                msg = "MSG," + "Start fastest car." + "\n";
         }
         return msg;
     }
+
+    public boolean updateIDFromRpi(String obstacleID, String imageID) {
+        int x, y;
+
+        x = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[0];
+        y = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[1];
+
+//        for (int i = 0; i < obstacleCoord.size(); i++) {
+//            if (Math.abs(curCoord[0] - obstacleCoord.get(i)[0]) > 3 ||
+//                    Math.abs(curCoord[1] - obstacleCoord.get(i)[1]) > 3) {
+//                continue;
+//            } else {
+//                x = obstacleCoord.get(i)[0];
+//                y = obstacleCoord.get(i)[1];
+//            }
+//        }
+//
+//        if (x == -99 || y == -99) {
+//            showLog("x and y are invalid");
+//            return false;
+//        }
+        switch (imageID) {
+            case "1": ITEM_LIST.get(y)[x] = "1";
+                break;
+            case "2": ITEM_LIST.get(y)[x] = "2";
+                break;
+            case "3": ITEM_LIST.get(y)[x] = "3";
+                break;
+            case "4": ITEM_LIST.get(y)[x] = "4";
+                break;
+            case "5": ITEM_LIST.get(y)[x] = "5";
+                break;
+            case "6": ITEM_LIST.get(y)[x] = "6";
+                break;
+            case "7": ITEM_LIST.get(y)[x] = "7";
+                break;
+            case "8": ITEM_LIST.get(y)[x] = "8";
+                break;
+            case "9": ITEM_LIST.get(y)[x] = "9";
+                break;
+            case "10": ITEM_LIST.get(y)[x] = "10";
+                break;
+            case "11": ITEM_LIST.get(y)[x] = "11";
+                break;
+            case "12": ITEM_LIST.get(y)[x] = "12";
+                break;
+            case "13": ITEM_LIST.get(y)[x] = "13";
+                break;
+            case "14": ITEM_LIST.get(y)[x] = "14";
+                break;
+            case "15": ITEM_LIST.get(y)[x] = "15";
+                break;
+            case "16": ITEM_LIST.get(y)[x] = "16";
+                break;
+            case "17": ITEM_LIST.get(y)[x] = "17";
+                break;
+            case "18": ITEM_LIST.get(y)[x] = "18";
+                break;
+            case "19": ITEM_LIST.get(y)[x] = "19";
+                break;
+            case "20": ITEM_LIST.get(y)[x] = "20";
+                break;
+            case "21": ITEM_LIST.get(y)[x] = "21";
+                break;
+            case "22": ITEM_LIST.get(y)[x] = "22";
+                break;
+            case "23": ITEM_LIST.get(y)[x] = "23";
+                break;
+            case "24": ITEM_LIST.get(y)[x] = "24";
+                break;
+            case "25": ITEM_LIST.get(y)[x] = "25";
+                break;
+            case "26": ITEM_LIST.get(y)[x] = "26";
+                break;
+            case "27": ITEM_LIST.get(y)[x] = "27";
+                break;
+            case "28": ITEM_LIST.get(y)[x] = "28";
+                break;
+            case "29": ITEM_LIST.get(y)[x] = "29";
+                break;
+            case "30": ITEM_LIST.get(y)[x] = "30";
+                break;
+            default: ITEM_LIST.get(y)[x] = "";
+        }
+
+        this.invalidate();
+        return true;
+    }
+
 
 }

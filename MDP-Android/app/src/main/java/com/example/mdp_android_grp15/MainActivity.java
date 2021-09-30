@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
 import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
 import com.example.mdp_android_grp15.ui.main.BluetoothChatFragment;
+import com.example.mdp_android_grp15.ui.main.ControlFragment;
 import com.example.mdp_android_grp15.ui.main.GridMap;
 import com.example.mdp_android_grp15.ui.main.MapTabFragment;
 import com.example.mdp_android_grp15.ui.main.ReconfigureFragment;
@@ -35,6 +37,7 @@ import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static GridMap gridMap;
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
-    static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice;
+    static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice, exploreTime;
     static Button f1, f2;
     static Button upBtn, downBtn, leftBtn, rightBtn;
     Button reconfigure;
@@ -119,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
         xAxisTextView = findViewById(R.id.xAxisTextView);
         yAxisTextView = findViewById(R.id.yAxisTextView);
         directionAxisTextView = findViewById(R.id.directionAxisTextView);
+
+        // Timer
+
 
         // initialize ITEM_LIST and imageBearings strings
         for (int i = 0; i < 20; i++) {
@@ -351,25 +357,38 @@ public class MainActivity extends AppCompatActivity {
 
                 //String[] cmd = message.split("[(,)]");
                 String[] cmd = message.split(",");
-                int x = Integer.parseInt(cmd[0]);
-                int y = Integer.parseInt(cmd[1]);
+                float x = Integer.parseInt(cmd[0]);
+                float y = Integer.parseInt(cmd[1]);
+
+                int a = Math.round(x);
+                int b = Math.round(y);
+                a = a/10;
+                b = b/10;
 
                 if (cmd.length == 3) {
-                    x+=1;
-                    y+=1;
+                    a+=1;
+                    b+=1;
 
 //                    int angle = Integer.parseInt(cmd[2]);
                     String direction = cmd[2];
-                    gridMap.performAlgoCommand(x, y, direction);
+                    gridMap.performAlgoCommand(a, b, direction);
 //                    gridMap.performAlgoCommand(x, y, angle);
                 } else {
                     String id = cmd[2];
                     printMessage(id);
                     String image = cmd[3];
                     printMessage(image);
-                    gridMap.performRpiCommand(x, y, id, image);
+                    gridMap.performRpiCommand(a, b, id, image);
                 }
             }
+            else if(message.length() == 1 && message.length() == 2){
+                gridMap.updateIDFromRpi();
+            }
+//            else if(message.equals("END"))
+//            {
+//                ControlFragment.timerHandler.removeCallbacks(timerRunnableExplore);
+//            }
+
 
 
             try {
