@@ -7,6 +7,9 @@
 
 using namespace std;
 
+const int TURN_FORWARD_LENGTH = 2;
+const int TURN_SIDE_LENGTH = 4;
+
 // to illustrate each step. Will add more attributes when necessary
 class State{
     public:
@@ -39,6 +42,7 @@ class ActionStraight : public Action{
         State* takeAction(State* initState, Map& maps);
 
         int getCost(State* initState, Map maps, Obstacle o);
+        int getTravelDistGrid();
 
         // debug
         void printAction();

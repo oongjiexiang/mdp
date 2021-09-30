@@ -16,7 +16,8 @@ SOURCES += \
     src/config.cpp \
     src/action.cpp \
     src/asearch.cpp \
-    src/pathPlanning.cpp 
+    src/pathPlanning.cpp \
+    ../Navigate/src/actionFormulator.cpp
 
 HEADERS += \
     include/hamiltonian.h \
@@ -25,9 +26,11 @@ HEADERS += \
     include/config.h \
     include/action.h \
     include/asearch.h \
-    include/pathPlanning.h
+    include/pathPlanning.h \
+    ../Navigate/include/actionFormulator.h
 
 INCLUDEPATH += $$PWD/include
+INCLUDEPATH += $$PWD/../Navigate/include
 
 FORMS += \
     hamiltonian.ui \

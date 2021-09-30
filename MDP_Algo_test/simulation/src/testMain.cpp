@@ -3,13 +3,14 @@
 #include "action.h"
 #include "asearch.h"
 #include "pathPlanning.h"
+#include "actionFormulator.h"
 #include <iostream>
 
 using namespace std;
 
 int main(){
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 4, 9, 270));
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 4, 9, 270));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -34,7 +35,7 @@ int main(){
 
     //************** test action.cpp****************
     // vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 7, 7, 0));
+    // obstacles.push_back(Obstacle(1, 7, 7, 0));
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
     // Map map(obstacles);
     // map.printMap();
@@ -70,15 +71,36 @@ int main(){
     // cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // cout << result.size() << endl;
+    // for(int i = 0; i < result.size(); i++){
+    //     cout << "Obstacle-------------------------" << endl;
+    //     result[i].first.printObstacle();
+    //     vector<State*> states = result[i].second;
+    //     for(int j = 0; j < states.size(); j++){
+    //         states[j]->printState();
+    //     }
+    // }
+
+    //***********************test ActionFormulator.cpp ************************
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 5, 9, 270));
+    obstacles.push_back(Obstacle(2, 7, 14, 180));
+    obstacles.push_back(Obstacle(3, 12, 9, 0));
+    obstacles.push_back(Obstacle(4, 15, 15, 270));
+    obstacles.push_back(Obstacle(5, 15, 4, 180));
+
     ShortestPath sp(obstacles);
     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
-    cout << result.size() << endl;
+
+    // print results
+    ActionFormulator* af = new FormulatorShorten();
+    vector<State*> states;
     for(int i = 0; i < result.size(); i++){
-        cout << "Obstacle-------------------------" << endl;
-        result[i].first.printObstacle();
-        vector<State*> states = result[i].second;
-        for(int j = 0; j < states.size(); j++){
-            states[j]->printState();
-        }
+        Obstacle o = result[i].first;
+        states.insert(states.end(), result[i].second.begin(), result[i].second.end());
     }
+    af->convertToActualActions(states);
+    // cout << result.size() << endl;
 }

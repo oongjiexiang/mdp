@@ -11,7 +11,7 @@ const int ROBOT_INIT_Y_GRID = 1;
 const int ROBOT_INIT_X_GRID = 1;
 const int ROBOT_INIT_FACEDIRECTION = 90;
 const float ROBOT_OCCUPY_LENGTH = 22;
-const int ROBOT_VIEWING = 20;
+const int ROBOT_VIEWING = 30;
 
 // map
 const float AREA_LENGTH = 200;

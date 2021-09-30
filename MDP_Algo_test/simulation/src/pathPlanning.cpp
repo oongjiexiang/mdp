@@ -26,6 +26,7 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
         double pathDist = 0;
         for(int j = 0; j < pathDistanceList[i].size(); j++){
             pathDist+=pathDistanceList[i][j];
+<<<<<<< HEAD
 
         }
         if(minPathDist > pathDist){
@@ -34,6 +35,15 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
             }
     }
 
+=======
+        }
+        if(minPathDist > pathDist){
+            minPathDist = pathDist;
+            minPathIndex = i;
+        }
+    }
+    cout << "min path = " << minPathDist << endl;
+>>>>>>> 8243d16acc28100e3909e9a7907fdcba1f97a4df
     for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
         ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
         Obstacle o = alpo.first;
@@ -64,7 +74,7 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         vector<ActionListPerObstacle> onePermuteSolution;
         vector<double> onePermuteSubDistance;
         SearchResult buffer;
-        cout << float(iteration_debug++)/totalPermutation << "%" << endl;
+        cout << float(iteration_debug++)/totalPermutation*100 << "%" << endl;
         // initial state
         Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
         State* initState = new State(robotInitPosition, ROBOT_INIT_FACEDIRECTION, nullptr);

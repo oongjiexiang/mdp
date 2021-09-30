@@ -4,6 +4,7 @@
 #include "action.h"
 #include "asearch.h"
 #include "pathPlanning.h"
+#include "actionFormulator.h"
 #include "ui_hamiltonian.h"
 #include <QGroupBox>
 #include <QHBoxLayout>
