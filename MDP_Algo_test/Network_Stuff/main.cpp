@@ -43,7 +43,7 @@ int main()
         stateSize = static_cast<int>(states.size());
         printf("states size %d",stateSize);
         n.sendPath(states,stateSize);
-        n.sendObstacleIdToAndroid(obstacles[i].id);
+        n.sendObstacleIdToAndroid(result[i].first.id);
         n.sendTakePhoto();
     }
     n.sendEndToAndroid();

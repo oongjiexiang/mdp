@@ -238,7 +238,8 @@ int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
     int noOfObstacles = 0;
     string msg = "";
     //test message, remove later
-    //msg = "5,9,S;7,14,W;12,9,E;15,15,S;15,4,W;\n";
+//    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
+//    convertAndroidMessage(msg,xVector,yVector,fVector);
     while(true){
         receiveMessage();
         msg = decodeMessage();
@@ -495,10 +496,10 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
                 return turnLeft;
             }
             if(x > 0){
-                return reverseRight;
+                return turnLeft;
             }
             if(x < 0){
-                return turnLeft;
+                return reverseRight;
             }
         }
         if(facingDirection0 == 90){
@@ -510,10 +511,10 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
                 return turnLeft;
             }
             if(x > 0){
-                return turnLeft;
+                return reverseRight;
             }
             if(x < 0){
-                return reverseRight;
+                return turnLeft;
             }
         }
         if(facingDirection0 == 180){
@@ -534,16 +535,16 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
         if(facingDirection0 == 270){
             //check if y changes
             if(y < 0){
-                return reverseRight;
+                return turnLeft;
             }
             if(y > 0){
-                return turnLeft;
+                return reverseRight;
             }
             if(x > 0){
-                return turnLeft;
+                return reverseRight;
             }
             if(x < 0){
-                return reverseRight;
+                return turnLeft;
             }
         }
     }
@@ -558,10 +559,10 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
                 return reverseLeft;
             }
             if(x > 0){
-                return reverseLeft;
+                return turnRight;
             }
             if(x < 0){
-                return turnRight;
+                return reverseLeft;
             }
         }
         if(facingDirection0 == 90){
