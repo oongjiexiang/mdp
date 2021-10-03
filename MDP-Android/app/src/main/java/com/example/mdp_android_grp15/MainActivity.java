@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -42,6 +43,8 @@ import java.util.UUID;
 
 import static com.example.mdp_android_grp15.ui.main.ControlFragment.timerHandler;
 
+
+
 public class MainActivity extends AppCompatActivity {
 
     // Declaration Variables
@@ -62,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
     ProgressDialog myDialog;
+
+    int count=0;
+    String obstacleID = "";
+    String imageID = "";
 
     private static final String TAG = "Main Activity";
 
@@ -143,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         leftBtn = findViewById(R.id.leftBtn);
         rightBtn = findViewById(R.id.rightBtn);
 
+
         // Robot Status
         robotStatusTextView = findViewById(R.id.robotStatus);
 
@@ -222,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
     public static Button getDownBtn() { return downBtn; }
     public static Button getLeftBtn() { return leftBtn; }
     public static Button getRightBtn() { return rightBtn; }
+
 
     public static TextView getBluetoothStatus() { return bluetoothStatus; }
     public static TextView getConnectedDevice() { return bluetoothDevice; }
@@ -358,14 +367,20 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("receivedMessage");
             showLog("receivedMessage: message --- " + message);
+            ;
 
             if(message.contains(",")) {
                 String[] cmd = message.split(",");
 
                 // check if string is cmd sent by ALG/RPI to get obstacle/image id
                 if (cmd[0].equals("ALG") || cmd[0].equals("RPI")) {
-                    String obstacleID = cmd[0].equals("ALG") ? cmd[1] : "";
-                    String imageID = cmd[0].equals("RPI") ? cmd[1] : "";
+                    if(obstacleID == "")
+                        obstacleID = cmd[0].equals("ALG") ? cmd[1] : "";
+                    if(imageID == "")
+                        imageID = cmd[0].equals("RPI") ? cmd[1] : "";
+//                    showLog(String.valueOf(count));
+//                    showLog("ObstacleID: " + obstacleID);
+//                    showLog("imageID: " + imageID);
 
                     // call update fn only when both IDs are obtained
                     if (!(obstacleID.equals("") || imageID.equals(""))) {
@@ -410,15 +425,20 @@ public class MainActivity extends AppCompatActivity {
             else if (message.equals("END")) {
                 // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
                 // end the corresponding timer
-                if (controlFragment.exploreButton.isChecked()) {
-                    controlFragment.exploreButton.setChecked(false);
+                //controlFragment.exploreButton.setChecked(false);
+                if (controlFragment.getwk8Btn().isChecked()) {
+                    controlFragment.getwk8Btn().setChecked(false);
                     robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
-                    timerHandler.removeCallbacks(controlFragment.timerRunnableExplore);
-                } else if (controlFragment.fastestButton.isChecked()) {
-                    controlFragment.fastestButton.setChecked(false);
-                    robotStatusTextView.setText("Fastest Car Stopped");
-                    timerHandler.removeCallbacks(controlFragment.timerRunnableFastest);
+                    controlFragment.stopTimer();
                 }
+//                else if (controlFragment.fastestButton.isChecked()) {
+//                    controlFragment.fastestButton.setChecked(false);
+//                    robotStatusTextView.setText("Fastest Car Stopped");
+//                    timerHandler.removeCallbacks(controlFragment.timerRunnableFastest);
+//                }
+
+
+
             }
 
             try {

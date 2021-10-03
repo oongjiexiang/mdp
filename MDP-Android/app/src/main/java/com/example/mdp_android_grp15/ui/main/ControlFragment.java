@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -26,7 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.ui.main.GridMap;
 import com.example.mdp_android_grp15.R;
 
 import static android.content.Context.SENSOR_SERVICE;
@@ -46,7 +44,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     Button moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn;
     ImageButton exploreResetButton, fastestResetButton;
     private static long exploreTimer, fastestTimer;
-    public ToggleButton exploreButton, fastestButton;
+    public static ToggleButton exploreButton, fastestButton;
     TextView exploreTimeTextView, fastestTimeTextView, robotStatusTextView;
     Switch phoneTiltSwitch;
     static Button calibrateButton;
@@ -219,7 +217,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             }
         });
 
-        // TODO: renamed the explore button to week 8, check if working
         exploreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -416,7 +413,14 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         toast.show();
     }
 
-    public static Button getCalibrateButton() {
-        return calibrateButton;
+    public void stopTimer() {
+        timerHandler.removeCallbacks(timerRunnableExplore);
     }
+
+    public static ToggleButton getwk8Btn(){ return exploreButton; }
+    public static Handler getTimerHandler() { return timerHandler; }
+    public static long getExploreTimer() { return exploreTimer; }
+
+    public Runnable getwk8TimerRunnable() { return timerRunnableExplore; }
+
 }
