@@ -9,8 +9,8 @@
 using namespace std;
 
 int main(){
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 4, 9, 270));
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 4, 9, 270));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -22,16 +22,17 @@ int main(){
 
 
     //***************** test config.cpp********************
-    // obstacles.push_back(Obstacle(2, 3, 3, 0));
-    // obstacles.push_back(Obstacle(6, 5, 1, 270));
-    // obstacles.push_back(Obstacle(3, 6, 9, 0));
-    // obstacles.push_back(Obstacle(5, 13, 14, 90));
-    // Map map(obstacles);
-    // map.printMap();
-    // map.findVertexByCoor(15.0, 10)->printVertex();
-    // map.findVertexByGrid(10, 3)->printVertex();
-    // cout << map.isValidCoor(0, 0) << endl;
-    // cout << map.isValidGrid(1, 300000) << endl;
+    obstacles.push_back(Obstacle(2, 3, 3, 0));
+    obstacles.push_back(Obstacle(6, 5, 1, 270));
+    obstacles.push_back(Obstacle(3, 6, 9, 0));
+    obstacles.push_back(Obstacle(5, 13, 14, 90));
+    Map map(obstacles, FROM_BORDER_GRID_LENGTH);
+    // Map map(obstacles, 0);
+    map.printMap();
+    map.findVertexByCoor(-10, 20)->printVertex();
+    map.findVertexByGrid(-1, -3)->printVertex();
+    cout << map.isValidCoor(-50, -30) << endl;
+    cout << map.isValidGrid(-5, -3) << endl;
 
     //************** test action.cpp****************
     // vector<Obstacle> obstacles;
@@ -105,21 +106,21 @@ int main(){
     // cout << result.size() << endl;
 
     //**************************test pathPlanning.cpp again***********************
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 3, 9, 180));
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 3, 9, 180));
 
-    ShortestPath sp(obstacles);
-    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
 
-    for(int i = 0; i < result.size(); i++){
-        Obstacle o = result[i].first;
-        for(int j = 0; j < result[i].second.size(); j++){
-            result[i].second[j]->printState();
-        }
+    // for(int i = 0; i < result.size(); i++){
+    //     Obstacle o = result[i].first;
+    //     for(int j = 0; j < result[i].second.size(); j++){
+    //         result[i].second[j]->printState();
+    //     }
     
     // print results
     // ActionFormulator* af = new FormulatorShorten();
     // vector<State*> states;
-    }
+    // }
     // af->convertToActualActions(states);
 }
