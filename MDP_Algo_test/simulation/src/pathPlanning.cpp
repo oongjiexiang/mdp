@@ -6,6 +6,9 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <iostream>
+
+using namespace std;
 
 
 
@@ -18,7 +21,15 @@ ShortestPath::ShortestPath(vector<Obstacle> obstacles): obstacles(obstacles){
 vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
     vector<vector<double>> pathDistanceList;
     vector<vector<ActionListPerObstacle>> pathSolutionList;
-    if(!permutation(pathDistanceList, pathSolutionList)) return vector<ActionListPerObstacle>();    // if no Hamiltonian path, return an empty vector
+    try{
+        permutation(pathDistanceList, pathSolutionList);
+    }
+    catch(...){
+        cout << "Plan B: Allowing robot to move outside the border" << endl;
+        astar = aStar(obstacles, FROM_BORDER_GRID_LENGTH);
+        permutation(pathDistanceList, pathSolutionList);
+    }
+    // if(!) return vector<ActionListPerObstacle>();    // if no Hamiltonian path, return an empty vector
 
     int minPathIndex = 0;
     double minPathDist = DBL_MAX;
@@ -74,7 +85,7 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
             onePermuteSolution.push_back(make_pair(obstacles[goal_ids[i]], buffer.second));
             onePermuteSubDistance.push_back(buffer.first);
             if(initState == nullptr){   // if no complete Hamiltonian path
-                return false;
+                throw(initState);
             }
         }
 

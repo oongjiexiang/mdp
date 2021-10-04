@@ -14,6 +14,7 @@ const float ROBOT_OCCUPY_LENGTH = 22;
 const int ROBOT_VIEWING = 30;
 
 // map
+const int FROM_BORDER_GRID_LENGTH = 7;
 const float AREA_LENGTH = 200;
 const float START_COST = FLT_MAX;
 const float UNIT_LENGTH = 10;

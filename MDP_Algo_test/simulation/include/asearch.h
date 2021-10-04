@@ -35,6 +35,7 @@ class aStar{
     public:
         aStar();
         aStar(vector<Obstacle> obstacles);
+        aStar(vector<Obstacle> obstacles, int maxDistFromBorder);
         State* search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states);
         void changeObstacleFace(Obstacle obstacle, int newFaceDirection);
 };

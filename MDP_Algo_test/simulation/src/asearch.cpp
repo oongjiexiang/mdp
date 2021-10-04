@@ -19,6 +19,10 @@ aStar::aStar(vector<Obstacle> obstacles){
     grid = new Map(obstacles);
 }
 
+aStar::aStar(vector<Obstacle> obstacles, int maxDistFromBorder){
+    grid = new Map(obstacles, maxDistFromBorder);
+}
+
 void aStar::generatePossibleActions(Obstacle obstacle){
     ActionStraight* forward = new ActionStraight(1);
     ActionStraight* reverse = new ActionStraight(-1);
@@ -121,7 +125,6 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
         printf("We already detected %d at (%d, %d)\n", dest.id, dest.xGrid, dest.yGrid);
         return nullptr;
     }
-
     // 2. Initialise useful variables
     // Create a closed list and initialise it to false ie no cell is visited yet
     generatePossibleActions(dest);  // a. all 5 actions

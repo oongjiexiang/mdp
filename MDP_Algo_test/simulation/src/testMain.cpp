@@ -84,23 +84,42 @@ int main(){
     // }
 
     //***********************test ActionFormulator.cpp ************************
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 5, 9, 270));
+    // obstacles.push_back(Obstacle(2, 7, 14, 180));
+    // obstacles.push_back(Obstacle(3, 12, 9, 0));
+    // obstacles.push_back(Obstacle(4, 15, 15, 270));
+    // obstacles.push_back(Obstacle(5, 15, 4, 180));
+
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+
+    // // print results
+    // ActionFormulator* af = new FormulatorShorten();
+    // vector<State*> states;
+    // for(int i = 0; i < result.size(); i++){
+    //     Obstacle o = result[i].first;
+    //     states.insert(states.end(), result[i].second.begin(), result[i].second.end());
+    // }
+    // af->convertToActualActions(states);
+    // cout << result.size() << endl;
+
+    //**************************test pathPlanning.cpp again***********************
     vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 5, 9, 270));
-    obstacles.push_back(Obstacle(2, 7, 14, 180));
-    obstacles.push_back(Obstacle(3, 12, 9, 0));
-    obstacles.push_back(Obstacle(4, 15, 15, 270));
-    obstacles.push_back(Obstacle(5, 15, 4, 180));
+    obstacles.push_back(Obstacle(1, 3, 9, 180));
 
     ShortestPath sp(obstacles);
     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
 
-    // print results
-    ActionFormulator* af = new FormulatorShorten();
-    vector<State*> states;
     for(int i = 0; i < result.size(); i++){
         Obstacle o = result[i].first;
-        states.insert(states.end(), result[i].second.begin(), result[i].second.end());
+        for(int j = 0; j < result[i].second.size(); j++){
+            result[i].second[j]->printState();
+        }
+    
+    // print results
+    // ActionFormulator* af = new FormulatorShorten();
+    // vector<State*> states;
     }
-    af->convertToActualActions(states);
-    // cout << result.size() << endl;
+    // af->convertToActualActions(states);
 }

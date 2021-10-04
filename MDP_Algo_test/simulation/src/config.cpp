@@ -34,6 +34,30 @@ Map::Map(vector<Obstacle> obstacles): Map::Map(){
     }
 }
 
+Map::Map(vector<Obstacle> obstacles, int maxDistFromBorder){
+    grids.resize(X_GRID_COUNT + 2*maxDistFromBorder, vector<Vertex*>(Y_GRID_COUNT + 2*maxDistFromBorder));
+    //initialize all the variables for all vertices of the graph
+    for(int i=0; i < X_GRID_COUNT + 2*maxDistFromBorder; i++){
+        for(int j=0; j < Y_GRID_COUNT + 2*maxDistFromBorder; j++){
+            grids[i][j] = new Vertex(i, j);
+        }
+    }
+    this->obstacles = obstacles;
+    int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
+    for(int i = 0; i < obstacles.size(); i++){
+        Obstacle o = obstacles[i];
+        grids[o.xGrid + maxDistFromBorder][o.yGrid + maxDistFromBorder]->is_obstacle = true;
+        for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
+            for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
+                try{
+                    grids.at(o.xGrid + maxDistFromBorder + j).at(o.yGrid + maxDistFromBorder + k)->is_border = grids.at(o.xGrid + maxDistFromBorder + j).at(o.yGrid + maxDistFromBorder + k)->is_obstacle? false: true;
+                }
+                catch(out_of_range& e){}
+            }
+        }
+    }
+}
+
 void Map::addObstacle(Obstacle* o){
     obstacles.push_back(*o);
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));

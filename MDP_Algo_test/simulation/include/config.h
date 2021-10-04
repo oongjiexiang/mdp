@@ -13,6 +13,9 @@ class Map{
     public:
         Map();
 
+        // in case the robot must go outside the border
+        Map(vector<Obstacle> obstacles, int distFromBorderAllowed);
+        
         // get the map from Qt UI simulator
         Map(vector<Obstacle> obstacles);
 
