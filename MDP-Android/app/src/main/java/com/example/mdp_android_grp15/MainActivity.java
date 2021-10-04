@@ -376,15 +376,29 @@ public class MainActivity extends AppCompatActivity {
                 if (cmd[0].equals("ALG") || cmd[0].equals("RPI")) {
                     if(obstacleID == "")
                         obstacleID = cmd[0].equals("ALG") ? cmd[1] : "";
-                    if(imageID == "")
+                    if(imageID == "") {
                         imageID = cmd[0].equals("RPI") ? cmd[1] : "";
-//                    showLog(String.valueOf(count));
-//                    showLog("ObstacleID: " + obstacleID);
-//                    showLog("imageID: " + imageID);
+
+                    }
+
+                    //TODO check if fn is working when received imageID = -1
 
                     // call update fn only when both IDs are obtained
                     if (!(obstacleID.equals("") || imageID.equals(""))) {
+//                        imageID = (imageID.equals("-1")) ? "" : imageID;
+//                        if (imageID.equals("-1")) {
+//                            imageID = "";
+//                            obstacleID = "";
+//                        }
+//                        else{
+//                            gridMap.updateIDFromRpi(obstacleID, imageID);
+//                            obstacleID = "";
+//                            imageID = "";
+//                        }
                         gridMap.updateIDFromRpi(obstacleID, imageID);
+                        obstacleID = "";
+                        imageID = "";
+
                     }
                 } else {
 
@@ -395,27 +409,20 @@ public class MainActivity extends AppCompatActivity {
                     // process received figures to pass into our fn
                     int a = Math.round(x);
                     int b = Math.round(y);
-                    a = a / 10;
-                    b = b / 10;
+                    a = (a / 10) + 1;
+                    b = (b / 10) + 1;
+
+                    String direction = cmd[2];
 
                     // update robot pos from cmds sent by algo
-                    if (cmd.length == 3) {
-                        a += 1;
-                        b += 1;
-
-//                    int angle = Integer.parseInt(cmd[2]);
-                        String direction = cmd[2];
+                    if (cmd.length == 4) {
                         gridMap.performAlgoCommand(a, b, direction);
-//                    gridMap.performAlgoCommand(x, y, angle);
                     }
-                    // TODO: do we even need this branch anymore?
-                    else {
-                        String id = cmd[2];
-                        printMessage(id);
-                        String image = cmd[3];
-                        printMessage(image);
-                        gridMap.performRpiCommand(a, b, id, image);
-                    }
+
+//                    else if (cmd.length == 4){
+//                        String command = cmd[3];
+//                        gridMap.performAlgoTurning(a, b, direction, command);
+//                    }
                 }
             }
 //            else if(message.length() == 1 && message.length() == 2){
