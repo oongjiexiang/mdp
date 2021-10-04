@@ -41,7 +41,6 @@ import java.nio.charset.Charset;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import static com.example.mdp_android_grp15.ui.main.ControlFragment.timerHandler;
 
 
 
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     String imageID = "";
 
     private static final String TAG = "Main Activity";
+    public static boolean stopTimerFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -433,10 +433,12 @@ public class MainActivity extends AppCompatActivity {
                 // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
                 // end the corresponding timer
                 //controlFragment.exploreButton.setChecked(false);
-                if (controlFragment.getwk8Btn().isChecked()) {
-                    controlFragment.getwk8Btn().setChecked(false);
+                ToggleButton exploreButton = findViewById(R.id.exploreToggleBtn2);
+                if (exploreButton.isChecked()) {
+                    showLog("explorebutton is checked");
+                    stopTimerFlag = true;
+                    exploreButton.setChecked(false);
                     robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
-                    controlFragment.stopTimer();
                 }
 //                else if (controlFragment.fastestButton.isChecked()) {
 //                    controlFragment.fastestButton.setChecked(false);

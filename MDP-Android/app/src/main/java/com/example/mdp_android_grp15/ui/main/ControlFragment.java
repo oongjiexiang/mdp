@@ -65,9 +65,10 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             int minutesExplore = secondsExplore / 60;
             secondsExplore = secondsExplore % 60;
 
-            exploreTimeTextView.setText(String.format("%02d:%02d", minutesExplore, secondsExplore));
-
-            timerHandler.postDelayed(this, 500);
+            if (MainActivity.stopTimerFlag == false) {
+                exploreTimeTextView.setText(String.format("%02d:%02d", minutesExplore, secondsExplore));
+                timerHandler.postDelayed(this, 500);
+            }
         }
     };
 
@@ -231,6 +232,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 else if (exploreToggleBtn.getText().equals("STOP")) {
                     String msg = gridMap.getObstacles();
                     MainActivity.printMessage(msg);
+                    MainActivity.stopTimerFlag = false;
                     showToast("Auto Movement/ImageRecog timer start!");
 //                    MainActivity.printMessage("ES|");
                     robotStatusTextView.setText("Auto Movement Started");
