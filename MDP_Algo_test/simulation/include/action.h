@@ -18,7 +18,7 @@ class State{
         float gCost, hCost;
         State* prevState;
         State(Vertex* position, int face_direction, State* prevState);
-        
+
         // debug
         void printState();
 };
@@ -34,9 +34,10 @@ class Action{
 };
 
 class ActionStraight : public Action{
-    float travelDistGrid;   // in cm
     int cost = 1;
     public:
+
+        float travelDistGrid;   // in cm
         ActionStraight();
         ActionStraight(float travelDistGrid);
         State* takeAction(State* initState, Map& maps);
@@ -49,9 +50,9 @@ class ActionStraight : public Action{
 };
 
 class ActionTurn : public Action{
-    int turnAngle;
     int cost = 4;  // need to use mathematical calculation
     public:
+        int turnAngle;
         ActionTurn(int turnAngle);
         State* takeAction(State* initState, Map& maps);
 
@@ -62,9 +63,9 @@ class ActionTurn : public Action{
 };
 
 class ActionTurn2By4 : public Action{
-    int turnAngle;
     int cost = 4;  // need to use mathematical calculation
     public:
+        int turnAngle;
         ActionTurn2By4(int turnAngle);
         State* takeAction(State* initState, Map& maps);
 
@@ -75,9 +76,10 @@ class ActionTurn2By4 : public Action{
 };
 
 class ActionReverseTurn2By4 : public Action{
-    int turnAngle;
+
     int cost = 4;  // need to use mathematical calculation
     public:
+        int turnAngle;
         ActionReverseTurn2By4(int turnAngle);
         State* takeAction(State* initState, Map& maps);
 

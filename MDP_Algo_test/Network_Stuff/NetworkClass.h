@@ -29,14 +29,18 @@ class Network{
         std::string decodeMessage();
         int sendMessage(std::string formattedMessage);
         int receiveMessage();
-        bool sendPath(std::vector<State*>& vectorOfStates, int noOfStates);
+        bool sendPath(std::vector<State*>& vectorOfStates, int noOfStates,std::vector<Action*>& vectorOfAction);
+        bool sendCombinedActionPath(std::vector<State*>& vectorOfStates, int noOfStates, std::vector<Action*>& vectorOfAction);
         bool sendTakePhoto();
         int sendObstacleIdToAndroid(int obstacleId);
         int sendEndToAndroid();
-        std::string generateAndroidMessage(float x, float y, int facingDirection);
+        std::string generateAndroidMessage(float x, float y, int facingDirection,int stmMsgNumber);
         std::string calculateAction(float x0, float x1, float y0, float y1, int facingDirection0, int facingDirection1);
         int readAndGenerateObstacles(vector<Obstacle>& obstacles);
         int convertAndroidMessage(std::string message, std::vector<int>& xVector, std::vector<int>& yVector, std::vector<int>& facingDirection);
+        std::string calculateActionNew(Action* actionVector);
+        int checkMsgSent(std::string stmMsg);
+        int sendCalibrateToSTM();
         void endConnection();
 };
 
