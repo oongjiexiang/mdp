@@ -14,6 +14,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -52,10 +54,12 @@ public class GridMap extends View {
     public GridMap(Context c) {
         super(c);
         initMap();
+        setWillNotDraw(false);
     }
 
     SharedPreferences sharedPreferences;
 
+    final GridMap gridMap = (GridMap) findViewById(R.id.mapView);
     private Paint blackPaint = new Paint();
     private Paint whitePaint = new Paint();
     private Paint redPaint = new Paint();
@@ -864,6 +868,7 @@ public class GridMap extends View {
     }
 
     public void callInvalidate() {
+        showLog("Entering callinvalidate");
         this.invalidate();
     }
 
@@ -1814,46 +1819,117 @@ public class GridMap extends View {
         return false;
     }
 
-    // TODO: useless fn also?
-    // currently assuming we receiving coordinates for obstacles too
-    public boolean performRpiCommand(int x, int y, String imageID, String imageBearing) {
-        if (!((-1 < x && x < 20) && (-1 < y && y < 20))) {
-            showLog("target coord out of bounds");
-            return false;
-        }
-        if (imageID == null || imageBearing == null) {
-            showLog("null imageid/bearing");
-        }
+    // TODO: bug with onDraw()
+    public void performAlgoTurning(int x, int y, String facing, String cmd) {
+        final Handler handler = new Handler();
+        int a,b;
+        if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
+            robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
+            if (facing.equals("N"))
+                facing = "up";
+            else if (facing.equals("S"))
+                facing = "down";
+            else if (facing.equals("E"))
+                facing = "right";
+            else if (facing.equals("W"))
+                facing = "left";
+            switch (robotDirection) {
+                case "up":
+                    switch (cmd) {
+                        case "l":
+                            a = x-4;
+                            b = y-2;
+                            performAlgoCommand(a, b, robotDirection);
+                            a = x-3;
+                            b =y-2;
+                            performAlgoCommand(a, b, robotDirection);
 
-        // curCoord[0] = col, curCoord[1] = row (havent convert)
-        // item_list.get(initialrow - 1)[initialcol - 1] (initialrow is converted alr)
-        ITEM_LIST.get(y)[x] = imageID;
-        switch (imageBearing) {
-            case "N": imageBearings.get(y)[x] = "North";
-                break;
-            case "S": imageBearings.get(y)[x] = "South";
-                break;
-            case "E": imageBearings.get(y)[x] = "East";
-                break;
-            case "W": imageBearings.get(y)[x] = "West";
-                break;
-            default: imageBearings.get(y)[x] = "";
+
+                            break;
+                        case "r":
+                            // row
+
+                            long expectedTime = System.currentTimeMillis();
+
+                            for (int j = y - 2; j <= y; j++) {
+                                //setCurCoord(curCoord[0], j, robotDirection);
+                                performAlgoCommand(curCoord[0], j, robotDirection);
+                                showLog("looper thread = " + String.valueOf(Looper.getMainLooper().getThread()));
+                                showLog("current thread = " + String.valueOf(Thread.currentThread()));
+                                showLog("equal? " + String.valueOf(Looper.getMainLooper().getThread() == Thread.currentThread()));
+//                                canDrawRobot = true;
+//                                if (j != y - 1) {
+////                                    showLog("calling invalidate");
+//                                    gridMap.invalidate();
+//                                }
+                                while (System.currentTimeMillis() < expectedTime) { }
+                                expectedTime += 5000;
+                            }
+//                            performAlgoCommand(curCoord[0], y-2, robotDirection);
+//                            performAlgoCommand(curCoord[0], y-1, robotDirection);
+                            expectedTime = System.currentTimeMillis();
+
+//                            moveRobot("forward");
+//                            while (System.currentTimeMillis() < expectedTime) { }
+//                            expectedTime += 5000;
+//                            moveRobot("right");
+//                            while (System.currentTimeMillis() < expectedTime) { }
+//                            expectedTime += 5000;
+//                            moveRobot("forward");
+                            // col
+//                            for (int i = x - 4; i <= x; i++) {
+//                                performAlgoCommand(i, curCoord[1], facing);
+//                                setCurCoord(i, curCoord[1], facing);
+//                                canDrawRobot = true;
+//                                gridMap.invalidate();
+////                                showLog("am i calling invalidate?");
+////                                this.invalidate();
+////                                handler.postDelayed(runnable, 6000);
+//                                while (System.currentTimeMillis() < expectedTime) { }
+//                                expectedTime += 5000;
+//                            }
+//                            performAlgoCommand(x - 4, curCoord[1], facing);
+//                            performAlgoCommand(x - 3, curCoord[1], facing);
+
+                            break;
+                    }
+                    break;
+                case "down":
+
+                    break;
+                case "right":
+                    switch (cmd) {
+                        case "left":
+
+
+                            break;
+                        case "right":
+                            // row
+                            for (int j = y - 2; j <= y; j++) {
+                                setCurCoord(curCoord[0], j, robotDirection);
+                                if (j != y - 1) {
+                                    this.invalidate();
+                                }
+                            }
+
+                            // col
+                            for (int i = x - 4; i <= x; i++) {
+                                setCurCoord(i, curCoord[1], facing);
+                                this.invalidate();
+                            }
+                            break;
+                    }
+                    break;
+                case "left":
+
+                    break;
+            }
+
+            this.invalidate();
         }
-        cells[x + 1][20 - y - 1].setType("robot");
-        setObstacleCoord(x + 1, y + 1);
-        this.invalidate();
-        return true;
     }
 
-        /*public String getRobotSetpoint(int x, int y)
-    {
-        x= x-1;
-        String message = "";
-        //String direction = getRobotDirection();
-        message = "ALG|" + x + "," + y + "\n";
-        //MainActivity.printMessage(message);
-        return message;
-    }*/
+
 
     // week 8 req to send algo obstacle info
     public String getObstacles() {
@@ -1915,10 +1991,19 @@ public class GridMap extends View {
     public boolean updateIDFromRpi(String obstacleID, String imageID) {
         int x = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[0];
         int y = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[1];
-        ITEM_LIST.get(y)[x] = imageID;
+        ITEM_LIST.get(y)[x] = (imageID.equals("-1")) ? "" : imageID;
         this.invalidate();
         return true;
     }
 
+    public void callPostInvalidate() {
+        showLog("Enter post invalidate");
+        this.postInvalidate();
+    }
 
+    public void callDelay(int delayMillis) {
+        long expectedTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() < expectedTime) { }
+        expectedTime += delayMillis;
+    }
 }
