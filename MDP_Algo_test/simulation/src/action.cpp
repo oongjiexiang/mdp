@@ -48,7 +48,7 @@ State* ActionStraight::takeAction(State* initState, Map& maps){
 
     // Action can be taken!
     // 1. update map
-    maps.getVertexArray()[newXGrid][newYGrid]->safe = true;
+    maps.findVertexByGrid(newXGrid, newYGrid)->safe = true;
 
     // 2. generate new state
     Vertex* newPosition = new Vertex(newXGrid, newYGrid);
@@ -86,7 +86,6 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
     int faceDirection = initState->face_direction;
     int curXGrid = initState->position->xGrid;
     int curYGrid = initState->position->yGrid;
-    vector<vector<Vertex*>> grids = maps.getVertexArray();
 
     // 1. find new state
     switch(faceDirection){
@@ -114,7 +113,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
 
     // 2. check if new position and surrounding grids are safe
     if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;   // check if new grid is valid
-    newPosition = grids[newXGrid][newYGrid];
+    newPosition = maps.findVertexByGrid(newXGrid, newYGrid);
     for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){    // check if all other neighbouring grids exist and are available
         for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
             if(!maps.isAvailableGrid(i, j)) return nullptr;
@@ -125,7 +124,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
     // update map
     for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
         for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
-            maps.getVertexArray()[i][j]->safe = true;
+            maps.findVertexByGrid(i, j)->safe = true;
         }
     }
 
@@ -161,7 +160,6 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
     int faceDirection = initState->face_direction;
     int curXGrid = initState->position->xGrid;
     int curYGrid = initState->position->yGrid;
-    vector<vector<Vertex*>> grids = maps.getVertexArray();
 
     // 1. find new state
     switch(faceDirection){
@@ -189,7 +187,7 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
 
     // 2. check if new position and surrounding grids are safe
     if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;   // check if new grid is valid
-    newPosition = grids[newXGrid][newYGrid];
+    newPosition = maps.findVertexByGrid(newXGrid, newYGrid);
     for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){    // check if all other neighbouring grids exist and are available
         for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
             if(!maps.isAvailableGrid(i, j)) return nullptr;
@@ -200,7 +198,7 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
     // update map
     for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
         for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
-            maps.getVertexArray()[i][j]->safe = true;
+            maps.findVertexByGrid(i,j)->safe = true;
         }
     }
 
@@ -236,7 +234,6 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
     int faceDirection = initState->face_direction;
     int curXGrid = initState->position->xGrid;
     int curYGrid = initState->position->yGrid;
-    vector<vector<Vertex*>> grids = maps.getVertexArray();
 
     // 1. find new state
     switch(faceDirection){
@@ -264,7 +261,7 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
 
     // 2. check if new position and surrounding grids are safe
     if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;   // check if new grid is valid
-    newPosition = grids[newXGrid][newYGrid];
+    newPosition = maps.findVertexByGrid(newXGrid, newYGrid);
     for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){    // check if all other neighbouring grids exist and are available
         for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
             if(!maps.isAvailableGrid(i, j)) return nullptr;
@@ -275,7 +272,7 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
     // update map
     for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
         for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
-            maps.getVertexArray()[i][j]->safe = true;
+            maps.findVertexByGrid(i, j)->safe = true;
         }
     }
 

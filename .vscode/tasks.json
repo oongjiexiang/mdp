@@ -16,7 +16,7 @@
                 "-g",
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\component.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\config.cpp",
-                // "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\action.cpp",
+                "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\action.cpp",
                 // "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\asearch.cpp",
                 // "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\pathPlanning.cpp",
                 // "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\moveAround.cpp",

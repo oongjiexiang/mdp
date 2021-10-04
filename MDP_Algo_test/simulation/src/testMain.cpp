@@ -9,8 +9,8 @@
 using namespace std;
 
 int main(){
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 4, 9, 270));
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 4, 9, 270));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -22,39 +22,43 @@ int main(){
 
 
     //***************** test config.cpp********************
-    obstacles.push_back(Obstacle(2, 3, 3, 0));
-    obstacles.push_back(Obstacle(6, 5, 1, 270));
-    obstacles.push_back(Obstacle(3, 6, 9, 0));
-    obstacles.push_back(Obstacle(5, 13, 14, 90));
-    Map map(obstacles, FROM_BORDER_GRID_LENGTH);
-    // Map map(obstacles, 0);
-    map.printMap();
-    map.findVertexByCoor(-10, 20)->printVertex();
-    map.findVertexByGrid(-1, -3)->printVertex();
-    cout << map.isValidCoor(-50, -30) << endl;
-    cout << map.isValidGrid(-5, -3) << endl;
+    // obstacles.push_back(Obstacle(2, 3, 3, 0));
+    // obstacles.push_back(Obstacle(6, 5, 1, 270));
+    // obstacles.push_back(Obstacle(3, 6, 9, 0));
+    // obstacles.push_back(Obstacle(5, 13, 14, 90));
+    // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
+    // // Map map(obstacles, 0);
+    // map.printMap();
+    // map.findVertexByCoor(-10, 20)->printVertex();
+    // map.findVertexByGrid(-1, -3)->printVertex();
+    // cout << map.isValidCoor(-50, -30) << endl;
+    // cout << map.isValidGrid(-5, -3) << endl;
 
     //************** test action.cpp****************
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 7, 7, 0));
-    // obstacles.push_back(Obstacle(2, 3, 3, 0));
-    // Map map(obstacles);
-    // map.printMap();
-    // Vertex* initPosition = new Vertex(7, 8);
-    // State* initState = new State(initPosition, false, 180, nullptr);
-    // initState->printState();
-    // ActionStraight* aforward = new ActionStraight(1);
-    // ActionStraight* areverse = new ActionStraight(-1);
-    // ActionDetect* ad = new ActionDetect(2);
-    // ActionTurn* at = new ActionTurn(-90);
-    // aforward->takeAction(initState, map)->printState();
-    // map.printMap();
-    // cout << areverse->takeAction(initState, map) << endl;
-    // map.printMap();
-    // cout << ad->takeAction(initState, map) << endl;
-    // map.printMap();
-    // cout << at->takeAction(initState, map) << endl;
-    // map.printMap();
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 7, 7, 0));
+    obstacles.push_back(Obstacle(2, 3, 3, 0));
+    Map map(obstacles, FROM_BORDER_GRID_LENGTH);
+    map.printMap();
+    Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
+    State* initState = new State(initPosition, 180, nullptr);
+    initState->printState();
+    ActionStraight* aforward = new ActionStraight(1);
+    ActionStraight* areverse = new ActionStraight(-1);
+    ActionTurn2By4* at = new ActionTurn2By4(-90);
+    ActionReverseTurn2By4* art = new ActionReverseTurn2By4(-90);
+    cout << "forward direction" << endl;
+    aforward->takeAction(initState, map)->printState();
+    map.printMap();
+    cout << "reverse" << endl;
+    areverse->takeAction(initState, map);
+    map.printMap();
+    cout << "turn right" << endl;
+    at->takeAction(initState, map);
+    map.printMap();
+    cout << "reverse turn right" << endl;
+    art->takeAction(initState, map);
+    map.printMap();
 
     //**************** test asearch.cpp ***************
     // Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
