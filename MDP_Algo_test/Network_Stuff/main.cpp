@@ -3,10 +3,7 @@
 #include "NetworkClass.h"
 #include "action.h"
 #include "pathPlanning.h"
-
-
-#include <chrono>
-#include <thread>
+#include "actionFormulator.h"
 
 using namespace std;
 
@@ -24,7 +21,7 @@ int main()
 
     n.readAndGenerateObstacles(obstacles);
     printf("obstacles created\n");
-    for(int i =0; i<5;i++){
+    for(int i =0; i<obstacles.size();i++){
       obstacles[i].printObstacle();
     }
     int stateSize;
@@ -34,16 +31,23 @@ int main()
     int resultSize = static_cast<int>(result.size());
     cout << resultSize << endl;
     vector<State*> states;
+    vector<Action*> actions;
+    // new
+    ActionFormulator* af = new FormulatorShorten();
 
     //iterate through the paths to the obstacles
     for(int i = 0; i < resultSize; i++){
         cout << "Obstacle-------------------------" << endl;
         result[i].first.printObstacle();
         states = result[i].second;
+        actions=af->convertToActualActions(states);
         stateSize = static_cast<int>(states.size());
-        printf("states size %d",stateSize);
-        n.sendPath(states,stateSize);
+        printf("\n=========step path=============\n\n");
+        //n.sendPath(states,stateSize,actions);
+        printf("\n=========2nd path function============\n\n");
+        n.sendCombinedActionPath(states,stateSize,actions);
         n.sendObstacleIdToAndroid(result[i].first.id);
+        //n.sendCalibrateToSTM();
         n.sendTakePhoto();
     }
     n.sendEndToAndroid();

@@ -19,6 +19,7 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
         if(states[i-1]->face_direction == 0){
             if(abs(initPosition->xGrid - nextPosition->xGrid) == 1){
                 actions.push_back(new ActionStraight(nextPosition->xGrid - initPosition->xGrid));
+                printf("actions push %s \n", typeid(actions[0]).name());
             }
             else if(initPosition->xGrid == nextPosition->xGrid - TURN_FORWARD_LENGTH){
                 int sign = (nextPosition->yGrid - initPosition->yGrid)/abs(nextPosition->yGrid - initPosition->yGrid);
@@ -70,9 +71,9 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
         }
     }
 
-    // for(int i = 0; i < actions.size(); i++){
-    //     actions[i]->printAction();
-    // }
+//     for(int i = 0; i < actions.size(); i++){
+//         actions[i]->printAction();
+//     }
     return actions;
 }
 
@@ -94,8 +95,19 @@ vector<Action*> FormulatorShorten::convertToActualActions(vector<State*> states)
         }
         else{
             accumulatedStraightDistance+=as->getTravelDistGrid();
+            //zy added to account for the last state
+            if(i+1==actionsRaw.size()){
+                if(accumulatedStraightDistance!=0){
+                    as = new ActionStraight(accumulatedStraightDistance);
+                    actions.push_back(as);
+                    accumulatedStraightDistance = 0;
+                }
+                else{
+                actions.push_back(actionsRaw[i]);
+                }
+            }
         }
-    }  
+    }
     for(int i = 0; i < actions.size(); i++){
         actions[i]->printAction();
     }
