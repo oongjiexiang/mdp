@@ -77,7 +77,7 @@ ActionTurn::ActionTurn(int turnAngle){
     // else this->turnAngle = turnAngle;
     this->turnAngle = turnAngle;
 }
-    
+
 State* ActionTurn::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
     Vertex* newPosition;
@@ -93,7 +93,7 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
         case 0:
             newXGrid = curXGrid + 1;
             newYGrid = curYGrid + turnAngle/abs(turnAngle);
-            
+
         break;
         case 90:
             newXGrid = curXGrid - turnAngle/abs(turnAngle);
@@ -131,13 +131,18 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
 
     // introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
-    
+
     State* endState = new State(newPosition, newFaceDirection, initState);
     return endState;
 }
 
 int ActionTurn::getCost(State* initState, Map maps, Obstacle o){
     return cost;
+}
+
+//zy added
+int ActionTurn::getTurnAngle(){
+    return turnAngle;
 }
 
 // debug ActionTurn
@@ -152,7 +157,7 @@ ActionTurn2By4::ActionTurn2By4(int turnAngle){
     // else this->turnAngle = turnAngle;
     this->turnAngle = turnAngle;
 }
-    
+
 State* ActionTurn2By4::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
     Vertex* newPosition;
@@ -168,7 +173,7 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
         case 0:
             newXGrid = curXGrid + 2;
             newYGrid = curYGrid + 4*turnAngle/abs(turnAngle);
-            
+
         break;
         case 90:
             newXGrid = curXGrid - 4*turnAngle/abs(turnAngle);
@@ -206,13 +211,18 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
 
     // introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
-    
+
     State* endState = new State(newPosition, newFaceDirection, initState);
     return endState;
 }
 
 int ActionTurn2By4::getCost(State* initState, Map maps, Obstacle o){
     return cost;
+}
+
+//zy added
+int ActionTurn2By4::getTurnAngle(){
+    return turnAngle;
 }
 
 // debug ActionTurn
@@ -227,7 +237,7 @@ ActionReverseTurn2By4::ActionReverseTurn2By4(int turnAngle){
     // else this->turnAngle = turnAngle;
     this->turnAngle = turnAngle;
 }
-    
+
 State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
     Vertex* newPosition;
@@ -243,7 +253,7 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
         case 0:
             newXGrid = curXGrid - 2;
             newYGrid = curYGrid + 4*turnAngle/abs(turnAngle);
-            
+
         break;
         case 90:
             newXGrid = curXGrid - 4*turnAngle/abs(turnAngle);
@@ -281,13 +291,17 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
 
     // introduce new state
     int newFaceDirection = (faceDirection - (int)turnAngle + 360)%360;
-    
+
     State* endState = new State(newPosition, newFaceDirection, initState);
     return endState;
 }
 
 int ActionReverseTurn2By4::getCost(State* initState, Map maps, Obstacle o){
     return cost;
+}
+
+int ActionReverseTurn2By4::getTurnAngle(){
+    return turnAngle;
 }
 
 // debug ActionTurn

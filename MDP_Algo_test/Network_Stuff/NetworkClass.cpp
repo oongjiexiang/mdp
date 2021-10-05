@@ -145,57 +145,59 @@ string Network::decodeMessage(){
     return retMessage;
 }
 
-//send the steps from a* search to android and stm
-bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates, vector<Action*>& vectorOfAction){
-    int currentStateIndex, facingDirection0, facingDirection1;
-    float x0, x1, y0, y1;
-    string currentExpectedMsg = "";
-    string expectedMsgFromSTM0 = "R";//a for ready, change this if there are changes from STM side
-    string expectedMsgFromSTM1 = "r";
-    int expectedMessage = 0;
-    string andMsg = "";
-    string stmMsg = "";
-    string replyMessage = "";
-    //noOfStates-1 as last state+1 is OOB
-    for(currentStateIndex = 0; currentStateIndex < (noOfStates-1); currentStateIndex++){
-        x0 = vectorOfStates[currentStateIndex]->position->x_left;
-        x1 = vectorOfStates[currentStateIndex+1]->position->x_left;
-        y0 = vectorOfStates[currentStateIndex]->position->y_low;
-        y1 = vectorOfStates[currentStateIndex+1]->position->y_low;
-        facingDirection0 = vectorOfStates[currentStateIndex]->face_direction;
-        facingDirection1 = vectorOfStates[currentStateIndex+1]->face_direction;
-        //create the messages
-        printf("\nx0 %f, y0 %f, facingDirection0 %d | x1 %f, y1 %f, facingDirection1 %d\n",x0,y0,facingDirection0,x1,y1,facingDirection1);
-        stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
-        andMsg = generateAndroidMessage(x1,y1,facingDirection1,checkMsgSent(stmMsg));
-        //encode the messages
-        stmMsg = encodeMessage(2,stmMsg);
-        andMsg = encodeMessage(1,andMsg);
-        sendMessage(andMsg);
-        sendMessage(stmMsg);
-
-        //wait for reply message from STM side
-        while(true){
-            replyMessage="";
-            if(expectedMessage==0){
-                currentExpectedMsg=expectedMsgFromSTM0;
-                expectedMessage=1;
-            }
-            else{
-                currentExpectedMsg=expectedMsgFromSTM0;
-                expectedMessage=0;
-            }
-            receiveMessage();
-            replyMessage = decodeMessage();
-            printf("reply message %s\ncurrent expectedMsg %s", replyMessage.c_str(),currentExpectedMsg.c_str());
-            if(replyMessage.substr(0,1)==(currentExpectedMsg)){
-                break;
-            }
-        }
-        replyMessage="";
-    }
-    return true;
-}
+//
+////send the steps from a* search to android and stm
+////OLD, no need to use
+//bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates, vector<Action*>& vectorOfAction){
+//    int currentStateIndex, facingDirection0, facingDirection1;
+//    float x0, x1, y0, y1;
+//    string currentExpectedMsg = "";
+//    string expectedMsgFromSTM0 = "R";//a for ready, change this if there are changes from STM side
+//    string expectedMsgFromSTM1 = "r";
+//    int expectedMessage = 0;
+//    string andMsg = "";
+//    string stmMsg = "";
+//    string replyMessage = "";
+//    //noOfStates-1 as last state+1 is OOB
+//    for(currentStateIndex = 0; currentStateIndex < (noOfStates-1); currentStateIndex++){
+//        x0 = vectorOfStates[currentStateIndex]->position->x_left;
+//        x1 = vectorOfStates[currentStateIndex+1]->position->x_left;
+//        y0 = vectorOfStates[currentStateIndex]->position->y_low;
+//        y1 = vectorOfStates[currentStateIndex+1]->position->y_low;
+//        facingDirection0 = vectorOfStates[currentStateIndex]->face_direction;
+//        facingDirection1 = vectorOfStates[currentStateIndex+1]->face_direction;
+//        //create the messages
+//        printf("\nx0 %f, y0 %f, facingDirection0 %d | x1 %f, y1 %f, facingDirection1 %d\n",x0,y0,facingDirection0,x1,y1,facingDirection1);
+//        stmMsg = calculateAction(x0,x1,y0,y1,facingDirection0,facingDirection1);
+//        andMsg = generateAndroidMessage(x1,y1,facingDirection1,checkMsgSent(stmMsg));
+//        //encode the messages
+//        stmMsg = encodeMessage(2,stmMsg);
+//        andMsg = encodeMessage(1,andMsg);
+//        sendMessage(andMsg);
+//        sendMessage(stmMsg);
+//
+//        //wait for reply message from STM side
+//        while(true){
+//            replyMessage="";
+//            if(expectedMessage==0){
+//                currentExpectedMsg=expectedMsgFromSTM0;
+//                expectedMessage=1;
+//            }
+//            else{
+//                currentExpectedMsg=expectedMsgFromSTM0;
+//                expectedMessage=0;
+//            }
+//            receiveMessage();
+//            replyMessage = decodeMessage();
+//            printf("reply message %s\ncurrent expectedMsg %s", replyMessage.c_str(),currentExpectedMsg.c_str());
+//            if(replyMessage.substr(0,1)==(currentExpectedMsg)){
+//                break;
+//            }
+//        }
+//        replyMessage="";
+//    }
+//    return true;
+//}
 
 bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfStates, vector<Action*>& vectorOfAction){
     int androidMessageIndex, facingDirection0, facingDirection1;
@@ -786,7 +788,7 @@ string Network::calculateActionNew(Action* actionVector){
         }
     ActionTurn2By4* atPtr = dynamic_cast<ActionTurn2By4*>(actionVector);
         if(atPtr!=nullptr){
-            if(atPtr->turnAngle>0){
+            if(atPtr->getTurnAngle()>0){
                 returnMsg = turnLeft;
             }
             else{
@@ -795,7 +797,7 @@ string Network::calculateActionNew(Action* actionVector){
         }
     ActionReverseTurn2By4* arPtr = dynamic_cast<ActionReverseTurn2By4*>(actionVector);
         if(arPtr!=nullptr){
-            if(arPtr->turnAngle>0){
+            if(arPtr->getTurnAngle()>0){
                 returnMsg = reverseLeft;
             }
             else{

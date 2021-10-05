@@ -51,11 +51,11 @@ class ActionStraight : public Action{
 
 class ActionTurn : public Action{
     int cost = 4;  // need to use mathematical calculation
+    int turnAngle;
     public:
-        int turnAngle;
         ActionTurn(int turnAngle);
         State* takeAction(State* initState, Map& maps);
-
+        int getTurnAngle();
         int getCost(State* initState, Map maps, Obstacle o);
 
         // debug
@@ -64,11 +64,11 @@ class ActionTurn : public Action{
 
 class ActionTurn2By4 : public Action{
     int cost = 4;  // need to use mathematical calculation
+    int turnAngle;
     public:
-        int turnAngle;
         ActionTurn2By4(int turnAngle);
         State* takeAction(State* initState, Map& maps);
-
+        int getTurnAngle();
         int getCost(State* initState, Map maps, Obstacle o);
 
         // debug
@@ -76,13 +76,12 @@ class ActionTurn2By4 : public Action{
 };
 
 class ActionReverseTurn2By4 : public Action{
-
+    int turnAngle;
     int cost = 4;  // need to use mathematical calculation
     public:
-        int turnAngle;
         ActionReverseTurn2By4(int turnAngle);
         State* takeAction(State* initState, Map& maps);
-
+        int getTurnAngle();
         int getCost(State* initState, Map maps, Obstacle o);
 
         // debug

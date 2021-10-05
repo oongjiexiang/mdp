@@ -40,7 +40,6 @@ int main()
         cout << "Obstacle-------------------------" << endl;
         result[i].first.printObstacle();
         states = result[i].second;
-        // new
         actions=af->convertToActualActions(states);
         stateSize = static_cast<int>(states.size());
         printf("\n=========step path=============\n\n");
@@ -52,7 +51,7 @@ int main()
         n.sendTakePhoto();
     }
     n.sendEndToAndroid();
-    //n.endConnection();
+    n.endConnection();
     return 0;
 }
 
