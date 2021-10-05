@@ -1837,12 +1837,7 @@ public class GridMap extends View {
                 case "up":
                     switch (cmd) {
                         case "l":
-                            a = x-4;
-                            b = y-2;
-                            performAlgoCommand(a, b, robotDirection);
-                            a = x-3;
-                            b =y-2;
-                            performAlgoCommand(a, b, robotDirection);
+
 
 
                             break;
