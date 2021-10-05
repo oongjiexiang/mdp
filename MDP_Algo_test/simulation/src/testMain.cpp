@@ -9,8 +9,8 @@
 using namespace std;
 
 int main(){
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 4, 9, 270));
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 2, 9, 180));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -35,45 +35,45 @@ int main(){
     // cout << map.isValidGrid(-5, -3) << endl;
 
     //************** test action.cpp****************
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 7, 7, 0));
-    obstacles.push_back(Obstacle(2, 3, 3, 0));
-    Map map(obstacles, FROM_BORDER_GRID_LENGTH);
-    map.printMap();
-    Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
-    State* initState = new State(initPosition, 180, nullptr);
-    initState->printState();
-    ActionStraight* aforward = new ActionStraight(1);
-    ActionStraight* areverse = new ActionStraight(-1);
-    ActionTurn2By4* at = new ActionTurn2By4(-90);
-    ActionReverseTurn2By4* art = new ActionReverseTurn2By4(-90);
-    cout << "forward direction" << endl;
-    aforward->takeAction(initState, map)->printState();
-    map.printMap();
-    cout << "reverse" << endl;
-    areverse->takeAction(initState, map);
-    map.printMap();
-    cout << "turn right" << endl;
-    at->takeAction(initState, map);
-    map.printMap();
-    cout << "reverse turn right" << endl;
-    art->takeAction(initState, map);
-    map.printMap();
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 7, 7, 0));
+    // obstacles.push_back(Obstacle(2, 3, 3, 0));
+    // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
+    // map.printMap();
+    // Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
+    // State* initState = new State(initPosition, 180, nullptr);
+    // initState->printState();
+    // ActionStraight* aforward = new ActionStraight(1);
+    // ActionStraight* areverse = new ActionStraight(-1);
+    // ActionTurn2By4* at = new ActionTurn2By4(-90);
+    // ActionReverseTurn2By4* art = new ActionReverseTurn2By4(-90);
+    // cout << "forward direction" << endl;
+    // aforward->takeAction(initState, map)->printState();
+    // map.printMap();
+    // cout << "reverse" << endl;
+    // areverse->takeAction(initState, map);
+    // map.printMap();
+    // cout << "turn right" << endl;
+    // at->takeAction(initState, map);
+    // map.printMap();
+    // cout << "reverse turn right" << endl;
+    // art->takeAction(initState, map);
+    // map.printMap();
 
     //**************** test asearch.cpp ***************
-    // Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
-    // State* initState = new State(initPosition, 90, nullptr);
-    // aStar* astar = new aStar(obstacles);
+    Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
+    State* initState = new State(initPosition, 90, nullptr);
+    aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
     
-    // float pathCost = 0;
-    // vector<State*> resultStates;
-    // astar->search(initState, obstacles[0], &pathCost, &resultStates);
+    float pathCost = 0;
+    vector<State*> resultStates;
+    astar->search(initState, obstacles[0], &pathCost, &resultStates);
     
-    // cout << "-----------path--------------" << endl;
-    // for(int i = 0; i < resultStates.size(); i++){
-    //     resultStates[i]->printState();
-    // }
-    // cout << pathCost << endl;
+    cout << "-----------path--------------" << endl;
+    for(int i = 0; i < resultStates.size(); i++){
+        resultStates[i]->printState();
+    }
+    cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
     // ShortestPath sp(obstacles);
