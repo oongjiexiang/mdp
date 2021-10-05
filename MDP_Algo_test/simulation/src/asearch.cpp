@@ -30,13 +30,16 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.push_back(reverse);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
-    //possibleActions.push_back(reverseLeft);
-    //possibleActions.push_back(reverseRight);
+    possibleActions.push_back(reverseLeft);
+    possibleActions.push_back(reverseRight);
 }
 
 State* aStar::generateGoalState(Obstacle obstacle){
     int goalXGrid = obstacle.xGrid + ((int)cos(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
     int goalYGrid = obstacle.yGrid + ((int)sin(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
+    if(!grid->isValidGrid(goalXGrid, goalYGrid)){
+        throw(nullptr);
+    }
     Vertex* goalPosition = grid->findVertexByGrid(goalXGrid, goalYGrid);
     int goalFaceDirection = (obstacle.face_direction + 180)%360;
     State* goalState = new State(goalPosition, goalFaceDirection, nullptr);
@@ -122,10 +125,10 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     generatePossibleActions(dest);  // a. all 5 actions
     Map localMap = *grid;   // b. local map so that the original map is not modified after every search
 
-    bool closedList[X_GRID_COUNT + maxDistFromBorder][Y_GRID_COUNT + maxDistFromBorder][4];    // c. check if the state is visited (5 actions)
+    bool closedList[X_GRID_COUNT + 2*maxDistFromBorder][Y_GRID_COUNT + 2*maxDistFromBorder][4];    // c. check if the state is visited (5 actions)
     memset(closedList, false, sizeof(closedList));
 
-    State* cellDetails[X_GRID_COUNT + maxDistFromBorder][Y_GRID_COUNT + maxDistFromBorder][4];  // d. get the latest state detail at that position and face direction
+    State* cellDetails[X_GRID_COUNT + 2*maxDistFromBorder][Y_GRID_COUNT + 2*maxDistFromBorder][4];  // d. get the latest state detail at that position and face direction
     memset(cellDetails, false, sizeof(cellDetails));
 
     priority_queue<Tuple, vector<Tuple>, greater<Tuple> > openList; // e. Priority Queue <f-cost, state>
@@ -145,6 +148,7 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     while (!openList.empty()) {
         const Tuple& p = openList.top();
         State* source = get<1>(p);
+
         // Remove this vertex from the open list
         openList.pop();
         closedList[source->position->xGrid + maxDistFromBorder][source->position->yGrid + maxDistFromBorder][source->face_direction/90] = true;

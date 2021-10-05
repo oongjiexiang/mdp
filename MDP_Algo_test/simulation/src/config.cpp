@@ -25,8 +25,8 @@ Map::Map(vector<Obstacle> obstacles, int distFromBorderAllowed): Map::Map(distFr
 }
 
 void Map::addObstacle(Obstacle* o){
-    o->xGrid = o->xGrid + distFromBorderAllowed;
-    o->yGrid = o->yGrid + distFromBorderAllowed;
+    // o->xGrid = o->xGrid + distFromBorderAllowed;
+    // o->yGrid = o->yGrid + distFromBorderAllowed;
     obstacles.push_back(*o);
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
     grids[o->xGrid + distFromBorderAllowed][o->yGrid + distFromBorderAllowed]->is_obstacle = true;

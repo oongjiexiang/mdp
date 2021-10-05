@@ -202,20 +202,23 @@ void Hamiltonian::displayRobotLocation(){
             catch(out_of_range& e){}
         }
     }
-    switch(nextState->face_direction){
-        case 0:
-            buttons[nextPosition->xGrid + 1][nextPosition->yGrid]->setStyleSheet(ROBOT_DIRECTION);
-            break;
-        case 90:
-            buttons[nextPosition->xGrid][nextPosition->yGrid + 1]->setStyleSheet(ROBOT_DIRECTION);
-            break;
-        case 180:
-            buttons[nextPosition->xGrid - 1][nextPosition->yGrid]->setStyleSheet(ROBOT_DIRECTION);
-            break;
-        case 270:
-            buttons[nextPosition->xGrid][nextPosition->yGrid - 1]->setStyleSheet(ROBOT_DIRECTION);
-            break;
+    try{
+        switch(nextState->face_direction){
+            case 0:
+                buttons.at(nextPosition->xGrid + 1).at(nextPosition->yGrid)->setStyleSheet(ROBOT_DIRECTION);
+                break;
+            case 90:
+                buttons.at(nextPosition->xGrid).at(nextPosition->yGrid + 1)->setStyleSheet(ROBOT_DIRECTION);
+                break;
+            case 180:
+                buttons.at(nextPosition->xGrid - 1).at(nextPosition->yGrid)->setStyleSheet(ROBOT_DIRECTION);
+                break;
+            case 270:
+                buttons.at(nextPosition->xGrid).at(nextPosition->yGrid - 1)->setStyleSheet(ROBOT_DIRECTION);
+                break;
+        }
     }
+    catch(out_of_range& e){}
 }
 
 Hamiltonian::~Hamiltonian()

@@ -13,7 +13,7 @@ using namespace std;
 
 
 ShortestPath::ShortestPath(vector<Obstacle> obstacles): obstacles(obstacles){
-    astar = aStar(obstacles);
+    astar = new aStar(obstacles, 0);
     int nObstacles = obstacles.size();
     // shortestPathSolution.resize(nObstacles);
 }
@@ -26,7 +26,7 @@ vector<ActionListPerObstacle> ShortestPath::hamiltonianPath(){
     }
     catch(...){
         cout << "Plan B: Allowing robot to move outside the border" << endl;
-        astar = aStar(obstacles, FROM_BORDER_GRID_LENGTH);
+        astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
         permutation(pathDistanceList, pathSolutionList);
     }
     // if(!) return vector<ActionListPerObstacle>();    // if no Hamiltonian path, return an empty vector
@@ -75,13 +75,14 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         vector<double> onePermuteSubDistance;
         SearchResult buffer;
         cout << float(iteration_debug++)/totalPermutation*100 << "%" << endl;
+
         // initial state
         Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
         State* initState = new State(robotInitPosition, ROBOT_INIT_FACEDIRECTION, nullptr);
 
         // compute the Hamiltonian path
         for(int i = 0; i < goal_ids.size(); i++){
-            initState = astar.search(initState, obstacles[goal_ids[i]], &buffer.first, &buffer.second);
+            initState = astar->search(initState, obstacles[goal_ids[i]], &buffer.first, &buffer.second);
             onePermuteSolution.push_back(make_pair(obstacles[goal_ids[i]], buffer.second));
             onePermuteSubDistance.push_back(buffer.first);
             if(initState == nullptr){   // if no complete Hamiltonian path

@@ -9,8 +9,8 @@
 using namespace std;
 
 int main(){
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 2, 9, 180));
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 2, 9, 180));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -61,6 +61,8 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 8, 19, 90));
     Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
     State* initState = new State(initPosition, 90, nullptr);
     aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
@@ -76,6 +78,8 @@ int main(){
     cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 2, 9, 180));
     // ShortestPath sp(obstacles);
     // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
     // cout << result.size() << endl;
