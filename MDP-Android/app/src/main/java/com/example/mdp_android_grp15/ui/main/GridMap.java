@@ -1822,37 +1822,56 @@ public class GridMap extends View {
     // TODO: bug with onDraw()
     public void performAlgoTurning(final int x, int y, String facing, String cmd) {
         final Handler handler = new Handler();
-        int a,b;
+
+        final int i = y;
+        final int j = x;
+        final String finalFacing = facing;
+        int delay = 1000;   // add 1000 after each run cos its like a timestamp
+
         if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
             robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
 
             switch (robotDirection) {
                 case "up":
                     switch (cmd) {
-                        case "l":
+                        case "fl":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j+4, i - 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j+3, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            // rest of the forward motion
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j+2, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j+1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
-                        case "r":
-                            // row
-
-                            long expectedTime = System.currentTimeMillis();
-//                            for (int j = y - 2; j <= y; j++) {
-                                //setCurCoord(curCoord[0], j, robotDirection);
-//                                performAlgoCommand(curCoord[0], j, robotDirection);
-//                                canDrawRobot = true;
-//                                if (j != y - 1) {
-////                                    showLog("calling invalidate");
-//                                    gridMap.invalidate();
-//                                }
-//                                while (System.currentTimeMillis() < expectedTime) { }
-//                                expectedTime += 5000;
-//                            }
-                            final int i = y;
-                            final int j = x;
-                            final String finalFacing = facing;
-                            int delay = 1000;   // add 1000 after each run cos its like a timestamp
+                        case "fr":
                             // move forward 1 grid
                             new Handler().postDelayed(new Runnable() {
                                 public void run() {
@@ -1889,54 +1908,132 @@ public class GridMap extends View {
                                     performAlgoCommand(j, i, finalFacing);
                                 }
                             }, delay);
-                            expectedTime = System.currentTimeMillis();
+                            break;
+                        case "rl":
 
-                            // col
-//                            for (int i = x - 4; i <= x; i++) {
-//                                performAlgoCommand(i, curCoord[1], facing);
-//                                setCurCoord(i, curCoord[1], facing);
-//                                canDrawRobot = true;
-//                                gridMap.invalidate();
-////                                showLog("am i calling invalidate?");
-////                                this.invalidate();
-////                                handler.postDelayed(runnable, 6000);
-//                                while (System.currentTimeMillis() < expectedTime) { }
-//                                expectedTime += 5000;
-//                            }
-//                            performAlgoCommand(x - 4, curCoord[1], facing);
-//                            performAlgoCommand(x - 3, curCoord[1], facing);
+                            break;
+                        case "ll":
 
                             break;
                     }
                     break;
                 case "down":
+                    switch (cmd){
+                        case "fl":
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 4, i + 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 3, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // move 1 grid forward
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            break;
+                        case "fr":
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 4 , i + 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 3, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // move 1 grid forward
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            break;
+                        case "rl":
+
+                            break;
+                        case "rr":
+
+                            break;
+                    }
 
                     break;
+
                 case "right":
                     switch (cmd) {
-                        case "left":
+                        case "fl":
 
 
                             break;
-                        case "right":
-                            // row
-                            for (int j = y - 2; j <= y; j++) {
-                                setCurCoord(curCoord[0], j, robotDirection);
-                                if (j != y - 1) {
-                                    this.invalidate();
-                                }
-                            }
+                        case "fr":
 
-                            // col
-                            for (int i = x - 4; i <= x; i++) {
-                                setCurCoord(i, curCoord[1], facing);
-                                this.invalidate();
-                            }
                             break;
+                        case "rl":
+
+                            break;
+                        case "rr":
+
+                            break;
+
                     }
                     break;
                 case "left":
+                    switch (cmd) {
+                        case "fl":
 
+
+                            break;
+                        case "fr":
+
+                            break;
+                        case "rl":
+
+                            break;
+                        case "rr":
+
+                            break;
+
+                    }
                     break;
             }
 
