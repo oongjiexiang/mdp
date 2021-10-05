@@ -12,7 +12,7 @@ int main()
     int checker=0;
     string retMessage="";
     Network n;
-    //checker = n.initializeConnection();
+    checker = n.initializeConnection();
     if(checker == 1){
         printf("error during initialization");
         return 1;
@@ -44,7 +44,7 @@ int main()
         actions=af->convertToActualActions(states);
         stateSize = static_cast<int>(states.size());
         printf("\n=========step path=============\n\n");
-        n.sendPath(states,stateSize,actions);
+        //n.sendPath(states,stateSize,actions);
         printf("\n=========2nd path function============\n\n");
         n.sendCombinedActionPath(states,stateSize,actions);
         n.sendObstacleIdToAndroid(result[i].first.id);

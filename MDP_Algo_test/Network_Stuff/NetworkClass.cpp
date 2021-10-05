@@ -175,7 +175,7 @@ bool Network::sendPath(vector<State*>& vectorOfStates, int noOfStates, vector<Ac
         sendMessage(stmMsg);
 
         //wait for reply message from STM side
-        while(false){
+        while(true){
             replyMessage="";
             if(expectedMessage==0){
                 currentExpectedMsg=expectedMsgFromSTM0;
@@ -236,7 +236,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
             andMsg = generateAndroidMessage(x1,y1,facingDirection1,checkMsgSent(stmMsg));
             andMsg = encodeMessage(1,andMsg);
             //wait for a short time before sending another message to android to prevent crashing
-            this_thread::sleep_for(200ms);
+            this_thread::sleep_for(1000ms);
             sendMessage(andMsg);
 
             if(androidMessageIndex+2>=noOfStates){
@@ -255,7 +255,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
             printf("current action state %s | next state action %s\n", currentStateAction.c_str(),nextStateAction.c_str());
         }while(currentStateAction==nextStateAction && (nextStateAction=="b" || nextStateAction=="f") && androidMessageIndex<noOfStates);
         printf("finish sending to android\n");
-        while(false){
+        while(true){
             replyMessage="";
             if(expectedMessage==0){
                 currentExpectedMsg=expectedMsgFromSTM0;
@@ -282,7 +282,7 @@ int Network::checkMsgSent(string stmMsg){
         if(stmMsg.substr(0,1).compare("b")==0 || stmMsg.substr(0,1).compare("p")==0 ){ //forward
             return 0;
         }
-        if(stmMsg.substr(0,1).compare("f")==0 || stmMsg.substr(0,1).compare("q")==0){ //reverse
+        if(stmMsg.substr(0,1).compare("f")==0 || stmMsg.substr(0,1).compare("s")==0){ //reverse
             return 1;
         }
 
@@ -365,9 +365,9 @@ int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
     int noOfObstacles = 0;
     string msg = "";
     //test message, remove later
-    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
-    convertAndroidMessage(msg,xVector,yVector,fVector);
-    while(false){
+//    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
+//    convertAndroidMessage(msg,xVector,yVector,fVector);
+    while(true){
         receiveMessage();
         msg = decodeMessage();
         //convert android message and create obstacles
@@ -766,22 +766,22 @@ string Network::calculateActionNew(Action* actionVector){
     ActionStraight* aPtr = dynamic_cast<ActionStraight*>(actionVector);
         if(aPtr!=nullptr){
             if(aPtr->getTravelDistGrid()>0){ //check if forward
-                    if(aPtr->getTravelDistGrid()>=100)
+                if(aPtr->getTravelDistGrid()>=100)
                     sprintf(buffer,"p%d",aPtr->getTravelDistGrid()*10);
-                    else{
+                else{
                     sprintf(buffer,"p0%d",aPtr->getTravelDistGrid()*10);
-                    }
-                    returnMsg=buffer;
+                }
+                returnMsg=buffer;
             }
             else if(aPtr->getTravelDistGrid()<0){ //check if backward
-//                    if(aPtr->getTravelDistGrid()>=100)
-//                    sprintf(buffer,"p%d",aPtr->getTravelDistGrid()*10);
-//                    else{
-//                    sprintf(buffer,"p0%d",aPtr->getTravelDistGrid()*10);
-//                    }
-//                returnMsg=buffer;
+                if(aPtr->getTravelDistGrid()>=100)
+                    sprintf(buffer,"s%d",abs(aPtr->getTravelDistGrid()*10));
+                else{
+                    sprintf(buffer,"s0%d",abs(aPtr->getTravelDistGrid()*10));
+                }
+                returnMsg=buffer;
 
-                returnMsg = "f"; //currently no instructions for reverseXXX, replace this once we have the function
+                //returnMsg = "f"; //currently no instructions for reverseXXX, replace this once we have the function
             }
         }
     ActionTurn2By4* atPtr = dynamic_cast<ActionTurn2By4*>(actionVector);
