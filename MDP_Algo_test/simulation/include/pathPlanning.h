@@ -10,7 +10,7 @@ typedef pair<Obstacle, vector<State*>> ActionListPerObstacle;
 
 // main class for week 8 and simulation for ShortestPath path
 class ShortestPath{
-    aStar astar;
+    aStar* astar;
     vector<ActionListPerObstacle> shortestPathSolution;
     vector<Obstacle> obstacles;
 

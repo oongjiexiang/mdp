@@ -7,66 +7,42 @@
 
 using namespace std;
 
-Map::Map(){
-    grids.resize(X_GRID_COUNT, vector<Vertex*>(Y_GRID_COUNT));
+Map::Map(int distFromBorderAllowed): distFromBorderAllowed(distFromBorderAllowed){
+    grids.resize(X_GRID_COUNT + 2*distFromBorderAllowed, vector<Vertex*>(Y_GRID_COUNT  + 2*distFromBorderAllowed));
     //initialize all the variables for all vertices of the graph
-    for(int i=0; i < X_GRID_COUNT; i++){
-        for(int j=0; j < Y_GRID_COUNT; j++){
-            grids[i][j] = new Vertex(i, j);
+    for(int i=0; i < X_GRID_COUNT + 2*distFromBorderAllowed; i++){
+        for(int j=0; j < Y_GRID_COUNT + 2*distFromBorderAllowed; j++){
+            grids[i][j] = new Vertex(i - distFromBorderAllowed, j - distFromBorderAllowed);
         }
     }
 }
 
-Map::Map(vector<Obstacle> obstacles): Map::Map(){
-    this->obstacles = obstacles;
+Map::Map(vector<Obstacle> obstacles, int distFromBorderAllowed): Map::Map(distFromBorderAllowed){
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
     for(int i = 0; i < obstacles.size(); i++){
-        Obstacle o = obstacles[i];
-        grids[o.xGrid][o.yGrid]->is_obstacle = true;
-        for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
-            for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
-                try{
-                    grids.at(o.xGrid + j).at(o.yGrid + k)->is_border = grids.at(o.xGrid + j).at(o.yGrid + k)->is_obstacle? false: true;
-                }
-                catch(out_of_range& e){}
-            }
-        }
-    }
-}
-
-Map::Map(vector<Obstacle> obstacles, int maxDistFromBorder){
-    grids.resize(X_GRID_COUNT + 2*maxDistFromBorder, vector<Vertex*>(Y_GRID_COUNT + 2*maxDistFromBorder));
-    //initialize all the variables for all vertices of the graph
-    for(int i=0; i < X_GRID_COUNT + 2*maxDistFromBorder; i++){
-        for(int j=0; j < Y_GRID_COUNT + 2*maxDistFromBorder; j++){
-            grids[i][j] = new Vertex(i, j);
-        }
-    }
-    this->obstacles = obstacles;
-    int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
-    for(int i = 0; i < obstacles.size(); i++){
-        Obstacle o = obstacles[i];
-        grids[o.xGrid + maxDistFromBorder][o.yGrid + maxDistFromBorder]->is_obstacle = true;
-        for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
-            for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
-                try{
-                    grids.at(o.xGrid + maxDistFromBorder + j).at(o.yGrid + maxDistFromBorder + k)->is_border = grids.at(o.xGrid + maxDistFromBorder + j).at(o.yGrid + maxDistFromBorder + k)->is_obstacle? false: true;
-                }
-                catch(out_of_range& e){}
-            }
-        }
+        addObstacle(&obstacles[i]);
     }
 }
 
 void Map::addObstacle(Obstacle* o){
+    // o->xGrid = o->xGrid + distFromBorderAllowed;
+    // o->yGrid = o->yGrid + distFromBorderAllowed;
     obstacles.push_back(*o);
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
-    grids[o->xGrid][o->yGrid]->is_obstacle = true;
+    grids[o->xGrid + distFromBorderAllowed][o->yGrid + distFromBorderAllowed]->is_obstacle = true;
     for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
         for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
-            grids[o->xGrid + j][o->yGrid + k]->is_border = grids[o->xGrid + j][o->yGrid + k]->is_obstacle? false: true;
+            try{
+                grids.at(o->xGrid + j + distFromBorderAllowed).at(o->yGrid + k + distFromBorderAllowed)->is_border = 
+                grids.at(o->xGrid + j + distFromBorderAllowed).at(o->yGrid + k + distFromBorderAllowed)->is_obstacle? false: true;
+            }
+            catch(out_of_range& e){}
         }
     }
+}
+
+Vertex* Map::getVertex(int xGrid, int yGrid){
+    return grids[xGrid + distFromBorderAllowed][yGrid + distFromBorderAllowed];
 }
 
 /*
@@ -121,25 +97,27 @@ void Map::add_obstacle(vector<Obstacle> obstacleList){
 Vertex* Map::findVertexByCoor(float x_center, float y_center){
     int xGrid = (int)(ceil(x_center/UNIT_LENGTH)) - 1;
     int yGrid = (int)(ceil(y_center/UNIT_LENGTH)) - 1;
-    return grids[xGrid][yGrid];
+    return grids[xGrid + distFromBorderAllowed][yGrid + distFromBorderAllowed];
 }
 
 Vertex* Map::findVertexByGrid(int xGrid, int yGrid){
-    return grids[xGrid][yGrid];
+    return grids[xGrid + distFromBorderAllowed][yGrid + distFromBorderAllowed];
 }
 
 bool Map::isValidCoor(float x_center, float y_center){
-    return (x_center < AREA_LENGTH && y_center < AREA_LENGTH 
-    && x_center >= 0 && y_center >= 0);
+    return (x_center < AREA_LENGTH + distFromBorderAllowed*UNIT_LENGTH && y_center < AREA_LENGTH + distFromBorderAllowed*UNIT_LENGTH 
+    && x_center >= -distFromBorderAllowed*UNIT_LENGTH && y_center >= -distFromBorderAllowed*UNIT_LENGTH);
 }
 
 bool Map::isValidGrid(int xGrid, int yGrid){
-    return (yGrid >= 0 && xGrid >= 0 && yGrid < Y_GRID_COUNT && xGrid < X_GRID_COUNT);
+    return (yGrid >= -distFromBorderAllowed && xGrid >= -distFromBorderAllowed && 
+        yGrid < Y_GRID_COUNT + distFromBorderAllowed && 
+        xGrid < X_GRID_COUNT + distFromBorderAllowed);
 }
 
 bool Map::isAvailableGrid(int xGrid, int yGrid){
     if(isValidGrid(xGrid, yGrid)){
-        Vertex* v = grids[xGrid][yGrid];
+        Vertex* v = grids[xGrid + distFromBorderAllowed][yGrid + distFromBorderAllowed];
         return !v->is_border && !v->is_obstacle;
     }
     return false;
@@ -157,11 +135,11 @@ vector<Obstacle>& Map::getObstacles(){
 // debug
 void Map::printMap(){
     cout << "---------------Map----------------" << endl;
-    for(int i = Y_GRID_COUNT - 1; i >= 0; i--){
-        for(int j = 0; j < X_GRID_COUNT; j++){
-            if(grids[j][i]->is_obstacle) cout << "O";
-            else if(grids[j][i]->is_border) cout << "B";
-            else if(grids[j][i]->safe) cout << "^";
+    for(int i = Y_GRID_COUNT + distFromBorderAllowed - 1; i >= 0; i--){
+        for(int j = 0; j < X_GRID_COUNT + distFromBorderAllowed; j++){
+            if(grids[j + distFromBorderAllowed][i + distFromBorderAllowed]->is_obstacle) cout << "O";
+            else if(grids[j + distFromBorderAllowed][i + distFromBorderAllowed]->is_border) cout << "B";
+            else if(grids[j + distFromBorderAllowed][i + distFromBorderAllowed]->safe) cout << "^";
             else cout << " ";
         }
         cout << endl;

@@ -10,7 +10,7 @@ using namespace std;
 
 int main(){
     // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 4, 9, 270));
+    // obstacles.push_back(Obstacle(1, 2, 9, 180));
 
     //*********************test component.cpp******************
     // Robot r(3, 4, 90);
@@ -26,51 +26,60 @@ int main(){
     // obstacles.push_back(Obstacle(6, 5, 1, 270));
     // obstacles.push_back(Obstacle(3, 6, 9, 0));
     // obstacles.push_back(Obstacle(5, 13, 14, 90));
-    // Map map(obstacles);
+    // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
+    // // Map map(obstacles, 0);
     // map.printMap();
-    // map.findVertexByCoor(15.0, 10)->printVertex();
-    // map.findVertexByGrid(10, 3)->printVertex();
-    // cout << map.isValidCoor(0, 0) << endl;
-    // cout << map.isValidGrid(1, 300000) << endl;
+    // map.findVertexByCoor(-10, 20)->printVertex();
+    // map.findVertexByGrid(-1, -3)->printVertex();
+    // cout << map.isValidCoor(-50, -30) << endl;
+    // cout << map.isValidGrid(-5, -3) << endl;
 
     //************** test action.cpp****************
     // vector<Obstacle> obstacles;
     // obstacles.push_back(Obstacle(1, 7, 7, 0));
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
-    // Map map(obstacles);
+    // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
     // map.printMap();
-    // Vertex* initPosition = new Vertex(7, 8);
-    // State* initState = new State(initPosition, false, 180, nullptr);
+    // Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
+    // State* initState = new State(initPosition, 180, nullptr);
     // initState->printState();
     // ActionStraight* aforward = new ActionStraight(1);
     // ActionStraight* areverse = new ActionStraight(-1);
-    // ActionDetect* ad = new ActionDetect(2);
-    // ActionTurn* at = new ActionTurn(-90);
+    // ActionTurn2By4* at = new ActionTurn2By4(-90);
+    // ActionReverseTurn2By4* art = new ActionReverseTurn2By4(-90);
+    // cout << "forward direction" << endl;
     // aforward->takeAction(initState, map)->printState();
     // map.printMap();
-    // cout << areverse->takeAction(initState, map) << endl;
+    // cout << "reverse" << endl;
+    // areverse->takeAction(initState, map);
     // map.printMap();
-    // cout << ad->takeAction(initState, map) << endl;
+    // cout << "turn right" << endl;
+    // at->takeAction(initState, map);
     // map.printMap();
-    // cout << at->takeAction(initState, map) << endl;
+    // cout << "reverse turn right" << endl;
+    // art->takeAction(initState, map);
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    // Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
-    // State* initState = new State(initPosition, 90, nullptr);
-    // aStar* astar = new aStar(obstacles);
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 8, 19, 90));
+    Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
+    State* initState = new State(initPosition, 90, nullptr);
+    aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
     
-    // float pathCost = 0;
-    // vector<State*> resultStates;
-    // astar->search(initState, obstacles[0], &pathCost, &resultStates);
+    float pathCost = 0;
+    vector<State*> resultStates;
+    astar->search(initState, obstacles[0], &pathCost, &resultStates);
     
-    // cout << "-----------path--------------" << endl;
-    // for(int i = 0; i < resultStates.size(); i++){
-    //     resultStates[i]->printState();
-    // }
-    // cout << pathCost << endl;
+    cout << "-----------path--------------" << endl;
+    for(int i = 0; i < resultStates.size(); i++){
+        resultStates[i]->printState();
+    }
+    cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 2, 9, 180));
     // ShortestPath sp(obstacles);
     // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
     // cout << result.size() << endl;
@@ -105,21 +114,21 @@ int main(){
     // cout << result.size() << endl;
 
     //**************************test pathPlanning.cpp again***********************
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 3, 9, 180));
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 3, 9, 180));
 
-    ShortestPath sp(obstacles);
-    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
 
-    for(int i = 0; i < result.size(); i++){
-        Obstacle o = result[i].first;
-        for(int j = 0; j < result[i].second.size(); j++){
-            result[i].second[j]->printState();
-        }
+    // for(int i = 0; i < result.size(); i++){
+    //     Obstacle o = result[i].first;
+    //     for(int j = 0; j < result[i].second.size(); j++){
+    //         result[i].second[j]->printState();
+    //     }
     
     // print results
     // ActionFormulator* af = new FormulatorShorten();
     // vector<State*> states;
-    }
+    // }
     // af->convertToActualActions(states);
 }

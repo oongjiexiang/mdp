@@ -15,6 +15,7 @@ typedef pair<float, vector<State*>> SearchResult;
 class aStar{
     Map* grid; 
     vector<Action*> possibleActions;
+    int maxDistFromBorder;
 
     bool isDestination(const State& curState, const State& goalState);
     
@@ -33,8 +34,6 @@ class aStar{
     State* generateGoalState(Obstacle obstacle);
     
     public:
-        aStar();
-        aStar(vector<Obstacle> obstacles);
         aStar(vector<Obstacle> obstacles, int maxDistFromBorder);
         State* search(State* initState, Obstacle& dest, float* pathCost, vector<State*>* states);
         void changeObstacleFace(Obstacle obstacle, int newFaceDirection);

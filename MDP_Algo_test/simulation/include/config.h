@@ -8,16 +8,14 @@ using namespace std;
 
 class Map{
     private:
+        int distFromBorderAllowed;
         vector<vector<Vertex*>> grids;
         vector<Obstacle> obstacles;
     public:
-        Map();
+        Map(int distFromBorderAllowed);
 
-        // in case the robot must go outside the border
-        Map(vector<Obstacle> obstacles, int distFromBorderAllowed);
-        
         // get the map from Qt UI simulator
-        Map(vector<Obstacle> obstacles);
+        Map(vector<Obstacle> obstacles, int distFromBorderAllowed);
 
         //search for a vertex given the x and y coordinates and returns a pointer to the vertex
         Vertex* findVertexByCoor(float x_center, float y_center);
@@ -26,6 +24,8 @@ class Map{
         Vertex* findVertexByGrid(int xGrid, int yGrid);
 
         void addObstacle(Obstacle* o);
+
+        Vertex* getVertex(int xGrid, int yGrid);
 
         bool isValidCoor(float x_center, float y_center);
 

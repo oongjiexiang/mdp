@@ -11,15 +11,7 @@
 using namespace std;
 
 
-aStar::aStar(){
-    grid = new Map();
-}
-
-aStar::aStar(vector<Obstacle> obstacles){
-    grid = new Map(obstacles);
-}
-
-aStar::aStar(vector<Obstacle> obstacles, int maxDistFromBorder){
+aStar::aStar(vector<Obstacle> obstacles, int maxDistFromBorder): maxDistFromBorder(maxDistFromBorder){
     grid = new Map(obstacles, maxDistFromBorder);
 }
 
@@ -38,13 +30,16 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.push_back(reverse);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
-    //possibleActions.push_back(reverseLeft);
-    //possibleActions.push_back(reverseRight);
+    possibleActions.push_back(reverseLeft);
+    possibleActions.push_back(reverseRight);
 }
 
 State* aStar::generateGoalState(Obstacle obstacle){
     int goalXGrid = obstacle.xGrid + ((int)cos(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
     int goalYGrid = obstacle.yGrid + ((int)sin(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
+    if(!grid->isValidGrid(goalXGrid, goalYGrid)){
+        throw(nullptr);
+    }
     Vertex* goalPosition = grid->findVertexByGrid(goalXGrid, goalYGrid);
     int goalFaceDirection = (obstacle.face_direction + 180)%360;
     State* goalState = new State(goalPosition, goalFaceDirection, nullptr);
@@ -130,10 +125,10 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     generatePossibleActions(dest);  // a. all 5 actions
     Map localMap = *grid;   // b. local map so that the original map is not modified after every search
 
-    bool closedList[X_GRID_COUNT][Y_GRID_COUNT][6];    // c. check if the state is visited (5 actions)
+    bool closedList[X_GRID_COUNT + 2*maxDistFromBorder][Y_GRID_COUNT + 2*maxDistFromBorder][4];    // c. check if the state is visited (5 actions)
     memset(closedList, false, sizeof(closedList));
 
-    State* cellDetails[X_GRID_COUNT][Y_GRID_COUNT][6];  // d. get the latest state detail at that position and face direction
+    State* cellDetails[X_GRID_COUNT + 2*maxDistFromBorder][Y_GRID_COUNT + 2*maxDistFromBorder][4];  // d. get the latest state detail at that position and face direction
     memset(cellDetails, false, sizeof(cellDetails));
 
     priority_queue<Tuple, vector<Tuple>, greater<Tuple> > openList; // e. Priority Queue <f-cost, state>
@@ -146,16 +141,17 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
     position->safe = true;
     initState->gCost = initState->hCost = 0.0;
     initState->prevState = nullptr;
-    cellDetails[position->xGrid][position->yGrid][faceDirection] = initState;  // mark as visited
+    cellDetails[position->xGrid + maxDistFromBorder][position->yGrid + maxDistFromBorder][faceDirection] = initState;  // mark as visited
     openList.emplace(Tuple(0.0, initState));
 
     // 4. A* algorithm begins
     while (!openList.empty()) {
         const Tuple& p = openList.top();
         State* source = get<1>(p);
+
         // Remove this vertex from the open list
         openList.pop();
-        closedList[source->position->xGrid][source->position->yGrid][source->face_direction/90] = true;
+        closedList[source->position->xGrid + maxDistFromBorder][source->position->yGrid + maxDistFromBorder][source->face_direction/90] = true;
 
         // start finding next states/ neighbours
         for(int i = 0; i < possibleActions.size(); i++){
@@ -174,16 +170,16 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
             int neighbourFaceDirection = (int)(neighbourState->face_direction)/90;
 
             bool newlySeenState = false;
-            if(cellDetails[neighbourPosition->xGrid][neighbourPosition->yGrid][neighbourFaceDirection] != nullptr){
-                neighbourState = cellDetails[neighbourPosition->xGrid][neighbourPosition->yGrid][neighbourFaceDirection];
+            if(cellDetails[neighbourPosition->xGrid + maxDistFromBorder][neighbourPosition->yGrid + maxDistFromBorder][neighbourFaceDirection] != nullptr){
+                neighbourState = cellDetails[neighbourPosition->xGrid + maxDistFromBorder][neighbourPosition->yGrid + maxDistFromBorder][neighbourFaceDirection];
             }
             else{
                 newlySeenState = true;
-                cellDetails[neighbourPosition->xGrid][neighbourPosition->yGrid][neighbourFaceDirection] = neighbourState;
+                cellDetails[neighbourPosition->xGrid + maxDistFromBorder][neighbourPosition->yGrid + maxDistFromBorder][neighbourFaceDirection] = neighbourState;
             }
 
             // If the successor is not yet in the closed list
-            if(!closedList[neighbourPosition->xGrid][neighbourPosition->yGrid][neighbourFaceDirection]){
+            if(!closedList[neighbourPosition->xGrid + maxDistFromBorder][neighbourPosition->yGrid + maxDistFromBorder][neighbourFaceDirection]){
                 float gNew, hNew, fNew;
                 gNew = calculateGValue(*source, possibleActions[i], localMap, dest);
                 hNew = calculateHValue(*neighbourState, *goalState);
