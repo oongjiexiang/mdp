@@ -367,38 +367,28 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("receivedMessage");
             showLog("receivedMessage: message --- " + message);
-            ;
 
             if(message.contains(",")) {
                 String[] cmd = message.split(",");
 
                 // check if string is cmd sent by ALG/RPI to get obstacle/image id
                 if (cmd[0].equals("ALG") || cmd[0].equals("RPI")) {
-                    if(obstacleID == "")
+                    showLog("cmd[0] is ALG or RPI");
+                    if(obstacleID.equals(""))
                         obstacleID = cmd[0].equals("ALG") ? cmd[1] : "";
-                    if(imageID == "") {
+                    if(imageID.equals(""))
                         imageID = cmd[0].equals("RPI") ? cmd[1] : "";
 
-                    }
-
                     //TODO check if fn is working when received imageID = -1
+                    showLog("obstacleID = " + obstacleID);
+                    showLog("imageID = " + imageID);
 
                     // call update fn only when both IDs are obtained
                     if (!(obstacleID.equals("") || imageID.equals(""))) {
-//                        imageID = (imageID.equals("-1")) ? "" : imageID;
-//                        if (imageID.equals("-1")) {
-//                            imageID = "";
-//                            obstacleID = "";
-//                        }
-//                        else{
-//                            gridMap.updateIDFromRpi(obstacleID, imageID);
-//                            obstacleID = "";
-//                            imageID = "";
-//                        }
+                        showLog("imageID and obstacleID not empty");
                         gridMap.updateIDFromRpi(obstacleID, imageID);
                         obstacleID = "";
                         imageID = "";
-
                     }
                 } else {
 
@@ -415,14 +405,15 @@ public class MainActivity extends AppCompatActivity {
                     String direction = cmd[2];
 
                     // update robot pos from cmds sent by algo
-                    if (cmd.length == 4) {
+                    if (cmd.length == 3) {
                         gridMap.performAlgoCommand(a, b, direction);
                     }
 
-//                    else if (cmd.length == 4){
-//                        String command = cmd[3];
-//                        gridMap.performAlgoTurning(a, b, direction, command);
-//                    }
+                    else if (cmd.length == 4){
+                        String command = cmd[3];
+                        direction = cmd[2];
+                        gridMap.performAlgoTurning(a, b, direction, command);
+                    }
                 }
             }
 //            else if(message.length() == 1 && message.length() == 2){

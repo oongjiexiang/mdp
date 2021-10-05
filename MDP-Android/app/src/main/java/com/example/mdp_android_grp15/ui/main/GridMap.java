@@ -1820,19 +1820,12 @@ public class GridMap extends View {
     }
 
     // TODO: bug with onDraw()
-    public void performAlgoTurning(int x, int y, String facing, String cmd) {
+    public void performAlgoTurning(final int x, int y, String facing, String cmd) {
         final Handler handler = new Handler();
         int a,b;
         if ((x > -1 && x < 21) && (y > -1 && y < 21)) {
             robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
-            if (facing.equals("N"))
-                facing = "up";
-            else if (facing.equals("S"))
-                facing = "down";
-            else if (facing.equals("E"))
-                facing = "right";
-            else if (facing.equals("W"))
-                facing = "left";
+
             switch (robotDirection) {
                 case "up":
                     switch (cmd) {
@@ -1845,32 +1838,59 @@ public class GridMap extends View {
                             // row
 
                             long expectedTime = System.currentTimeMillis();
-
-                            for (int j = y - 2; j <= y; j++) {
+//                            for (int j = y - 2; j <= y; j++) {
                                 //setCurCoord(curCoord[0], j, robotDirection);
-                                performAlgoCommand(curCoord[0], j, robotDirection);
-                                showLog("looper thread = " + String.valueOf(Looper.getMainLooper().getThread()));
-                                showLog("current thread = " + String.valueOf(Thread.currentThread()));
-                                showLog("equal? " + String.valueOf(Looper.getMainLooper().getThread() == Thread.currentThread()));
+//                                performAlgoCommand(curCoord[0], j, robotDirection);
 //                                canDrawRobot = true;
 //                                if (j != y - 1) {
 ////                                    showLog("calling invalidate");
 //                                    gridMap.invalidate();
 //                                }
-                                while (System.currentTimeMillis() < expectedTime) { }
-                                expectedTime += 5000;
-                            }
-//                            performAlgoCommand(curCoord[0], y-2, robotDirection);
-//                            performAlgoCommand(curCoord[0], y-1, robotDirection);
+//                                while (System.currentTimeMillis() < expectedTime) { }
+//                                expectedTime += 5000;
+//                            }
+                            final int i = y;
+                            final int j = x;
+                            final String finalFacing = facing;
+                            int delay = 1000;   // add 1000 after each run cos its like a timestamp
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j-4, i - 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j-3, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            // rest of the forward motion
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j-2, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j-1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             expectedTime = System.currentTimeMillis();
 
-//                            moveRobot("forward");
-//                            while (System.currentTimeMillis() < expectedTime) { }
-//                            expectedTime += 5000;
-//                            moveRobot("right");
-//                            while (System.currentTimeMillis() < expectedTime) { }
-//                            expectedTime += 5000;
-//                            moveRobot("forward");
                             // col
 //                            for (int i = x - 4; i <= x; i++) {
 //                                performAlgoCommand(i, curCoord[1], facing);
@@ -1984,6 +2004,7 @@ public class GridMap extends View {
 
     // wk 8 task
     public boolean updateIDFromRpi(String obstacleID, String imageID) {
+        showLog("starting updateIDFromRpi");
         int x = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[0];
         int y = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[1];
         ITEM_LIST.get(y)[x] = (imageID.equals("-1")) ? "" : imageID;
