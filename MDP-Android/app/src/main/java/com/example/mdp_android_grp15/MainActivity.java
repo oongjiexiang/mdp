@@ -405,13 +405,15 @@ public class MainActivity extends AppCompatActivity {
                     String direction = cmd[2];
 
                     // update robot pos from cmds sent by algo
-                    if (cmd.length == 3) {
-                        gridMap.performAlgoCommand(a, b, direction);
-                    }
+//                    if (cmd.length == 3) {
+//                        gridMap.performAlgoCommand(a, b, direction);
+//                    }
 
-                    else if (cmd.length == 4){
+                     if (cmd.length == 4){
                         String command = cmd[3];
-                        direction = cmd[2];
+//                        if(command.equals("fl") || command.equals("fr")){
+//                            gridMap.performAlgoCommand(a, b, direction);
+//                        }
                         gridMap.performAlgoTurning(a, b, direction, command);
                     }
                 }
@@ -419,7 +421,6 @@ public class MainActivity extends AppCompatActivity {
 //            else if(message.length() == 1 && message.length() == 2){
 //                gridMap.updateIDFromRpi();
 //            }
-            // TODO: stop timer when receive "END" message
             else if (message.equals("END")) {
                 // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
                 // end the corresponding timer
