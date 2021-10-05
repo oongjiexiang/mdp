@@ -405,15 +405,15 @@ public class MainActivity extends AppCompatActivity {
                     String direction = cmd[2];
 
                     // update robot pos from cmds sent by algo
-                    if (cmd.length == 3) {
-                        gridMap.performAlgoCommand(a, b, direction);
-                    }
+//                    if (cmd.length == 3) {
+//                        gridMap.performAlgoCommand(a, b, direction);
+//                    }
 
-                    else if (cmd.length == 4){
+                     if (cmd.length == 4){
                         String command = cmd[3];
-                        if(command.equals("fl") || command.equals("fr")){
-                            gridMap.performAlgoCommand(a, b, direction);
-                        }
+//                        if(command.equals("fl") || command.equals("fr")){
+//                            gridMap.performAlgoCommand(a, b, direction);
+//                        }
                         gridMap.performAlgoTurning(a, b, direction, command);
                     }
                 }

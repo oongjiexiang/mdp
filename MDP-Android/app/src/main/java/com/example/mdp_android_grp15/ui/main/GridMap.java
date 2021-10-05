@@ -1819,7 +1819,6 @@ public class GridMap extends View {
         return false;
     }
 
-    // TODO: bug with onDraw()
     public void performAlgoTurning(final int x, int y, String facing, String cmd) {
         final Handler handler = new Handler();
 
@@ -1910,10 +1909,72 @@ public class GridMap extends View {
                             }, delay);
                             break;
                         case "rl":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i + 3, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i + 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
-                        case "ll":
+                        case "rr":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i + 3, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            // rest of the forward motion
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i + 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
                     }
                     break;
@@ -1990,49 +2051,360 @@ public class GridMap extends View {
                             delay += 1000;
                             break;
                         case "rl":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i - 3, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i - 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
                         case "rr":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i - 3, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i - 1, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
                     }
-
                     break;
 
                 case "right":
                     switch (cmd) {
                         case "fl":
-
-
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1 , i - 4, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 3, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // move 1 grid forward
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 2, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
                             break;
                         case "fr":
-
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1 , i + 4, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 3, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // move 1 grid forward
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 2, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
                             break;
                         case "rl":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 3, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
                         case "rr":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 3, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 2, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
-
                     }
                     break;
                 case "left":
                     switch (cmd) {
                         case "fl":
-
-
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1 , i + 4, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 3, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // move 1 grid forward
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 2, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
                             break;
                         case "fr":
-
+                            // move forward 1 grid
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j + 1 , i - 4, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // turn
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 3, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            // move 1 grid forward
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 2, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
                             break;
                         case "rl":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 3, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1, i + 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i + 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
                         case "rr":
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 3, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 2, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
 
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j - 1, i - 2, robotDirection);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i - 1, finalFacing);
+                                }
+                            }, delay);
+                            delay += 1000;
+
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    performAlgoCommand(j, i, finalFacing);
+                                }
+                            }, delay);
                             break;
-
                     }
                     break;
             }
