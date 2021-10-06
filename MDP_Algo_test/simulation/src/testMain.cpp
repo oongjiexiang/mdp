@@ -40,9 +40,15 @@ int main(){
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
     // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
     // map.printMap();
-    // Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
-    // State* initState = new State(initPosition, 180, nullptr);
+    // // Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
+    // Vertex* initPosition = new Vertex(9, 9);
+    // State* initState = new State(initPosition, 270, nullptr);
     // initState->printState();
+    // ActionTurnOnSpot* atoleft = new ActionTurnOnSpot(90);
+    // ActionTurnOnSpot* atoright = new ActionTurnOnSpot(-90);
+    // atoleft->takeAction(initState, map)->printState();
+    // atoright->takeAction(initState, map)->printState();
+    
     // ActionStraight* aforward = new ActionStraight(1);
     // ActionStraight* areverse = new ActionStraight(-1);
     // ActionTurn2By4* at = new ActionTurn2By4(-90);
@@ -78,26 +84,26 @@ int main(){
     // cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 1, 9, 180));
-    obstacles.push_back(Obstacle(2, 3, 15, 180));
-    obstacles.push_back(Obstacle(3, 7, 18, 90));
-    obstacles.push_back(Obstacle(4, 13, 18, 90));
-    obstacles.push_back(Obstacle(5, 15, 15, 0));
-    obstacles.push_back(Obstacle(6, 8, 10, 90));
-    obstacles.push_back(Obstacle(7, 8, 1, 90));
-    obstacles.push_back(Obstacle(8, 16, 4, 180));
-    ShortestPath sp(obstacles);
-    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
-    cout << result.size() << endl;
-    for(int i = 0; i < result.size(); i++){
-        cout << "Obstacle-------------------------" << endl;
-        result[i].first.printObstacle();
-        vector<State*> states = result[i].second;
-        for(int j = 0; j < states.size(); j++){
-            states[j]->printState();
-        }
-    }
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 1, 9, 180));
+    // obstacles.push_back(Obstacle(2, 3, 15, 180));
+    // obstacles.push_back(Obstacle(3, 7, 18, 90));
+    // obstacles.push_back(Obstacle(4, 13, 18, 90));
+    // obstacles.push_back(Obstacle(5, 15, 15, 0));
+    // obstacles.push_back(Obstacle(6, 8, 10, 90));
+    // obstacles.push_back(Obstacle(7, 8, 1, 90));
+    // obstacles.push_back(Obstacle(8, 16, 4, 180));
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // cout << result.size() << endl;
+    // for(int i = 0; i < result.size(); i++){
+    //     cout << "Obstacle-------------------------" << endl;
+    //     result[i].first.printObstacle();
+    //     vector<State*> states = result[i].second;
+    //     for(int j = 0; j < states.size(); j++){
+    //         states[j]->printState();
+    //     }
+    // }
 
     //***********************test ActionFormulator.cpp ************************
     // vector<Obstacle> obstacles;

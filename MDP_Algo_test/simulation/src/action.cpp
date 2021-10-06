@@ -10,6 +10,8 @@ const int TURN_RADIUS_GRID = (int)(ceil(TURN_RADIUS/UNIT_LENGTH));
 const float MAX_IMAGE_VIEW_DISTANCE = 30;
 const int MAX_IMAGE_VIEW_DISTANCE_GRID = (int)(ceil(MAX_IMAGE_VIEW_DISTANCE/UNIT_LENGTH));
 const float MAX_IMAGE_VIEW_ANGLE = 180; // currently set as complete opposite. Will change in real application
+const int TURN_ON_SPOT_RADIUS = 10;
+const int TURN_ON_SPOT_RADIUS_GRID = (int)(ceil(TURN_ON_SPOT_RADIUS/UNIT_LENGTH));
 
 // -------------Utility Euclidean distance-------------
 float euclidean(float x1, float y1, float x2, float y2){
@@ -72,58 +74,54 @@ void ActionStraight::printAction(){
 }
 
 // -------------------Turning Action----------------------
-ActionTurn::ActionTurn(int turnAngle){
-    // if(turnAngle < 0) this->turnAngle = turnAngle + 360;
-    // else this->turnAngle = turnAngle;
+ActionTurnOnSpot::ActionTurnOnSpot(int turnAngle){
     this->turnAngle = turnAngle;
 }
 
-State* ActionTurn::takeAction(State* initState, Map& maps){
+State* ActionTurnOnSpot::takeAction(State* initState, Map& maps){
     // assume that turnAngle is always 90 or -90
     Vertex* newPosition;
-    int newXGrid, newYGrid;
 
     int faceDirection = initState->face_direction;
     int curXGrid = initState->position->xGrid;
     int curYGrid = initState->position->yGrid;
+    int furthestXGrid = curXGrid;
+    int furthestYGrid = curYGrid;
 
-    // 1. find new state
+    // 2. check if surrounding grids are safe
     switch(faceDirection){
         case 0:
-            newXGrid = curXGrid + 1;
-            newYGrid = curYGrid + turnAngle/abs(turnAngle);
-
+            furthestXGrid+=TURN_ON_SPOT_RADIUS_GRID;
+            furthestYGrid+=TURN_ON_SPOT_RADIUS_GRID*turnAngle/abs(turnAngle);
         break;
         case 90:
-            newXGrid = curXGrid - turnAngle/abs(turnAngle);
-            newYGrid = curYGrid + 1;
+            furthestXGrid-=TURN_ON_SPOT_RADIUS_GRID*turnAngle/abs(turnAngle);
+            furthestYGrid+=TURN_ON_SPOT_RADIUS_GRID;
         break;
         case 180:
-            newXGrid = curXGrid - 1;
-            newYGrid = curYGrid - turnAngle/abs(turnAngle);
+            furthestXGrid-=TURN_ON_SPOT_RADIUS_GRID;
+            furthestYGrid-=TURN_ON_SPOT_RADIUS_GRID*turnAngle/abs(turnAngle);
         break;
         case 270:
-            newXGrid = curXGrid + turnAngle/abs(turnAngle);
-            newYGrid = curYGrid - 1;
+            furthestXGrid+=TURN_ON_SPOT_RADIUS_GRID*turnAngle/abs(turnAngle);
+            furthestYGrid-=TURN_ON_SPOT_RADIUS_GRID;
         break;
         default:
-            cout << "faceDirection is not straight, but = " << faceDirection << endl;
-            return nullptr;
+            cout << "faceDirection in ActionOnSpot = " << faceDirection << endl;
     }
 
-    // 2. check if new position and surrounding grids are safe
-    if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;   // check if new grid is valid
-    newPosition = maps.findVertexByGrid(newXGrid, newYGrid);
-    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){    // check if all other neighbouring grids exist and are available
-        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
+    if(!maps.isAvailableGrid(furthestXGrid, furthestYGrid)) return nullptr;   // check if new grid is valid
+    newPosition = maps.findVertexByGrid(curXGrid, curYGrid);
+    for(int i = min(curXGrid, furthestXGrid); i <= max(curXGrid, furthestXGrid); i++){    // check if all other neighbouring grids exist and are available
+        for(int j = min(curYGrid, furthestYGrid); j <= max(curYGrid, furthestYGrid); j++){
             if(!maps.isAvailableGrid(i, j)) return nullptr;
         }
     }
 
     // 3. perform action since it can be taken
     // update map
-    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
-        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
+    for(int i = min(curXGrid, furthestXGrid); i <= max(curXGrid, furthestXGrid); i++){
+        for(int j = min(curYGrid, furthestYGrid); j <= max(curYGrid, furthestYGrid); j++){
             maps.findVertexByGrid(i, j)->safe = true;
         }
     }
@@ -135,18 +133,18 @@ State* ActionTurn::takeAction(State* initState, Map& maps){
     return endState;
 }
 
-int ActionTurn::getCost(State* initState, Map maps, Obstacle o){
+int ActionTurnOnSpot::getCost(State* initState, Map maps, Obstacle o){
     return cost;
 }
 
 //zy added
-int ActionTurn::getTurnAngle(){
+int ActionTurnOnSpot::getTurnAngle(){
     return turnAngle;
 }
 
 // debug ActionTurn
-void ActionTurn::printAction(){
-    cout << "TURN: turnAngle = " << turnAngle << endl;
+void ActionTurnOnSpot::printAction(){
+    cout << "TURN ON SPOT: turnAngle = " << turnAngle << endl;
 }
 
 

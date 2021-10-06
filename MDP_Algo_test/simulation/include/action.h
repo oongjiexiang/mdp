@@ -49,11 +49,11 @@ class ActionStraight : public Action{
         void printAction();
 };
 
-class ActionTurn : public Action{
-    int cost = 4;  // need to use mathematical calculation
+class ActionTurnOnSpot : public Action{
+    int cost = 3;  // need to use mathematical calculation
     int turnAngle;
     public:
-        ActionTurn(int turnAngle);
+        ActionTurnOnSpot(int turnAngle);
         State* takeAction(State* initState, Map& maps);
         int getTurnAngle();
         int getCost(State* initState, Map maps, Obstacle o);
