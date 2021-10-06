@@ -40,9 +40,15 @@ int main(){
     // obstacles.push_back(Obstacle(2, 3, 3, 0));
     // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
     // map.printMap();
-    // Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
-    // State* initState = new State(initPosition, 180, nullptr);
+    // // Vertex* initPosition = new Vertex(10 + FROM_BORDER_GRID_LENGTH, 7 + FROM_BORDER_GRID_LENGTH);
+    // Vertex* initPosition = new Vertex(9, 9);
+    // State* initState = new State(initPosition, 270, nullptr);
     // initState->printState();
+    // ActionTurnOnSpot* atoleft = new ActionTurnOnSpot(90);
+    // ActionTurnOnSpot* atoright = new ActionTurnOnSpot(-90);
+    // atoleft->takeAction(initState, map)->printState();
+    // atoright->takeAction(initState, map)->printState();
+    
     // ActionStraight* aforward = new ActionStraight(1);
     // ActionStraight* areverse = new ActionStraight(-1);
     // ActionTurn2By4* at = new ActionTurn2By4(-90);
@@ -61,25 +67,32 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 8, 19, 90));
-    Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
-    State* initState = new State(initPosition, 90, nullptr);
-    aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 8, 19, 90));
+    // Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
+    // State* initState = new State(initPosition, 90, nullptr);
+    // aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
     
-    float pathCost = 0;
-    vector<State*> resultStates;
-    astar->search(initState, obstacles[0], &pathCost, &resultStates);
+    // float pathCost = 0;
+    // vector<State*> resultStates;
+    // astar->search(initState, obstacles[0], &pathCost, &resultStates);
     
-    cout << "-----------path--------------" << endl;
-    for(int i = 0; i < resultStates.size(); i++){
-        resultStates[i]->printState();
-    }
-    cout << pathCost << endl;
+    // cout << "-----------path--------------" << endl;
+    // for(int i = 0; i < resultStates.size(); i++){
+    //     resultStates[i]->printState();
+    // }
+    // cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
     // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 2, 9, 180));
+    // obstacles.push_back(Obstacle(1, 1, 9, 180));
+    // obstacles.push_back(Obstacle(2, 3, 15, 180));
+    // obstacles.push_back(Obstacle(3, 7, 18, 90));
+    // obstacles.push_back(Obstacle(4, 13, 18, 90));
+    // obstacles.push_back(Obstacle(5, 15, 15, 0));
+    // obstacles.push_back(Obstacle(6, 8, 10, 90));
+    // obstacles.push_back(Obstacle(7, 8, 1, 90));
+    // obstacles.push_back(Obstacle(8, 16, 4, 180));
     // ShortestPath sp(obstacles);
     // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
     // cout << result.size() << endl;
@@ -93,25 +106,23 @@ int main(){
     // }
 
     //***********************test ActionFormulator.cpp ************************
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 5, 9, 270));
-    // obstacles.push_back(Obstacle(2, 7, 14, 180));
-    // obstacles.push_back(Obstacle(3, 12, 9, 0));
-    // obstacles.push_back(Obstacle(4, 15, 15, 270));
-    // obstacles.push_back(Obstacle(5, 15, 4, 180));
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 5, 9, 270));
+    obstacles.push_back(Obstacle(2, 7, 14, 180));
+    obstacles.push_back(Obstacle(3, 12, 9, 0));
+    obstacles.push_back(Obstacle(4, 15, 15, 270));
+    obstacles.push_back(Obstacle(5, 15, 4, 180));
 
-    // ShortestPath sp(obstacles);
-    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    ShortestPath sp(obstacles);
+    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
 
-    // // print results
-    // ActionFormulator* af = new FormulatorShorten();
-    // vector<State*> states;
-    // for(int i = 0; i < result.size(); i++){
-    //     Obstacle o = result[i].first;
-    //     states.insert(states.end(), result[i].second.begin(), result[i].second.end());
-    // }
-    // af->convertToActualActions(states);
-    // cout << result.size() << endl;
+    // print results
+    // do not combine all states and send to FormulatorShorten in one go, as forward and reverse during consecutive obstacle targets will be combined
+    ActionFormulator* af = new FormulatorShorten();
+    for(int i = 0; i < result.size(); i++){
+        Obstacle o = result[i].first;
+        af->convertToActualActions(result[i].second);
+    }
 
     //**************************test pathPlanning.cpp again***********************
     // vector<Obstacle> obstacles;
