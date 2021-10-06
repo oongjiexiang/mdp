@@ -359,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     // message handler
-    // alg sends x,y,robotDirection
+    // alg sends x,y,robotDirection,movementAction
     // alg sends ALG,<obstacle id>
     // rpi sends RPI,<image id>
     BroadcastReceiver messageReceiver = new BroadcastReceiver() {
@@ -379,7 +379,6 @@ public class MainActivity extends AppCompatActivity {
                     if(imageID.equals(""))
                         imageID = cmd[0].equals("RPI") ? cmd[1] : "";
 
-                    //TODO check if fn is working when received imageID = -1
                     showLog("obstacleID = " + obstacleID);
                     showLog("imageID = " + imageID);
 
@@ -392,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
 
-                    // alg sends in cm and float e.g. 100.0,100.0,N
+                    // alg sends in cm and float e.g. 100,100,N
                     float x = Integer.parseInt(cmd[0]);
                     float y = Integer.parseInt(cmd[1]);
 
@@ -411,20 +410,23 @@ public class MainActivity extends AppCompatActivity {
 
                      if (cmd.length == 4){
                         String command = cmd[3];
-//                        if(command.equals("fl") || command.equals("fr")){
-//                            gridMap.performAlgoCommand(a, b, direction);
-//                        }
-                        gridMap.performAlgoTurning(a, b, direction, command);
+
+                        // if move forward, reverse, turn on the spot left/right
+                        if (command.equals("f") || command.equals("r") || command.equals("sr")
+                            || command.equals("sl")) {
+                            showLog("forward, reverse or turn on spot");
+                            gridMap.performAlgoCommand(a, b, direction);
+                        }
+                        // for all other turning cmds
+                        else {
+                            gridMap.performAlgoTurning(a, b, direction, command);
+                        }
                     }
                 }
             }
-//            else if(message.length() == 1 && message.length() == 2){
-//                gridMap.updateIDFromRpi();
-//            }
             else if (message.equals("END")) {
                 // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
                 // end the corresponding timer
-                //controlFragment.exploreButton.setChecked(false);
                 ToggleButton exploreButton = findViewById(R.id.exploreToggleBtn2);
                 if (exploreButton.isChecked()) {
                     showLog("explorebutton is checked");
@@ -432,14 +434,6 @@ public class MainActivity extends AppCompatActivity {
                     exploreButton.setChecked(false);
                     robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
                 }
-//                else if (controlFragment.fastestButton.isChecked()) {
-//                    controlFragment.fastestButton.setChecked(false);
-//                    robotStatusTextView.setText("Fastest Car Stopped");
-//                    timerHandler.removeCallbacks(controlFragment.timerRunnableFastest);
-//                }
-
-
-
             }
 
             try {
