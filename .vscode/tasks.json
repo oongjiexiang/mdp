@@ -20,7 +20,7 @@
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\asearch.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\pathPlanning.cpp",
                 // "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\moveAround.cpp",
-                // "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\actionFormulator.cpp",
+                "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\actionFormulator.cpp",
                 // "${workspaceFolder}\\MDP_Algo_test\\Navigate\\src\\navigate.cpp",
                 "${workspaceFolder}\\MDP_Algo_test\\Simulation\\src\\testMain.cpp",
                 // "${workspaceFolder}\\MDP_Algo_test\\Network_Stuff\\NetworkClass.cpp",

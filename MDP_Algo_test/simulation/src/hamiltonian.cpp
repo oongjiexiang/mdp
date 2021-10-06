@@ -148,6 +148,7 @@ void Hamiltonian::simulate(){
     }
     ShortestPath sp(simulateObstacles);
     results = sp.hamiltonianPath();
+
     if(results.size() > 0){
         controlButtons[1]->setEnabled(true);
         vector<State*> states = results[showingObstacle].second;
