@@ -217,7 +217,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
     printf("number of actions:%d",actionVectorSize);
     for(int i=0; i<actionVectorSize;i++){
     //send stm message first
-        printf("\n\n");
+        printf("\n\nnew action");
         stmMsg = calculateActionNew(vectorOfAction[i]);
         encodedStmMsg = encodeMessage(2,stmMsg);
         sendMessage(encodedStmMsg);
@@ -257,7 +257,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
             printf("current action state %s | next state action %s\n", currentStateAction.c_str(),nextStateAction.c_str());
         }while(currentStateAction==nextStateAction && (nextStateAction=="b" || nextStateAction=="f") && androidMessageIndex<noOfStates);
         printf("finish sending to android\n");
-        while(true){
+        while(false){
             replyMessage="";
             if(expectedMessage==0){
                 currentExpectedMsg=expectedMsgFromSTM0;
@@ -302,6 +302,12 @@ int Network::checkMsgSent(string stmMsg){
         if(stmMsg.substr(0,1).compare("B")==0){ //reverse left
             return 5;
         }
+//        if(stmMsg.substr(0,1).compare("")==0){//turn on the spot right
+//           return 6;
+//           }
+//        if(stmMsg.substr(0,1).compare("")==0){//turn on the spot left
+//           return 7;
+//           }
         printf("Error when checking stmMsg %s",stmMsg.c_str());
         return -1;
 }
@@ -367,9 +373,9 @@ int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
     int noOfObstacles = 0;
     string msg = "";
     //test message, remove later
-//    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
-//    convertAndroidMessage(msg,xVector,yVector,fVector);
-    while(true){
+    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;19.5,1.5,W;1.5,19.5,S;\n";
+    convertAndroidMessage(msg,xVector,yVector,fVector);
+    while(false){
         receiveMessage();
         msg = decodeMessage();
         //convert android message and create obstacles
@@ -460,7 +466,7 @@ int Network::convertAndroidMessage(string message, vector<int>& xVector, vector<
 //given x,y,facing direction, generate the message to android
 string Network::generateAndroidMessage(float x, float y, int facingDirection, int stmMsgNumber){
     string retMessage ="";
-    string message[6] = {"f","r","fr","fl","rr","rl"}; //make sure this is in the same order as calculate action
+    string message[8] = {"f","r","fr","fl","rr","rl","sr","sl"}; //make sure this is in the same order as calculate action
     //facing east
     if(facingDirection==0){
         int xInt = static_cast<int>(x);
@@ -761,9 +767,11 @@ string Network::calculateActionNew(Action* actionVector){
     string reverse10 = "f";
     string turnRight = "j";
     string turnLeft = "i";
-    string reverseRight = "s";
-    string reverseLeft = "t";
+    string reverseRight = "A";
+    string reverseLeft = "B";
     string returnMsg ="";
+    string turnOnSpotRight = "";
+    string turnOnSpotLeft = "";
     char buffer [100];
     ActionStraight* aPtr = dynamic_cast<ActionStraight*>(actionVector);
         if(aPtr!=nullptr){
@@ -804,6 +812,15 @@ string Network::calculateActionNew(Action* actionVector){
                 returnMsg = reverseRight;
             }
         }
-    //}
+//    ActionTurnOnSpot* arPtr = dynamic_cast<ActionTurnOnSpot*>(actionVector);
+//        if(arPtr!=nullptr){
+//            if(arPtr->getTurnAngle()>0){
+//                returnMsg = turnOnSpotLeft;
+//            }
+//            else{
+//                returnMsg = turnOnSpotRight;
+//            }
+//        }
+//
     return returnMsg;
 }

@@ -12,7 +12,7 @@ int main()
     int checker=0;
     string retMessage="";
     Network n;
-    checker = n.initializeConnection();
+    //checker = n.initializeConnection();
     if(checker == 1){
         printf("error during initialization");
         return 1;

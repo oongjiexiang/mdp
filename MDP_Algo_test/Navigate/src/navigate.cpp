@@ -7,7 +7,7 @@ float stmCalibrate();
 void rpiCaptureImage();
 
 void Navigate::run(){
-    Map grid;
+    Map grid(10);
     Vertex* curPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
     State* curState = new State(curPosition, ROBOT_INIT_FACEDIRECTION, nullptr);
 
