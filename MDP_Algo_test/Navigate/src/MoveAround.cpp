@@ -5,7 +5,7 @@
 using namespace std;
 
 MoveAround::MoveAround(vector<Obstacle> obstacles){
-    astar = new aStar(obstacles,10);
+    astar = new aStar(obstacles,0);
 }
 
 vector<State*> MoveAround::generatePath(State* robotInitState, Obstacle obstacle){

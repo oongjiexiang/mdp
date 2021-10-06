@@ -25,7 +25,7 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
                 int sign = (nextPosition->yGrid - initPosition->yGrid)/abs(nextPosition->yGrid - initPosition->yGrid);
                 actions.push_back(new ActionTurn2By4(90*sign));
             }
-            else if(initPosition->xGrid == nextPosition->xGrid + TURN_FORWARD_LENGTH){
+            else if(initPosition->xGrid == nextPosition->xGrid + TURN_SIDE_LENGTH){
                 int sign = (nextPosition->yGrid - initPosition->yGrid)/abs(nextPosition->yGrid - initPosition->yGrid);
                 actions.push_back(new ActionReverseTurn2By4(90*sign));
             }
@@ -44,7 +44,7 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
                 int sign = (initPosition->xGrid - nextPosition->xGrid)/abs(initPosition->xGrid - nextPosition->xGrid);
                 actions.push_back(new ActionTurn2By4(90*sign));
             }
-            else if(initPosition->yGrid == nextPosition->yGrid + TURN_FORWARD_LENGTH){
+            else if(initPosition->yGrid == nextPosition->yGrid + TURN_SIDE_LENGTH){
                 int sign = (initPosition->xGrid - nextPosition->xGrid)/abs(initPosition->xGrid - nextPosition->xGrid);
                 actions.push_back(new ActionReverseTurn2By4(90*sign));
             }
@@ -56,7 +56,7 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
             if(abs(initPosition->xGrid - nextPosition->xGrid) == 1){
                 actions.push_back(new ActionStraight(initPosition->xGrid - nextPosition->xGrid));
             }
-            else if(initPosition->xGrid == nextPosition->xGrid - TURN_FORWARD_LENGTH){
+            else if(initPosition->xGrid == nextPosition->xGrid - TURN_SIDE_LENGTH){
                 int sign = (initPosition->yGrid - nextPosition->yGrid)/abs(initPosition->yGrid - nextPosition->yGrid);
                 actions.push_back(new ActionReverseTurn2By4(90*sign));
             }
@@ -76,7 +76,7 @@ vector<Action*> FormulatorSmooth::convertToActualActions(vector<State*> states){
                 int sign = (nextPosition->xGrid - initPosition->xGrid)/abs(nextPosition->xGrid - initPosition->xGrid);
                 actions.push_back(new ActionTurn2By4(90*sign));
             }
-            else if(initPosition->yGrid == nextPosition->yGrid - TURN_FORWARD_LENGTH){
+            else if(initPosition->yGrid == nextPosition->yGrid - TURN_SIDE_LENGTH){
                 int sign = (nextPosition->xGrid - initPosition->xGrid)/abs(nextPosition->xGrid - initPosition->xGrid);
                 actions.push_back(new ActionReverseTurn2By4(90*sign));
             }
