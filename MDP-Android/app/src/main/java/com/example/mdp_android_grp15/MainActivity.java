@@ -408,7 +408,11 @@ public class MainActivity extends AppCompatActivity {
 //                        gridMap.performAlgoCommand(a, b, direction);
 //                    }
 
-                     if (cmd.length == 4){
+                    // allow robot to show up on grid if its on the very boundary
+                    if (a == 1) a++;
+                    if (b == 20) b--;
+
+                    if (cmd.length == 4){
                         String command = cmd[3];
 
                         // if move forward, reverse, turn on the spot left/right

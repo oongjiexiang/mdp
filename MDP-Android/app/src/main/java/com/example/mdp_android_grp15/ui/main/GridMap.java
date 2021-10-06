@@ -152,7 +152,7 @@ public class GridMap extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         showLog("Entering onDraw");
-        showLog(String.valueOf(getCanDrawRobot()));
+        showLog("canDrawRobot = " + String.valueOf(getCanDrawRobot()));
         super.onDraw(canvas);
         showLog("Redrawing map");
 
@@ -1784,7 +1784,10 @@ public class GridMap extends View {
     // TODO: edit such that when alg send us 0 still display it, maybe edit in MainActivity to +1
     // week 8 req to update robot pos when alg sends updates
     public void performAlgoCommand(int x, int y, String direction) {
-        if ((x > 0 && x < 21) && (y > -1 && y < 21)) {
+        showLog("Enter performAlgoCommand");
+        showLog("x = " + x + "\n" + "y = " + y);
+        if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            showLog("within grid");
             robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
             switch (direction) {
                 case "N":
@@ -1803,7 +1806,9 @@ public class GridMap extends View {
         }
         // if robot pos was not set initially, don't set as explored before moving to new coord
         if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
-            if ((x > 0 && x < 21) && (y > -1 && y < 20)) {
+            showLog("if robot was not at invalid pos prev");
+            if ((curCoord[0] > 1 && curCoord[0] < 21) && (curCoord[1] > -1 && curCoord[1] < 20)) {
+                showLog("prev pos was within grid");
                 for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
                     for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
                         cells[i][20 - j - 1].setType("explored");
@@ -1814,40 +1819,36 @@ public class GridMap extends View {
         }
         // if robot is still in frame
         if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            showLog("within grid");
             setCurCoord(x, y, robotDirection);    // set new coords and direction
             canDrawRobot = true;
         }
         // if robot goes out of frame
         else {
-            // if still out of frame, don't do shit
-//            if (!(curCoord[0] != -1 || curCoord[0] != -1)) {
-//                for (int n = curCoord[0] - 1; n <= curCoord[0]; n++) {
-//                    for (int m = curCoord[1] - 1; m <= curCoord[1]; m++) {
-//                        cells[n][19 - m].setType("explored");
-//                    }
-//                }
-//            }
-//            curCoord[0] = -1;
-//            curCoord[1] = -1;
+            showLog("set canDrawRobot to false");
             canDrawRobot = false;
+            curCoord[0] = -1;
+            curCoord[1] = -1;
         }
         this.invalidate();
+        showLog("Exit performAlgoCommand");
     }
 
     // TODO: edit such that when alg send us 0 still display it, maybe edit in MainActivity to +1 but might need to consider if obstacles are on the borders too then later on our end ram into them hmm but algo say they will check so shd be fine
     public void performAlgoTurning(int x, int y, String facing, String cmd) {
-        final Handler handler = new Handler();
-
+        showLog("Enter performAlgoTurning");
         final int i = y;
         final int j = x;
         final String finalFacing = facing;
-        int delay = 1000;   // add 1000 after each run cos its like a timestamp
+        int delay = 500;   // add 1000 after each run cos its like a timestamp
 
-        if ((x > 0 && x < 21) && (y > -1 && y < 21)) {
+        if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            showLog("within grid");
             robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
 
             // call animation only when the robot is in frame
             if (curCoord[0] != -1 && curCoord[1] != -1) {
+                showLog("robot is within grid");
                 switch (robotDirection) {
                     case "up":
                         switch (cmd) {
@@ -1857,7 +1858,7 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 4, i - 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
@@ -1865,7 +1866,7 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 3, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 // rest of the forward motion
                                 new Handler().postDelayed(new Runnable() {
@@ -1873,14 +1874,14 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 2, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -1895,7 +1896,7 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 4, i - 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
@@ -1903,7 +1904,7 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 3, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 // rest of the forward motion
                                 new Handler().postDelayed(new Runnable() {
@@ -1911,14 +1912,14 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 2, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -1932,26 +1933,26 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 2, i + 3, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i + 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -1965,13 +1966,13 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 2, i + 3, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 2, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 // rest of the forward motion
                                 new Handler().postDelayed(new Runnable() {
@@ -1979,14 +1980,14 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 2, i + 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2005,27 +2006,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 4, i + 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 3, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // move 1 grid forward
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 2, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i, finalFacing);
@@ -2039,27 +2040,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 4, i + 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 3, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // move 1 grid forward
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i, finalFacing);
@@ -2072,27 +2073,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 2, i - 3, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 2, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 2, i - 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2106,28 +2107,28 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 2, i - 3, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i - 1, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 1, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2147,27 +2148,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 1, i - 4, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 3, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // move 1 grid forward
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 2, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i, finalFacing);
@@ -2181,27 +2182,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 1, i + 4, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 3, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // move 1 grid forward
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 2, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i, finalFacing);
@@ -2214,28 +2215,28 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 3, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 1, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2249,27 +2250,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 3, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 2, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j + 1, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2288,33 +2289,33 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 1, i + 4, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 3, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // move 1 grid forward
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 2, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 break;
                             case "fr":
                                 // move forward 1 grid
@@ -2323,33 +2324,33 @@ public class GridMap extends View {
                                         performAlgoCommand(j + 1, i - 4, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // turn
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 3, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 // move 1 grid forward
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 2, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i - 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 break;
                             case "rl":
                                 new Handler().postDelayed(new Runnable() {
@@ -2357,27 +2358,27 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 3, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 2, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 1, i + 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j, i + 1, finalFacing);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2391,20 +2392,20 @@ public class GridMap extends View {
                                         performAlgoCommand(j - 3, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 2, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
                                         performAlgoCommand(j - 1, i - 2, robotDirection);
                                     }
                                 }, delay);
-                                delay += 750;
+                                delay += 500;
 
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
@@ -2425,34 +2426,32 @@ public class GridMap extends View {
             }
             // if robot was out of frame in prev state
             else {
-                switch (facing) {
-                    case "N": robotDirection = "up";
-                        break;
-                    case "S": robotDirection = "down";
-                        break;
-                    case "E": robotDirection = "right";
-                        break;
-                    case "W": robotDirection = "left";
-                }
-                setCurCoord(x, y, robotDirection);
-                canDrawRobot = true;
+                showLog("robot was out of grid in prev state");
+                performAlgoCommand(x, y, facing);
             }
         }
         // if robot goes out of frame
         else {
-//            if (!(curCoord[0] != -1 || curCoord[0] != -1)) {
-//
-//                for (int n = curCoord[0] - 1; n <= curCoord[0]; n++) {
-//                    for (int m = curCoord[1] - 1; m <= curCoord[1]; m++) {
-//                        cells[n][19 - m].setType("explored");
-//                    }
-//                }
-//            }
-//            curCoord[0] = -1;
-//            curCoord[1] = -1;
+            // colour explored before disappearing
+            if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
+                showLog("if robot was alr in grid");
+                if ((curCoord[0] > 1 && curCoord[0] < 21) && (curCoord[1] > -1 && curCoord[1] < 20)) {
+                    showLog("pos is good before going out of grid");
+                    for (int n = curCoord[0] - 1; n <= curCoord[0]; n++) {
+                        for (int m = curCoord[1] - 1; m <= curCoord[1]; m++) {
+                            cells[n][20 - m - 1].setType("explored");
+//                        showLog("i = " + i + ", j = " + j);
+                        }
+                    }
+                }
+            }
+            showLog("setting canDrawRobot to false");
             canDrawRobot = false;
+            curCoord[0] = -1;
+            curCoord[1] = -1;
         }
         this.invalidate();
+        showLog("Exit performAlgoTurning");
     }
 
 
