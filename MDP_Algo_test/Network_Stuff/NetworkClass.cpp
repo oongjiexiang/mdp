@@ -257,7 +257,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
             printf("current action state %s | next state action %s\n", currentStateAction.c_str(),nextStateAction.c_str());
         }while(currentStateAction==nextStateAction && (nextStateAction=="b" || nextStateAction=="f") && androidMessageIndex<noOfStates);
         printf("finish sending to android\n");
-        while(false){
+        while(true){
             replyMessage="";
             if(expectedMessage==0){
                 currentExpectedMsg=expectedMsgFromSTM0;
@@ -302,12 +302,12 @@ int Network::checkMsgSent(string stmMsg){
         if(stmMsg.substr(0,1).compare("B")==0){ //reverse left
             return 5;
         }
-//        if(stmMsg.substr(0,1).compare("")==0){//turn on the spot right
-//           return 6;
-//           }
-//        if(stmMsg.substr(0,1).compare("")==0){//turn on the spot left
-//           return 7;
-//           }
+        if(stmMsg.substr(0,1).compare("C")==0){//turn on the spot right
+           return 6;
+           }
+        if(stmMsg.substr(0,1).compare("E")==0){//turn on the spot left
+           return 7;
+           }
         printf("Error when checking stmMsg %s",stmMsg.c_str());
         return -1;
 }
@@ -373,9 +373,9 @@ int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
     int noOfObstacles = 0;
     string msg = "";
     //test message, remove later
-    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;19.5,1.5,W;1.5,19.5,S;\n";
-    convertAndroidMessage(msg,xVector,yVector,fVector);
-    while(false){
+//    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
+//    convertAndroidMessage(msg,xVector,yVector,fVector);
+    while(true){
         receiveMessage();
         msg = decodeMessage();
         //convert android message and create obstacles
@@ -504,6 +504,8 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
     string turnLeft = "i";
     string reverseRight = "A";
     string reverseLeft = "B";
+    string onTheSpotTurnRight = "C";
+    string onTheSpotTurnLeft = "E";
     int x,y;
     x = x1-x0;
     y = y1-y0;
@@ -621,6 +623,10 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
                 return turnRight;
             }
         }
+
+        if(x==0 && y==0){
+            return onTheSpotTurnLeft;
+        }
     }
     //if facing direction differs by + 90, turn left
     if((facingDirection0+90)%360 == facingDirection1){
@@ -683,6 +689,9 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
             if(x < 0){
                 return turnLeft;
             }
+        }
+        if(x==0 && y==0){
+            return onTheSpotTurnLeft;
         }
     }
     //if facing direction differs by -270, turn right
@@ -747,6 +756,9 @@ string Network::calculateAction(float x0, float x1, float y0, float y1, int faci
                 return turnRight;
             }
         }
+        if(x==0 && y==0){
+            return onTheSpotTurnRight;
+        }
     }
     printf("Error");
     return"";
@@ -770,13 +782,13 @@ string Network::calculateActionNew(Action* actionVector){
     string reverseRight = "A";
     string reverseLeft = "B";
     string returnMsg ="";
-    string turnOnSpotRight = "";
-    string turnOnSpotLeft = "";
+    string turnOnSpotRight = "C";
+    string turnOnSpotLeft = "E";
     char buffer [100];
     ActionStraight* aPtr = dynamic_cast<ActionStraight*>(actionVector);
         if(aPtr!=nullptr){
             if(aPtr->getTravelDistGrid()>0){ //check if forward
-                if(aPtr->getTravelDistGrid()>=100)
+                if(aPtr->getTravelDistGrid()>=10)
                     sprintf(buffer,"p%d",aPtr->getTravelDistGrid()*10);
                 else{
                     sprintf(buffer,"p0%d",aPtr->getTravelDistGrid()*10);
@@ -784,7 +796,7 @@ string Network::calculateActionNew(Action* actionVector){
                 returnMsg=buffer;
             }
             else if(aPtr->getTravelDistGrid()<0){ //check if backward
-                if(aPtr->getTravelDistGrid()>=100)
+                if(aPtr->getTravelDistGrid()>=10)
                     sprintf(buffer,"s%d",abs(aPtr->getTravelDistGrid()*10));
                 else{
                     sprintf(buffer,"s0%d",abs(aPtr->getTravelDistGrid()*10));
@@ -812,15 +824,15 @@ string Network::calculateActionNew(Action* actionVector){
                 returnMsg = reverseRight;
             }
         }
-//    ActionTurnOnSpot* arPtr = dynamic_cast<ActionTurnOnSpot*>(actionVector);
-//        if(arPtr!=nullptr){
-//            if(arPtr->getTurnAngle()>0){
-//                returnMsg = turnOnSpotLeft;
-//            }
-//            else{
-//                returnMsg = turnOnSpotRight;
-//            }
-//        }
-//
+    ActionTurnOnSpot* atosPtr = dynamic_cast<ActionTurnOnSpot*>(actionVector);
+        if(atosPtr!=nullptr){
+            if(atosPtr->getTurnAngle()>0){
+                returnMsg = turnOnSpotLeft;
+            }
+            else{
+                returnMsg = turnOnSpotRight;
+            }
+        }
+
     return returnMsg;
 }

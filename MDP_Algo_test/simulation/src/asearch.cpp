@@ -28,8 +28,8 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.clear();
     possibleActions.push_back(forward);
     possibleActions.push_back(reverse);
-    possibleActions.push_back(leftOnSpot);
-    possibleActions.push_back(rightOnSpot);
+    //possibleActions.push_back(leftOnSpot);
+    //possibleActions.push_back(rightOnSpot);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
     possibleActions.push_back(reverseLeft);

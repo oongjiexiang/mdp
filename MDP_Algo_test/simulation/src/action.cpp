@@ -246,21 +246,21 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
     // 1. find new state
     switch(faceDirection){
         case 0:
-            newXGrid = curXGrid - 2;
-            newYGrid = curYGrid + 4*turnAngle/abs(turnAngle);
+            newXGrid = curXGrid - 4;
+            newYGrid = curYGrid + 2*turnAngle/abs(turnAngle);
 
         break;
         case 90:
-            newXGrid = curXGrid - 4*turnAngle/abs(turnAngle);
-            newYGrid = curYGrid - 2;
+            newXGrid = curXGrid - 2*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid - 4;
         break;
         case 180:
-            newXGrid = curXGrid + 2;
-            newYGrid = curYGrid - 4*turnAngle/abs(turnAngle);
+            newXGrid = curXGrid + 4;
+            newYGrid = curYGrid - 2*turnAngle/abs(turnAngle);
         break;
         case 270:
-            newXGrid = curXGrid + 4*turnAngle/abs(turnAngle);
-            newYGrid = curYGrid + 2;
+            newXGrid = curXGrid + 2*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid + 4;
         break;
         default:
             cout << "faceDirection is not straight, but = " << faceDirection << endl;
