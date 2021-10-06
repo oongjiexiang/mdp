@@ -50,7 +50,7 @@ class ActionStraight : public Action{
 };
 
 class ActionTurnOnSpot : public Action{
-    int cost = 3;  // need to use mathematical calculation
+    int cost = 6;  // need to use mathematical calculation
     int turnAngle;
     public:
         ActionTurnOnSpot(int turnAngle);

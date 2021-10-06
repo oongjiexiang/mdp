@@ -18,8 +18,8 @@ aStar::aStar(vector<Obstacle> obstacles, int maxDistFromBorder): maxDistFromBord
 void aStar::generatePossibleActions(Obstacle obstacle){
     ActionStraight* forward = new ActionStraight(1);
     ActionStraight* reverse = new ActionStraight(-1);
-    // ActionTurn* left = new ActionTurn(90);
-    // ActionTurn* right = new ActionTurn(-90);
+    ActionTurnOnSpot* leftOnSpot = new ActionTurnOnSpot(90);
+    ActionTurnOnSpot* rightOnSpot = new ActionTurnOnSpot(-90);
     ActionTurn2By4* left = new ActionTurn2By4(90);
     ActionTurn2By4* right = new ActionTurn2By4(-90);
     ActionReverseTurn2By4* reverseLeft = new ActionReverseTurn2By4(90);
@@ -28,6 +28,8 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.clear();
     possibleActions.push_back(forward);
     possibleActions.push_back(reverse);
+    possibleActions.push_back(leftOnSpot);
+    possibleActions.push_back(rightOnSpot);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
     possibleActions.push_back(reverseLeft);
