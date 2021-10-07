@@ -30,6 +30,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="libws2_32.a" />
+					<Add library="libwsock32.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -45,12 +47,8 @@
 			<Add directory="../simulation/include" />
 			<Add directory="../Utilities/include" />
 		</Compiler>
-		<Unit filename="../Navigate/include/MoveAround.h" />
 		<Unit filename="../Navigate/include/actionFormulator.h" />
-		<Unit filename="../Navigate/include/navigate.h" />
-		<Unit filename="../Navigate/src/MoveAround.cpp" />
 		<Unit filename="../Navigate/src/actionFormulator.cpp" />
-		<Unit filename="../Navigate/src/navigate.cpp" />
 		<Unit filename="../Network_Stuff/NetworkClass.cpp">
 			<Option virtualFolder="Network_Stuff/" />
 		</Unit>
