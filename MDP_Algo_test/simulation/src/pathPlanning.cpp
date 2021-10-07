@@ -59,18 +59,18 @@ void ShortestPath::pathForObstacle_6(vector<ActionListPerObstacle>& resultPath){
         }
     }
     cout << "min path = " << minPathDist << endl;
-    for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
-        ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
-        Obstacle o = alpo.first;
-        vector<State*> states = alpo.second;
-        cout << "going to obstacle *****************" << endl;
-        o.printObstacle();
-        for(int j = 0; j < states.size(); j++){
-            states[j]->printState();
-        }
-        cout << "obstacle is visited*****************" << endl;
-        cout << endl;
-    }
+    // for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
+    //     ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
+    //     Obstacle o = alpo.first;
+    //     vector<State*> states = alpo.second;
+    //     cout << "going to obstacle *****************" << endl;
+    //     o.printObstacle();
+    //     for(int j = 0; j < states.size(); j++){
+    //         states[j]->printState();
+    //     }
+    //     cout << "obstacle is visited*****************" << endl;
+    //     cout << endl;
+    // }
     resultPath = pathSolutionList[minPathIndex];
 }
 
@@ -181,7 +181,7 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
         vector<ActionListPerObstacle> onePermuteSolution;
         vector<double> onePermuteSubDistance;
         SearchResult buffer;
-        //cout << float(iteration_debug++)/totalPermutation*100 << "%" << endl;
+        cout << float(iteration_debug++)/totalPermutation*100 << "%" << endl;
 
         // initial state
         Vertex* robotInitPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
@@ -199,7 +199,6 @@ bool ShortestPath::permutation(vector<vector<double>>& pathDistanceList, vector<
 
         pathDistanceList.push_back(onePermuteSubDistance);
         pathSolutionList.push_back(onePermuteSolution);
-        // }
     // + 1 because first position is always initial point with id = 0
     }while(next_permutation(goal_ids.begin(), goal_ids.end()));
     return true;
