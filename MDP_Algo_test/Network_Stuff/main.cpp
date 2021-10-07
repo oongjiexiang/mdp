@@ -25,6 +25,7 @@ int main()
       obstacles[i].printObstacle();
     }
     int stateSize;
+
     ShortestPath sp(obstacles);
     //generate paths
     vector<ActionListPerObstacle> result = sp.hamiltonianPath();
@@ -47,7 +48,7 @@ int main()
         n.sendCombinedActionPath(states,stateSize,actions);
         n.sendObstacleIdToAndroid(result[i].first.id);
         //n.sendSingleMessageToSTM("f010");
-        n.sendSingleMessageToSTM("n");
+        //n.sendSingleMessageToSTM("n");
         n.sendTakePhoto();
     }
     n.sendEndToAndroid();

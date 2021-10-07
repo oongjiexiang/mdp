@@ -796,7 +796,7 @@ string Network::calculateActionNew(Action* actionVector){
                 returnMsg=buffer;
             }
             else if(aPtr->getTravelDistGrid()<0){ //check if backward
-                if(aPtr->getTravelDistGrid()>=10)
+                if(aPtr->getTravelDistGrid()<=-10)
                     sprintf(buffer,"s%d",abs(aPtr->getTravelDistGrid()*10));
                 else{
                     sprintf(buffer,"s0%d",abs(aPtr->getTravelDistGrid()*10));
