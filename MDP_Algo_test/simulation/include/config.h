@@ -25,8 +25,6 @@ class Map{
 
         void addObstacle(Obstacle* o);
 
-        Vertex* getVertex(int xGrid, int yGrid);
-
         bool isValidCoor(float x_center, float y_center);
 
         bool isValidGrid(int xGrid, int yGrid);

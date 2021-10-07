@@ -27,12 +27,23 @@ int main(){
     // obstacles.push_back(Obstacle(3, 6, 9, 0));
     // obstacles.push_back(Obstacle(5, 13, 14, 90));
     // Map map(obstacles, FROM_BORDER_GRID_LENGTH);
-    // // Map map(obstacles, 0);
+    // Map map(obstacles, 0);
     // map.printMap();
     // map.findVertexByCoor(-10, 20)->printVertex();
     // map.findVertexByGrid(-1, -3)->printVertex();
     // cout << map.isValidCoor(-50, -30) << endl;
+    // cout << map.isValidCoor(-80, -70) << endl;
+    // cout << map.isValidCoor(-70, -70) << endl;
+    // cout << map.isValidCoor(-65, -65) << endl;
+    // cout << map.isValidCoor(-66, -66) << endl;
+    // cout << map.isValidCoor(0, 370) << endl;
     // cout << map.isValidGrid(-5, -3) << endl;
+    // cout << map.isValidGrid(0, 0) << endl;
+    // cout << map.isValidGrid(0, 1) << endl;
+    // cout << map.isValidGrid(10, 0) << endl;
+    // cout << map.isValidGrid(19, 19) << endl;
+    // cout << map.isValidGrid(18, 19) << endl;
+    // cout << map.isValidGrid(18, 18) << endl;
 
     //************** test action.cpp****************
     // vector<Obstacle> obstacles;
@@ -106,23 +117,23 @@ int main(){
     // }
 
     //***********************test ActionFormulator.cpp ************************
-    vector<Obstacle> obstacles;
-    obstacles.push_back(Obstacle(1, 5, 9, 270));
-    obstacles.push_back(Obstacle(2, 7, 14, 180));
-    obstacles.push_back(Obstacle(3, 12, 9, 0));
-    obstacles.push_back(Obstacle(4, 15, 15, 270));
-    obstacles.push_back(Obstacle(5, 15, 4, 180));
+    // vector<Obstacle> obstacles;
+    // obstacles.push_back(Obstacle(1, 5, 9, 270));
+    // obstacles.push_back(Obstacle(2, 7, 14, 180));
+    // obstacles.push_back(Obstacle(3, 12, 9, 0));
+    // obstacles.push_back(Obstacle(4, 15, 15, 270));
+    // obstacles.push_back(Obstacle(5, 15, 4, 180));
 
-    ShortestPath sp(obstacles);
-    vector<ActionListPerObstacle> result = sp.hamiltonianPath();
+    // ShortestPath sp(obstacles);
+    // vector<ActionListPerObstacle> result = sp.hamiltonianPath();
 
-    // print results
-    // do not combine all states and send to FormulatorShorten in one go, as forward and reverse during consecutive obstacle targets will be combined
-    ActionFormulator* af = new FormulatorShorten();
-    for(int i = 0; i < result.size(); i++){
-        Obstacle o = result[i].first;
-        af->convertToActualActions(result[i].second);
-    }
+    // // print results
+    // // do not combine all states and send to FormulatorShorten in one go, as forward and reverse during consecutive obstacle targets will be combined
+    // ActionFormulator* af = new FormulatorShorten();
+    // for(int i = 0; i < result.size(); i++){
+    //     Obstacle o = result[i].first;
+    //     af->convertToActualActions(result[i].second);
+    // }
 
     //**************************test pathPlanning.cpp again***********************
     // vector<Obstacle> obstacles;

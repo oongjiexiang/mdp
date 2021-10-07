@@ -29,7 +29,7 @@ class Vertex{
     public: 
         int xGrid, yGrid;
         float x_right, x_left, y_high, y_low;
-        bool is_obstacle, is_border, safe;
+        bool is_obstacle, is_border;
         
         Vertex(int xGrid, int yGrid);
         void printVertex();
@@ -47,18 +47,6 @@ class Obstacle{
         bool is_seen;   // 16/9 no use currently
         Obstacle(int id, int xGrid, int yGrid, int face_direction);
         void printObstacle();
-};
-
-
-//used to track the robot's simulated location
-class Robot{
-    public:
-        float x_right, x_left, y_high, y_low;
-        float x_center, y_center;
-        int xGrid, yGrid;
-        float face_direction;  // theta in range (-pi, pi]
-        Robot(int xGrid, int yGrid, float face_direction);
-        void printRobot();
 };
 
 #endif

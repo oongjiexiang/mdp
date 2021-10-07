@@ -4,13 +4,11 @@
 
 using namespace std;
 
-// const float TURN_RADIUS = 34;   // to update regularly according to STM Team
 const float TURN_RADIUS = 20;
 const int TURN_RADIUS_GRID = (int)(ceil(TURN_RADIUS/UNIT_LENGTH));
 const float MAX_IMAGE_VIEW_DISTANCE = 30;
 const int MAX_IMAGE_VIEW_DISTANCE_GRID = (int)(ceil(MAX_IMAGE_VIEW_DISTANCE/UNIT_LENGTH));
-const float MAX_IMAGE_VIEW_ANGLE = 180; // currently set as complete opposite. Will change in real application
-const int TURN_ON_SPOT_RADIUS = 10;
+const float TURN_ON_SPOT_RADIUS = 20;
 const int TURN_ON_SPOT_RADIUS_GRID = (int)(ceil(TURN_ON_SPOT_RADIUS/UNIT_LENGTH));
 
 // -------------Utility Euclidean distance-------------
@@ -49,10 +47,7 @@ State* ActionStraight::takeAction(State* initState, Map& maps){
     if(!maps.isAvailableGrid(newXGrid, newYGrid)) return nullptr;
 
     // Action can be taken!
-    // 1. update map
-    maps.findVertexByGrid(newXGrid, newYGrid)->safe = true;
-
-    // 2. generate new state
+    // 1. generate new state
     Vertex* newPosition = new Vertex(newXGrid, newYGrid);
     State* endState = new State(newPosition, initState->face_direction, initState);
 
@@ -118,15 +113,7 @@ State* ActionTurnOnSpot::takeAction(State* initState, Map& maps){
         }
     }
 
-    // 3. perform action since it can be taken
-    // update map
-    for(int i = min(curXGrid, furthestXGrid); i <= max(curXGrid, furthestXGrid); i++){
-        for(int j = min(curYGrid, furthestYGrid); j <= max(curYGrid, furthestYGrid); j++){
-            maps.findVertexByGrid(i, j)->safe = true;
-        }
-    }
-
-    // introduce new state
+    // 3. introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
 
     State* endState = new State(newPosition, newFaceDirection, initState);
@@ -150,8 +137,6 @@ void ActionTurnOnSpot::printAction(){
 
 // -------------------Turning Action Updated----------------------
 ActionTurn2By4::ActionTurn2By4(int turnAngle){
-    // if(turnAngle < 0) this->turnAngle = turnAngle + 360;
-    // else this->turnAngle = turnAngle;
     this->turnAngle = turnAngle;
 }
 
@@ -167,21 +152,21 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
     // 1. find new state
     switch(faceDirection){
         case 0:
-            newXGrid = curXGrid + 2;
-            newYGrid = curYGrid + 4*turnAngle/abs(turnAngle);
+            newXGrid = curXGrid + TURN_FORWARD_LENGTH;
+            newYGrid = curYGrid + TURN_SIDE_LENGTH*turnAngle/abs(turnAngle);
 
         break;
         case 90:
-            newXGrid = curXGrid - 4*turnAngle/abs(turnAngle);
-            newYGrid = curYGrid + 2;
+            newXGrid = curXGrid - TURN_SIDE_LENGTH*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid + TURN_FORWARD_LENGTH;
         break;
         case 180:
-            newXGrid = curXGrid - 2;
-            newYGrid = curYGrid - 4*turnAngle/abs(turnAngle);
+            newXGrid = curXGrid - TURN_FORWARD_LENGTH;
+            newYGrid = curYGrid - TURN_SIDE_LENGTH*turnAngle/abs(turnAngle);
         break;
         case 270:
-            newXGrid = curXGrid + 4*turnAngle/abs(turnAngle);
-            newYGrid = curYGrid - 2;
+            newXGrid = curXGrid + TURN_SIDE_LENGTH*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid - TURN_FORWARD_LENGTH;
         break;
         default:
             cout << "faceDirection is not straight, but = " << faceDirection << endl;
@@ -197,15 +182,7 @@ State* ActionTurn2By4::takeAction(State* initState, Map& maps){
         }
     }
 
-    // 3. perform action since it can be taken
-    // update map
-    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
-        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
-            maps.findVertexByGrid(i,j)->safe = true;
-        }
-    }
-
-    // introduce new state
+    // 3. introduce new state
     int newFaceDirection = (faceDirection + (int)turnAngle + 360)%360;
 
     State* endState = new State(newPosition, newFaceDirection, initState);
@@ -229,8 +206,6 @@ void ActionTurn2By4::printAction(){
 
 // ------------------------Action Reverse------------------------
 ActionReverseTurn2By4::ActionReverseTurn2By4(int turnAngle){
-    // if(turnAngle < 0) this->turnAngle = turnAngle + 360;
-    // else this->turnAngle = turnAngle;
     this->turnAngle = turnAngle;
 }
 
@@ -246,21 +221,21 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
     // 1. find new state
     switch(faceDirection){
         case 0:
-            newXGrid = curXGrid - 4;
-            newYGrid = curYGrid + 2*turnAngle/abs(turnAngle);
+            newXGrid = curXGrid - TURN_SIDE_LENGTH;
+            newYGrid = curYGrid + TURN_FORWARD_LENGTH*turnAngle/abs(turnAngle);
 
         break;
         case 90:
-            newXGrid = curXGrid - 2*turnAngle/abs(turnAngle);
-            newYGrid = curYGrid - 4;
+            newXGrid = curXGrid - TURN_FORWARD_LENGTH*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid - TURN_SIDE_LENGTH;
         break;
         case 180:
-            newXGrid = curXGrid + 4;
-            newYGrid = curYGrid - 2*turnAngle/abs(turnAngle);
+            newXGrid = curXGrid + TURN_SIDE_LENGTH;
+            newYGrid = curYGrid - TURN_FORWARD_LENGTH*turnAngle/abs(turnAngle);
         break;
         case 270:
-            newXGrid = curXGrid + 2*turnAngle/abs(turnAngle);
-            newYGrid = curYGrid + 4;
+            newXGrid = curXGrid + TURN_FORWARD_LENGTH*turnAngle/abs(turnAngle);
+            newYGrid = curYGrid + TURN_SIDE_LENGTH;
         break;
         default:
             cout << "faceDirection is not straight, but = " << faceDirection << endl;
@@ -276,15 +251,7 @@ State* ActionReverseTurn2By4::takeAction(State* initState, Map& maps){
         }
     }
 
-    // 3. perform action since it can be taken
-    // update map
-    for(int i = min(curXGrid, newXGrid); i <= max(curXGrid, newXGrid); i++){
-        for(int j = min(curYGrid, newYGrid); j <= max(curYGrid, newYGrid); j++){
-            maps.findVertexByGrid(i, j)->safe = true;
-        }
-    }
-
-    // introduce new state
+    // 3. introduce new state
     int newFaceDirection = (faceDirection - (int)turnAngle + 360)%360;
 
     State* endState = new State(newPosition, newFaceDirection, initState);

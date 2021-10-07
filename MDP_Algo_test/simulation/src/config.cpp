@@ -25,8 +25,6 @@ Map::Map(vector<Obstacle> obstacles, int distFromBorderAllowed): Map::Map(distFr
 }
 
 void Map::addObstacle(Obstacle* o){
-    // o->xGrid = o->xGrid + distFromBorderAllowed;
-    // o->yGrid = o->yGrid + distFromBorderAllowed;
     obstacles.push_back(*o);
     int boundaryGridCount = (int)(ceil(BOUNDARY_SIZE/UNIT_LENGTH));
     grids[o->xGrid + distFromBorderAllowed][o->yGrid + distFromBorderAllowed]->is_obstacle = true;
@@ -41,58 +39,6 @@ void Map::addObstacle(Obstacle* o){
     }
 }
 
-Vertex* Map::getVertex(int xGrid, int yGrid){
-    return grids[xGrid + distFromBorderAllowed][yGrid + distFromBorderAllowed];
-}
-
-/*
-// JX comment out (13/9/2021) as I am assuming that obstacles will be placed in square grids precisely. If not, need calculations
-//adds an obstacles and the borders of the obstacles into the grid given the array of obstacles
-void Map::add_obstacle(vector<Obstacle> obstacleList){
-    int i,j;
-    float obstacle_x_left, obstacle_x_right, obstacle_y_high, obstacle_y_low, border_x_left, border_x_right, border_y_high, border_y_low;
-    float obstacle_length = OBSTACLE_LENGTH/2;      // JX: var here means half of obstacle length to find the left, right, high, low coordinates (for loop below)
-    float boundary_size = BOUNDARY_SIZE;
-
-    // 1. register the list of obstacles into this grid map
-    obstacles.insert(obstacleList.end(), obstacleList.begin(), obstacleList.end());
-
-    // 2. mark applicable Vertices (ie Grids) as blocked with obstacle (is_obstacle) or a virtual obstacle (is_blocked)
-    //loop through the obstacle array
-    for(i = 0; i < obstacleList.size(); i++){
-        //find the 4 points of the obstacle
-        obstacle_x_left = obstacleList[i].x_center - obstacle_length;
-        obstacle_x_right = obstacleList[i].x_center + obstacle_length;
-        obstacle_y_high = obstacleList[i].y_center + obstacle_length;
-        obstacle_y_low = obstacleList[i].y_center - obstacle_length;
-        printf("Obstacle : (%.1f, %.1f) to (%.1f, %.1f)",obstacle_x_left,obstacle_y_low,obstacle_x_right,obstacle_y_high);
-
-        //find the 4 points of the border
-        border_x_left = obstacleList[i].x_center - boundary_size;
-        border_x_right = obstacleList[i].x_center + boundary_size;
-        border_y_high = obstacleList[i].y_center + boundary_size;
-        border_y_low = obstacleList[i].y_center - boundary_size;
-
-        
-        Vertex bottomLeft = findVertexByCoor(obstacle_x_left, obstacle_y_low);
-        Vertex topRight = findVertexByCoor(obstacle_x_right, obstacle_y_high);
-        for(int i = bottomLeft.yGrid; i <= topRight.yGrid; i++){
-            for(int j = bottomLeft.xGrid; j <= topRight.xGrid; j++){
-                grids[i][j].is_obstacle = true;
-            }
-        }
-        bottomLeft = findVertexByCoor(border_x_left, border_y_low);
-        topRight = findVertexByCoor(border_x_right, border_y_high);
-        for(int i = bottomLeft.yGrid; i <= topRight.yGrid; i++){
-            for(int j = bottomLeft.xGrid; j <= topRight.xGrid; j++){
-                grids[i][j].is_border = grids[i][j].is_obstacle? false: true;
-            }
-        }
-
-    }
-}
-*/
-
 //search for a vertex given the x and y coordinates and returns a pointer to the vertex
 Vertex* Map::findVertexByCoor(float x_center, float y_center){
     int xGrid = (int)(ceil(x_center/UNIT_LENGTH)) - 1;
@@ -105,14 +51,14 @@ Vertex* Map::findVertexByGrid(int xGrid, int yGrid){
 }
 
 bool Map::isValidCoor(float x_center, float y_center){
-    return (x_center < AREA_LENGTH + distFromBorderAllowed*UNIT_LENGTH && y_center < AREA_LENGTH + distFromBorderAllowed*UNIT_LENGTH 
-    && x_center >= -distFromBorderAllowed*UNIT_LENGTH && y_center >= -distFromBorderAllowed*UNIT_LENGTH);
+    return (x_center < AREA_LENGTH + (distFromBorderAllowed - 0.5)*UNIT_LENGTH && y_center < AREA_LENGTH + (distFromBorderAllowed - 0.5)*UNIT_LENGTH 
+    && x_center >= -(distFromBorderAllowed - 0.5)*UNIT_LENGTH && y_center >= -(distFromBorderAllowed - 0.5)*UNIT_LENGTH);
 }
 
-bool Map::isValidGrid(int xGrid, int yGrid){
-    return (yGrid >= -distFromBorderAllowed && xGrid >= -distFromBorderAllowed && 
-        yGrid < Y_GRID_COUNT + distFromBorderAllowed && 
-        xGrid < X_GRID_COUNT + distFromBorderAllowed);
+bool Map::isValidGrid(int xGrid, int yGrid){    // 7 Oct 2021: to disable robot center to be on the edge during search, will return false
+    return (yGrid > -distFromBorderAllowed && xGrid > -distFromBorderAllowed && 
+        yGrid < Y_GRID_COUNT + distFromBorderAllowed - 1 && 
+        xGrid < X_GRID_COUNT + distFromBorderAllowed - 1);
 }
 
 bool Map::isAvailableGrid(int xGrid, int yGrid){
@@ -137,9 +83,8 @@ void Map::printMap(){
     cout << "---------------Map----------------" << endl;
     for(int i = Y_GRID_COUNT + distFromBorderAllowed - 1; i >= 0; i--){
         for(int j = 0; j < X_GRID_COUNT + distFromBorderAllowed; j++){
-            if(grids[j + distFromBorderAllowed][i + distFromBorderAllowed]->is_obstacle) cout << "O";
-            else if(grids[j + distFromBorderAllowed][i + distFromBorderAllowed]->is_border) cout << "B";
-            else if(grids[j + distFromBorderAllowed][i + distFromBorderAllowed]->safe) cout << "^";
+            if(grids[j][i]->is_obstacle) cout << "O";
+            else if(grids[j][i]->is_border) cout << "B";
             else cout << " ";
         }
         cout << endl;
