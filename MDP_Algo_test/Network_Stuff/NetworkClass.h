@@ -40,7 +40,7 @@ class Network{
         int convertAndroidMessage(std::string message, std::vector<int>& xVector, std::vector<int>& yVector, std::vector<int>& facingDirection);
         std::string calculateActionNew(Action* actionVector);
         int checkMsgSent(std::string stmMsg);
-        int sendCalibrateToSTM();
+        int sendSingleMessageToSTM(string messageToSend);
         void endConnection();
 };
 

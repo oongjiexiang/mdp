@@ -238,7 +238,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
             andMsg = generateAndroidMessage(x1,y1,facingDirection1,checkMsgSent(stmMsg));
             andMsg = encodeMessage(1,andMsg);
             //wait for a short time before sending another message to android to prevent crashing
-            this_thread::sleep_for(500ms);
+            this_thread::sleep_for(400ms);
             sendMessage(andMsg);
 
             if(androidMessageIndex+2>=noOfStates){
@@ -348,10 +348,10 @@ int Network::sendEndToAndroid(){
 
 
 //end of search, tell android to stop
-int Network::sendCalibrateToSTM(){
+int Network::sendSingleMessageToSTM(string messageToSend){
     string message="";
     string replyMessage = "";
-    message = encodeMessage(2,"n");
+    message = encodeMessage(2,messageToSend);
     sendMessage(message);
     while(true){
         replyMessage="";

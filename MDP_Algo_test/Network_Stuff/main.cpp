@@ -32,7 +32,6 @@ int main()
     cout << resultSize << endl;
     vector<State*> states;
     vector<Action*> actions;
-    // new
     ActionFormulator* af = new FormulatorShorten();
 
     //iterate through the paths to the obstacles
@@ -47,7 +46,8 @@ int main()
         printf("\n=========2nd path function============\n\n");
         n.sendCombinedActionPath(states,stateSize,actions);
         n.sendObstacleIdToAndroid(result[i].first.id);
-        //n.sendCalibrateToSTM();
+        //n.sendSingleMessageToSTM("f010");
+        n.sendSingleMessageToSTM("n");
         n.sendTakePhoto();
     }
     n.sendEndToAndroid();
