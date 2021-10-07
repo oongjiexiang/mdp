@@ -40,17 +40,23 @@ State* aStar::generateGoalState(Obstacle obstacle){
     int goalXGrid = obstacle.xGrid + ((int)cos(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
     int goalYGrid = obstacle.yGrid + ((int)sin(M_PI/180*obstacle.face_direction))*ROBOT_VIEWING_GRID_LENGTH;
     if(!grid->isValidGrid(goalXGrid, goalYGrid)){
-        throw(nullptr);
+        cout << "grid at " << goalXGrid << ", " << goalYGrid << " is not empty. Check with the position near to obstacle is available" << endl;
+        goalXGrid = obstacle.xGrid + ((int)cos(M_PI/180*obstacle.face_direction))*(ROBOT_VIEWING_GRID_LENGTH - 1);
+        goalYGrid = obstacle.yGrid + ((int)sin(M_PI/180*obstacle.face_direction))*(ROBOT_VIEWING_GRID_LENGTH - 1);
+        if(!grid->isValidGrid(goalXGrid, goalYGrid)){
+            cout << "Position near obstacle is also not available. Last check: 40cm from obstacle" << endl;
+            goalXGrid = obstacle.xGrid + ((int)cos(M_PI/180*obstacle.face_direction))*(ROBOT_VIEWING_GRID_LENGTH + 1);
+            goalYGrid = obstacle.yGrid + ((int)sin(M_PI/180*obstacle.face_direction))*(ROBOT_VIEWING_GRID_LENGTH + 1);
+            if(!grid->isValidGrid(goalXGrid, goalYGrid)){
+                cout << "fail to find goal state. Hamiltonian path cannot be found" << endl;
+                throw(nullptr);
+            }
+        }
     }
+    // create goal state
     Vertex* goalPosition = grid->findVertexByGrid(goalXGrid, goalYGrid);
     int goalFaceDirection = (obstacle.face_direction + 180)%360;
     State* goalState = new State(goalPosition, goalFaceDirection, nullptr);
-
-//     debug
-//    cout << "ROBOT_VIEWING_GRID_LENGTH = " << ROBOT_VIEWING_GRID_LENGTH << endl;
-//    cout << cos(M_PI/180*obstacle.face_direction) << " " << sin(M_PI/180*obstacle.face_direction) << endl;
-//    cout << "goal state is" << endl;
-//    goalState->printState();
     return goalState;
 }
 
@@ -64,12 +70,12 @@ bool aStar::isDestination(const State& curState, const State& goalState){
 float aStar::calculateHValue(State& curState, State& goalState){  // tochange
     float hCost = 0;
     hCost = hCost + abs(goalState.position->xGrid - curState.position->xGrid) + abs(goalState.position->yGrid - curState.position->yGrid);
-    if((goalState.face_direction == curState.face_direction == 0 && goalState.position->xGrid + 1 == curState.position->xGrid && goalState.position->yGrid == curState.position->yGrid)
-        || (goalState.face_direction == curState.face_direction == 90 && goalState.position->yGrid + 1 == curState.position->yGrid && goalState.position->xGrid == curState.position->xGrid)
-        || (goalState.face_direction == curState.face_direction == 180 && goalState.position->xGrid - 1 == curState.position->xGrid && goalState.position->yGrid == curState.position->yGrid)
-        || (goalState.face_direction == curState.face_direction == 270 && goalState.position->yGrid - 1 == curState.position->yGrid && goalState.position->xGrid == curState.position->xGrid)
+    if((goalState.face_direction == 0 && curState.face_direction == 0 && goalState.position->xGrid + 1 == curState.position->xGrid && goalState.position->yGrid == curState.position->yGrid)
+        || (goalState.face_direction == 90 && curState.face_direction == 90 && goalState.position->yGrid + 1 == curState.position->yGrid && goalState.position->xGrid == curState.position->xGrid)
+        || (goalState.face_direction == 180 && curState.face_direction == 180 && goalState.position->xGrid - 1 == curState.position->xGrid && goalState.position->yGrid == curState.position->yGrid)
+        || (goalState.face_direction == 270 && curState.face_direction == 270 && goalState.position->yGrid - 1 == curState.position->yGrid && goalState.position->xGrid == curState.position->xGrid)
     ){
-        hCost+=50;  // penalise the algo when it is nearly touching the obstacle
+        hCost+=20;  // penalise the algo when it is nearly touching the obstacle
     }
     return hCost;
 }
@@ -147,7 +153,6 @@ State* aStar::search(State* initState, Obstacle& dest, float* pathCost, vector<S
 
     // 3. Set up initial state
     Vertex* position = initState->position;
-    position->safe = true;
     initState->gCost = initState->hCost = 0.0;
     initState->prevState = nullptr;
     cellDetails[position->xGrid + maxDistFromBorder][position->yGrid + maxDistFromBorder][faceDirection] = initState;  // mark as visited

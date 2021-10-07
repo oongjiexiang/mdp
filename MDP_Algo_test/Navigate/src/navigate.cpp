@@ -24,7 +24,7 @@ void Navigate::run(){
         int newYGrid = curPosition->yGrid + (int)(sin(M_PI/180*curState->face_direction));
         int newXGrid = curPosition->xGrid + (int)(cos(M_PI/180*curState->face_direction));
         bool reachBorder = false;
-        if(!reachBorder && !grid.getVertexArray()[newXGrid][newYGrid]->safe){   // if that grid is still not visited
+        //if(!reachBorder && !grid.getVertexArray()[newXGrid][newYGrid]->safe){   // if that grid is still not visited
             curState = forward->takeAction(curState, grid);
         }
     }

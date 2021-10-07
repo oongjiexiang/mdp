@@ -243,34 +243,34 @@ std::string avoidObstacle(std::string sensorMessage){
 //define a set pattern that the robot will travel in if the image deteced is a bullseye image and check that the image is on the target obstacle, returns instructions to move the robot
 //change image detected into string corresponding to the message that RPi sends us
 //***REFER TO COMMAND LIST TO SEE WHAT THE INSTRUCTIONS MEAN
-std::string aroundObstacleTillDetect(char imageDetected, Vertex targetVertex, Robot robot){
-    std::string instructions;
-    int facesChecked;
-    facesChecked = 0;
-    //if image is not found, eg. robot did not detect an image even though it is at an obstacle
-    if(imageDetected == 'A'){
-        instructions = "f";
-        //if still not detected go to another obstacle
-    }
-    //check the 4 faces of an obstacle and return to original position
-    //move to check the image on the right until the robot is back to it's original position
-    else if(imageDetected == 'B'){
-        while(facesChecked!=4){
-        //perhaps instead of hardcoding the reaction, perform A* search given the new target location
-
-        //move robot to the right face
-        //reverse10,right90,reverse10x2,left90,reverse10x3,left90,forward10
-        instructions = "f|h|f|f|i|f|f|f|i|b";
-
-        facesChecked++;
-        }
-    }
-    //image found, reverse robot slightly
-    else if(imageDetected == 'C'){
-        instructions = "e";
-    }
-    return instructions;
-}
+//std::string aroundObstacleTillDetect(char imageDetected, Vertex targetVertex, Robot robot){
+//    std::string instructions;
+//    int facesChecked;
+//    facesChecked = 0;
+//    //if image is not found, eg. robot did not detect an image even though it is at an obstacle
+//    if(imageDetected == 'A'){
+//        instructions = "f";
+//        //if still not detected go to another obstacle
+//    }
+//    //check the 4 faces of an obstacle and return to original position
+//    //move to check the image on the right until the robot is back to it's original position
+//    else if(imageDetected == 'B'){
+//        while(facesChecked!=4){
+//        //perhaps instead of hardcoding the reaction, perform A* search given the new target location
+//
+//        //move robot to the right face
+//        //reverse10,right90,reverse10x2,left90,reverse10x3,left90,forward10
+//        instructions = "f|h|f|f|i|f|f|f|i|b";
+//
+//        facesChecked++;
+//        }
+//    }
+//    //image found, reverse robot slightly
+//    else if(imageDetected == 'C'){
+//        instructions = "e";
+//    }
+//    return instructions;
+//}
 
 /*
 std::string translateAction(Action currentAction){
