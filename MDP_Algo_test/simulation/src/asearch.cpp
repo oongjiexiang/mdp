@@ -64,6 +64,13 @@ bool aStar::isDestination(const State& curState, const State& goalState){
 float aStar::calculateHValue(State& curState, State& goalState){  // tochange
     float hCost = 0;
     hCost = hCost + abs(goalState.position->xGrid - curState.position->xGrid) + abs(goalState.position->yGrid - curState.position->yGrid);
+    if((goalState.face_direction == curState.face_direction == 0 && goalState.position->xGrid + 1 == curState.position->xGrid && goalState.position->yGrid == curState.position->yGrid)
+        || (goalState.face_direction == curState.face_direction == 90 && goalState.position->yGrid + 1 == curState.position->yGrid && goalState.position->xGrid == curState.position->xGrid)
+        || (goalState.face_direction == curState.face_direction == 180 && goalState.position->xGrid - 1 == curState.position->xGrid && goalState.position->yGrid == curState.position->yGrid)
+        || (goalState.face_direction == curState.face_direction == 270 && goalState.position->yGrid - 1 == curState.position->yGrid && goalState.position->xGrid == curState.position->xGrid)
+    ){
+        hCost+=50;  // penalise the algo when it is nearly touching the obstacle
+    }
     return hCost;
 }
 
