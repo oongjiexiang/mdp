@@ -78,21 +78,21 @@ int main(){
     // map.printMap();
 
     //**************** test asearch.cpp ***************
-    // vector<Obstacle> obstacles;
-    // obstacles.push_back(Obstacle(1, 8, 19, 90));
-    // Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
-    // State* initState = new State(initPosition, 90, nullptr);
-    // aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
+    vector<Obstacle> obstacles;
+    obstacles.push_back(Obstacle(1, 8, 19, 90));
+    Vertex* initPosition = new Vertex(ROBOT_INIT_X_GRID, ROBOT_INIT_Y_GRID);
+    State* initState = new State(initPosition, 90, nullptr);
+    aStar* astar = new aStar(obstacles, FROM_BORDER_GRID_LENGTH);
     
-    // float pathCost = 0;
-    // vector<State*> resultStates;
-    // astar->search(initState, obstacles[0], &pathCost, &resultStates);
+    float pathCost = 0;
+    vector<State*> resultStates;
+    astar->search(initState, obstacles[0], &pathCost, &resultStates);
     
-    // cout << "-----------path--------------" << endl;
-    // for(int i = 0; i < resultStates.size(); i++){
-    //     resultStates[i]->printState();
-    // }
-    // cout << pathCost << endl;
+    cout << "-----------path--------------" << endl;
+    for(int i = 0; i < resultStates.size(); i++){
+        resultStates[i]->printState();
+    }
+    cout << pathCost << endl;
 
     //*******************test pathPlanning.cpp ****************
     // vector<Obstacle> obstacles;
