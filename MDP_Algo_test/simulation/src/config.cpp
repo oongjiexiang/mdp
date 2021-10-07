@@ -31,7 +31,7 @@ void Map::addObstacle(Obstacle* o){
     for(int j = -boundaryGridCount; j <= boundaryGridCount; j++){
         for(int k = -boundaryGridCount; k <= boundaryGridCount; k++){
             try{
-                grids.at(o->xGrid + j + distFromBorderAllowed).at(o->yGrid + k + distFromBorderAllowed)->is_border = 
+                grids.at(o->xGrid + j + distFromBorderAllowed).at(o->yGrid + k + distFromBorderAllowed)->is_border =
                 grids.at(o->xGrid + j + distFromBorderAllowed).at(o->yGrid + k + distFromBorderAllowed)->is_obstacle? false: true;
             }
             catch(out_of_range& e){}
@@ -51,13 +51,17 @@ Vertex* Map::findVertexByGrid(int xGrid, int yGrid){
 }
 
 bool Map::isValidCoor(float x_center, float y_center){
-    return (x_center < AREA_LENGTH + (distFromBorderAllowed - 0.5)*UNIT_LENGTH && y_center < AREA_LENGTH + (distFromBorderAllowed - 0.5)*UNIT_LENGTH 
+    return (x_center < AREA_LENGTH + (distFromBorderAllowed - 0.5)*UNIT_LENGTH && y_center < AREA_LENGTH + (distFromBorderAllowed - 0.5)*UNIT_LENGTH
     && x_center >= -(distFromBorderAllowed - 0.5)*UNIT_LENGTH && y_center >= -(distFromBorderAllowed - 0.5)*UNIT_LENGTH);
 }
 
 bool Map::isValidGrid(int xGrid, int yGrid){    // 7 Oct 2021: to disable robot center to be on the edge during search, will return false
-    return (yGrid > -distFromBorderAllowed && xGrid > -distFromBorderAllowed && 
-        yGrid < Y_GRID_COUNT + distFromBorderAllowed - 1 && 
+    bool somebool = (yGrid > -distFromBorderAllowed && xGrid > -distFromBorderAllowed &&
+        yGrid < Y_GRID_COUNT + distFromBorderAllowed - 1 &&
+        xGrid < X_GRID_COUNT + distFromBorderAllowed - 1);
+    printf("isvalidgrid x %d,y %d,bool %d\n",xGrid, yGrid,somebool);
+    return (yGrid > -distFromBorderAllowed && xGrid > -distFromBorderAllowed &&
+        yGrid < Y_GRID_COUNT + distFromBorderAllowed - 1 &&
         xGrid < X_GRID_COUNT + distFromBorderAllowed - 1);
 }
 
