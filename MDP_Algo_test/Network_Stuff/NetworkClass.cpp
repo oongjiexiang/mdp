@@ -373,8 +373,8 @@ int Network::readAndGenerateObstacles(vector<Obstacle>& obstacles){
     int noOfObstacles = 0;
     string msg = "";
     //test message, remove later
-//    msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
-//    convertAndroidMessage(msg,xVector,yVector,fVector);
+    //msg = "5.5,9.5,S;7.5,14.5,W;12.5,9,E;15.5,15.5,S;15.5,4.5,W;\n";
+    //convertAndroidMessage(msg,xVector,yVector,fVector);
     while(true){
         receiveMessage();
         msg = decodeMessage();

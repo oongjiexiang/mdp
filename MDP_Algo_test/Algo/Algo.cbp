@@ -5,7 +5,6 @@
 		<Option title="Algo" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Navigate/include/;Network_Stuff/" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/Simulate" prefix_auto="1" extension_auto="1" />
@@ -49,9 +48,7 @@
 		</Compiler>
 		<Unit filename="../Navigate/include/actionFormulator.h" />
 		<Unit filename="../Navigate/src/actionFormulator.cpp" />
-		<Unit filename="../Network_Stuff/NetworkClass.cpp">
-			<Option virtualFolder="Network_Stuff/" />
-		</Unit>
+		<Unit filename="../Network_Stuff/NetworkClass.cpp" />
 		<Unit filename="../Network_Stuff/NetworkClass.h" />
 		<Unit filename="../Network_Stuff/main.cpp" />
 		<Unit filename="../Simulation/include/action.h" />
