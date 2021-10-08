@@ -21,7 +21,7 @@ const float UNIT_LENGTH = 10;
 const int Y_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH;
 const int X_GRID_COUNT = AREA_LENGTH/UNIT_LENGTH;
 const float OBSTACLE_LENGTH = 10;
-const float BOUNDARY_SIZE = 20;    // originally 15. Temporarily changed to 15 for Qt testing
+const float BOUNDARY_SIZE = 10;    // originally 15. Temporarily changed to 15 for Qt testing
 const int ROBOT_VIEWING_GRID_LENGTH = ROBOT_VIEWING/UNIT_LENGTH;
 
 //used for obstacle avoidance

@@ -238,7 +238,7 @@ bool Network::sendCombinedActionPath(vector<State*>& vectorOfStates, int noOfSta
             andMsg = generateAndroidMessage(x1,y1,facingDirection1,checkMsgSent(stmMsg));
             andMsg = encodeMessage(1,andMsg);
             //wait for a short time before sending another message to android to prevent crashing
-            this_thread::sleep_for(500ms);
+            this_thread::sleep_for(1000ms);
             sendMessage(andMsg);
 
             if(androidMessageIndex+2>=noOfStates){

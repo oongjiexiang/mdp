@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <thread>
 #include "NetworkClass.h"
 #include "action.h"
 #include "pathPlanning.h"
@@ -42,15 +44,17 @@ int main()
         states = result[i].second;
         actions=af->convertToActualActions(states);
         stateSize = static_cast<int>(states.size());
-        printf("\n=========step path=============\n\n");
+        //printf("\n=========step path=============\n\n");
         //n.sendPath(states,stateSize,actions);
         printf("\n=========2nd path function============\n\n");
         n.sendCombinedActionPath(states,stateSize,actions);
+        this_thread::sleep_for(1000ms);
         n.sendObstacleIdToAndroid(result[i].first.id);
         //n.sendSingleMessageToSTM("f010");
         //n.sendSingleMessageToSTM("n");
         n.sendTakePhoto();
     }
+    this_thread::sleep_for(1000ms);
     n.sendEndToAndroid();
     n.endConnection();
     return 0;

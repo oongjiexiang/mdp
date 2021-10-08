@@ -32,8 +32,8 @@ void aStar::generatePossibleActions(Obstacle obstacle){
     possibleActions.push_back(rightOnSpot);
     possibleActions.push_back(left);
     possibleActions.push_back(right);
-    //possibleActions.push_back(reverseLeft);
-    //possibleActions.push_back(reverseRight);
+    possibleActions.push_back(reverseLeft);
+    possibleActions.push_back(reverseRight);
 }
 
 State* aStar::generateGoalState(Obstacle obstacle){
