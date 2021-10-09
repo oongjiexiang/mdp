@@ -103,10 +103,8 @@ void Hamiltonian::setupControlPanel()
 void Hamiltonian::obstacleInput(){
     int yGrid = sender()->property("yGrid").toInt();
     int xGrid = sender()->property("xGrid").toInt();
-    qDebug().nospace() << qPrintable(QString::number(xGrid)) << " " << qPrintable(QString::number(yGrid));
     for(unsigned int i = 0; i < obstacles.size(); i++){
         if(obstacles[i]->yGrid == yGrid && obstacles[i]->xGrid == xGrid){
-            qDebug() << qPrintable(QString::number((int)(obstacles[i]->face_direction)));
             switch((int)(obstacles[i]->face_direction)){
             case 90:
                 buttons[xGrid][yGrid]->setText("W");

@@ -58,19 +58,8 @@ void ShortestPath::pathForObstacle_6(vector<ActionListPerObstacle>& resultPath){
             minPathIndex = i;
         }
     }
+    cout << "Path found!" << endl;
     cout << "min path = " << minPathDist << endl;
-    // for(int i = 0; i < pathSolutionList[minPathIndex].size(); i++){
-    //     ActionListPerObstacle alpo = pathSolutionList[minPathIndex][i];
-    //     Obstacle o = alpo.first;
-    //     vector<State*> states = alpo.second;
-    //     cout << "going to obstacle *****************" << endl;
-    //     o.printObstacle();
-    //     for(int j = 0; j < states.size(); j++){
-    //         states[j]->printState();
-    //     }
-    //     cout << "obstacle is visited*****************" << endl;
-    //     cout << endl;
-    // }
     resultPath = pathSolutionList[minPathIndex];
 }
 
