@@ -10,13 +10,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -24,9 +24,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
 import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
-import com.example.mdp_android_grp15.ui.main.CommsFragment;
+import com.example.mdp_android_grp15.ui.main.BluetoothChatFragment;
+import com.example.mdp_android_grp15.ui.main.ControlFragment;
 import com.example.mdp_android_grp15.ui.main.GridMap;
-import com.example.mdp_android_grp15.ui.main.MapInformation;
 import com.example.mdp_android_grp15.ui.main.MapTabFragment;
 import com.example.mdp_android_grp15.ui.main.ReconfigureFragment;
 import com.example.mdp_android_grp15.ui.main.SectionsPagerAdapter;
@@ -38,7 +38,11 @@ import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.util.ResourceBundle;
 import java.util.UUID;
+
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,8 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private static Context context;
 
     private static GridMap gridMap;
+    private ControlFragment controlFragment;
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
-    static TextView robotStatusTextView;
+    static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice, exploreTime;
     static Button f1, f2;
     static Button upBtn, downBtn, leftBtn, rightBtn;
     Button reconfigure;
@@ -60,7 +65,12 @@ public class MainActivity extends AppCompatActivity {
     private static UUID myUUID;
     ProgressDialog myDialog;
 
+    int count=0;
+    String obstacleID = "";
+    String imageID = "";
+
     private static final String TAG = "Main Activity";
+    public static boolean stopTimerFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Bluetooth Status
+        bluetoothStatus = findViewById(R.id.bluetoothStatus);
+        bluetoothDevice = findViewById(R.id.bluetoothConnectedDevice);
+
 
         // Map
         gridMap = new GridMap(this);
@@ -118,6 +132,9 @@ public class MainActivity extends AppCompatActivity {
         xAxisTextView = findViewById(R.id.xAxisTextView);
         yAxisTextView = findViewById(R.id.yAxisTextView);
         directionAxisTextView = findViewById(R.id.directionAxisTextView);
+
+        // ControlFragment for Timer
+        controlFragment = new ControlFragment();
 
         // initialize ITEM_LIST and imageBearings strings
         for (int i = 0; i < 20; i++) {
@@ -132,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
         downBtn = findViewById(R.id.downBtn);
         leftBtn = findViewById(R.id.leftBtn);
         rightBtn = findViewById(R.id.rightBtn);
+
 
         // Robot Status
         robotStatusTextView = findViewById(R.id.robotStatus);
@@ -213,13 +231,19 @@ public class MainActivity extends AppCompatActivity {
     public static Button getLeftBtn() { return leftBtn; }
     public static Button getRightBtn() { return rightBtn; }
 
+
+    public static TextView getBluetoothStatus() { return bluetoothStatus; }
+    public static TextView getConnectedDevice() { return bluetoothDevice; }
+
     public static void sharedPreferences() {
         sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
         editor = sharedPreferences.edit();
     }
 
     // Send message to bluetooth
-    public static void printMessage(String message) {
+    public static void
+
+    printMessage(String message) {
         showLog("Entering printMessage");
         editor = sharedPreferences.edit();
 
@@ -228,11 +252,14 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnectionService.write(bytes);
         }
         showLog(message);
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message", BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
         showLog("Exiting printMessage");
     }
+
+    // Store received message into string
+
 
     public static void printMessage(String name, int x, int y) throws JSONException {
         showLog("Entering printMessage");
@@ -253,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
                 message = "Unexpected default for printMessage: " + name;
                 break;
         }
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message", BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
@@ -263,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void refreshMessageReceived() {
-        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+        BluetoothChatFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
     }
 
 
@@ -331,11 +358,88 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    // message handler
+    // alg sends x,y,robotDirection,movementAction
+    // alg sends ALG,<obstacle id>
+    // rpi sends RPI,<image id>
     BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("receivedMessage");
             showLog("receivedMessage: message --- " + message);
+
+            if(message.contains(",")) {
+                String[] cmd = message.split(",");
+
+                // check if string is cmd sent by ALG/RPI to get obstacle/image id
+                if (cmd[0].equals("ALG") || cmd[0].equals("RPI")) {
+                    showLog("cmd[0] is ALG or RPI");
+                    if(obstacleID.equals(""))
+                        obstacleID = cmd[0].equals("ALG") ? cmd[1] : "";
+                    if(imageID.equals(""))
+                        imageID = cmd[0].equals("RPI") ? cmd[1] : "";
+
+                    showLog("obstacleID = " + obstacleID);
+                    showLog("imageID = " + imageID);
+
+                    // call update fn only when both IDs are obtained
+                    if (!(obstacleID.equals("") || imageID.equals(""))) {
+                        showLog("imageID and obstacleID not empty");
+                        gridMap.updateIDFromRpi(obstacleID, imageID);
+                        obstacleID = "";
+                        imageID = "";
+                    }
+                } else {
+
+                    // alg sends in cm and float e.g. 100,100,N
+                    float x = Integer.parseInt(cmd[0]);
+                    float y = Integer.parseInt(cmd[1]);
+
+                    // process received figures to pass into our fn
+                    int a = Math.round(x);
+                    int b = Math.round(y);
+                    a = (a / 10) + 1;
+                    b = (b / 10) + 1;
+
+                    String direction = cmd[2];
+
+                    // update robot pos from cmds sent by algo
+//                    if (cmd.length == 3) {
+//                        gridMap.performAlgoCommand(a, b, direction);
+//                    }
+
+                    // allow robot to show up on grid if its on the very boundary
+                    if (a == 1) a++;
+                    if (b == 20) b--;
+
+                    if (cmd.length == 4){
+                        String command = cmd[3];
+
+                        // if move forward, reverse, turn on the spot left/right
+                        if (command.equals("f") || command.equals("r") || command.equals("sr")
+                            || command.equals("sl")) {
+                            showLog("forward, reverse or turn on spot");
+                            gridMap.performAlgoCommand(a, b, direction);
+                        }
+                        // for all other turning cmds
+                        else {
+                            gridMap.performAlgoTurning(a, b, direction, command);
+                        }
+                    }
+                }
+            }
+            else if (message.equals("END")) {
+                // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
+                // end the corresponding timer
+                ToggleButton exploreButton = findViewById(R.id.exploreToggleBtn2);
+                if (exploreButton.isChecked()) {
+                    showLog("explorebutton is checked");
+                    stopTimerFlag = true;
+                    exploreButton.setChecked(false);
+                    robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
+                }
+            }
+
             try {
                 if (message.length() > 7 && message.substring(2,6).equals("grid")) {
                     String resultString = "";

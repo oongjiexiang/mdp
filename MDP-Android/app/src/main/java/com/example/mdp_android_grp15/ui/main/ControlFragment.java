@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,7 +44,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     Button moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn;
     ImageButton exploreResetButton, fastestResetButton;
     private static long exploreTimer, fastestTimer;
-    ToggleButton exploreButton, fastestButton;
+    public static ToggleButton exploreButton, fastestButton;
     TextView exploreTimeTextView, fastestTimeTextView, robotStatusTextView;
     Switch phoneTiltSwitch;
     static Button calibrateButton;
@@ -56,9 +55,9 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
 
     // Timer
-    static Handler timerHandler = new Handler();
+    public static Handler timerHandler = new Handler();
 
-    Runnable timerRunnableExplore = new Runnable() {
+    public Runnable timerRunnableExplore = new Runnable() {
         @Override
         public void run() {
             long millisExplore = System.currentTimeMillis() - exploreTimer;
@@ -66,13 +65,14 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             int minutesExplore = secondsExplore / 60;
             secondsExplore = secondsExplore % 60;
 
-            exploreTimeTextView.setText(String.format("%02d:%02d", minutesExplore, secondsExplore));
-
-            timerHandler.postDelayed(this, 500);
+            if (MainActivity.stopTimerFlag == false) {
+                exploreTimeTextView.setText(String.format("%02d:%02d", minutesExplore, secondsExplore));
+                timerHandler.postDelayed(this, 500);
+            }
         }
     };
 
-    Runnable timerRunnableFastest = new Runnable() {
+    public Runnable timerRunnableFastest = new Runnable() {
         @Override
         public void run() {
             long millisFastest = System.currentTimeMillis() - fastestTimer;
@@ -154,7 +154,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                         updateStatus("moving forward");
                     else
                         updateStatus("Unable to move forward");
-                    MainActivity.printMessage("W1|");
+                    MainActivity.printMessage("STM|b \n");
                 }
                 else
                     updateStatus("Please press 'STARTING POINT'");
@@ -171,7 +171,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 else if (gridMap.getCanDrawRobot() && !gridMap.getAutoUpdate()) {
                     gridMap.moveRobot("right");
                     MainActivity.refreshLabel();
-                    MainActivity.printMessage("D|");
+                    MainActivity.printMessage("STM|j  / \n");
                 }
                 else
                     updateStatus("Please press 'STARTING POINT'");
@@ -192,7 +192,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                         updateStatus("moving backward");
                     else
                         updateStatus("Unable to move backward");
-                    MainActivity.printMessage("S1|");
+                    MainActivity.printMessage("STM|f \n");
                 }
                 else
                     updateStatus("Please press 'STARTING POINT'");
@@ -210,7 +210,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     gridMap.moveRobot("left");
                     MainActivity.refreshLabel();
                     updateStatus("turning left");
-                    MainActivity.printMessage("A|");
+                    MainActivity.printMessage("STM|i \n");
                 }
                 else
                     updateStatus("Please press 'STARTING POINT'");
@@ -223,15 +223,19 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             public void onClick(View v) {
                 showLog("Clicked exploreToggleBtn");
                 ToggleButton exploreToggleBtn = (ToggleButton) v;
-                if (exploreToggleBtn.getText().equals("EXPLORE")) {
-                    showToast("Exploration timer stop!");
-                    robotStatusTextView.setText("Exploration Stopped");
+
+                if (exploreToggleBtn.getText().equals("WK8 START")) {
+                    showToast("Auto Movement/ImageRecog timer stop!");
+                    robotStatusTextView.setText("Auto Movement Stopped");
                     timerHandler.removeCallbacks(timerRunnableExplore);
                 }
                 else if (exploreToggleBtn.getText().equals("STOP")) {
-                    showToast("Exploration timer start!");
-                    MainActivity.printMessage("ES|");
-                    robotStatusTextView.setText("Exploration Started");
+                    String msg = gridMap.getObstacles();
+                    MainActivity.printMessage(msg);
+                    MainActivity.stopTimerFlag = false;
+                    showToast("Auto Movement/ImageRecog timer start!");
+//                    MainActivity.printMessage("ES|");
+                    robotStatusTextView.setText("Auto Movement Started");
                     exploreTimer = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnableExplore, 0);
                 }
@@ -247,15 +251,15 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             public void onClick(View v) {
                 showLog("Clicked fastestToggleBtn");
                 ToggleButton fastestToggleBtn = (ToggleButton) v;
-                if (fastestToggleBtn.getText().equals("FASTEST")) {
-                    showToast("Fastest timer stop!");
-                    robotStatusTextView.setText("Fastest Path Stopped");
+                if (fastestToggleBtn.getText().equals("WK9 START")) {
+                    showToast("Fastest car timer stop!");
+                    robotStatusTextView.setText("Fastest Car Stopped");
                     timerHandler.removeCallbacks(timerRunnableFastest);
                 }
                 else if (fastestToggleBtn.getText().equals("STOP")) {
-                    showToast("Fastest timer start!");
-                    MainActivity.printMessage("FS|");
-                    robotStatusTextView.setText("Fastest Path Started");
+                    showToast("Fastest car timer start!");
+//                    MainActivity.printMessage("FS|");
+                    robotStatusTextView.setText("Fastest Car Started");
                     fastestTimer = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnableFastest, 0);
                 }
@@ -268,7 +272,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             @Override
             public void onClick(View v) {
                 showLog("Clicked exploreResetImageBtn");
-                showToast("Reseting exploration time...");
+                showToast("Resetting exploration time...");
                 exploreTimeTextView.setText("00:00");
                 robotStatusTextView.setText("Not Available");
                 if(exploreButton.isChecked())
@@ -301,7 +305,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     if(phoneTiltSwitch.isChecked()){
                         showToast("Tilt motion control: ON");
                         phoneTiltSwitch.setPressed(true);
-
                         mSensorManager.registerListener(ControlFragment.this, mSensor, mSensorManager.SENSOR_DELAY_NORMAL);
                         sensorHandler.post(sensorDelay);
                     }else{
@@ -326,7 +329,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 }
             }
         });
-
         calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -413,7 +415,14 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         toast.show();
     }
 
-    public static Button getCalibrateButton() {
-        return calibrateButton;
+    public void stopTimer() {
+        timerHandler.removeCallbacks(timerRunnableExplore);
     }
+
+    public static ToggleButton getwk8Btn(){ return exploreButton; }
+    public static Handler getTimerHandler() { return timerHandler; }
+    public static long getExploreTimer() { return exploreTimer; }
+
+    public Runnable getwk8TimerRunnable() { return timerRunnableExplore; }
+
 }

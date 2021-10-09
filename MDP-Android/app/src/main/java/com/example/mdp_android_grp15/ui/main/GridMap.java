@@ -1,8 +1,11 @@
 package com.example.mdp_android_grp15.ui.main;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,13 +14,19 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,21 +40,26 @@ import com.example.mdp_android_grp15.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.mdp_android_grp15.Constants.*;
+
 public class GridMap extends View {
 
     public GridMap(Context c) {
         super(c);
         initMap();
+        setWillNotDraw(false);
     }
 
     SharedPreferences sharedPreferences;
 
+    final GridMap gridMap = (GridMap) findViewById(R.id.mapView);
     private Paint blackPaint = new Paint();
     private Paint whitePaint = new Paint();
     private Paint redPaint = new Paint();
@@ -116,10 +130,11 @@ public class GridMap extends View {
         redPaint.setColor(Color.RED);
         redPaint.setStrokeWidth(8);
         obstacleColor.setColor(Color.BLACK);
-        robotColor.setColor(Color.GREEN);
+        robotColor.setColor(Color.YELLOW);
+        robotColor.setStrokeWidth(2);
         endColor.setColor(Color.RED);
         startColor.setColor(Color.CYAN);
-        waypointColor.setColor(Color.YELLOW);
+        waypointColor.setColor(Color.GREEN);
         unexploredColor.setColor(Color.LTGRAY);
         exploredColor.setColor(Color.WHITE);
         arrowColor.setColor(Color.BLACK);
@@ -137,10 +152,11 @@ public class GridMap extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         showLog("Entering onDraw");
+        showLog("canDrawRobot = " + String.valueOf(getCanDrawRobot()));
         super.onDraw(canvas);
         showLog("Redrawing map");
 
-        //CREATE CELL COORDINATES
+        // CREATE CELL COORDINATES
         Log.d(TAG,"Creating Cell");
 
         if (!mapDrawn) {
@@ -163,35 +179,42 @@ public class GridMap extends View {
         drawArrow(canvas, arrowCoord);
         drawObstacles(canvas);
 
-//        showLog("ITEM_LIST size is " + ITEM_LIST.size());
-
         showLog("Exiting onDraw");
     }
 
-    // TODO: fix obstacle so it draws correctly
     // draws obstacle cells whenever map refreshes, pos/correct item selection is here
     private void drawObstacles(Canvas canvas) {
         showLog("Entering drawObstacles");
 
-        // draw image id
-        showLog("ITEM_LIST size = " + ITEM_LIST.size());
+//        showLog("ITEM_LIST size = " + ITEM_LIST.size());
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
-                canvas.drawText(ITEM_LIST.get(19-i)[j], cells[j+1][19-i].startX + ((cells[1][1].endX - cells[1][1].startX) / 2),
-                        cells[j+1][i].startY + ((cells[1][1].endY - cells[1][1].startY) / 2) + 10, whitePaint);
+                // draw image id
+                canvas.drawText(
+                        ITEM_LIST.get(19-i)[j],
+                        cells[j+1][19-i].startX + ((cells[1][1].endX - cells[1][1].startX) / 2),
+                        cells[j+1][i].startY + ((cells[1][1].endY - cells[1][1].startY) / 2) + 10,
+                        whitePaint);
 
+                // color the face direction
                 switch (imageBearings.get(19-i)[j]) {
                     case "North":
                         canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY,
                                 cells[j + 1][20 - i].endX, cells[j + 1][i].startY, redPaint);
                         break;
                     case "South":
-                        canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY + cellSize,
-                                cells[j + 1][20 - i].endX, cells[j + 1][i].startY + cellSize, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX,
+                                cells[j + 1][i].startY + cellSize,
+                                cells[j + 1][20 - i].endX,
+                                cells[j + 1][i].startY + cellSize,
+                                redPaint);
                         break;
                     case "East":
-                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i].startY,
-                                cells[j + 1][20 - i].startX + cellSize, cells[j + 1][i].endY, redPaint);
+                        canvas.drawLine(cells[j + 1][20 - i].startX + cellSize,
+                                cells[j + 1][i].startY,
+                                cells[j + 1][20 - i].startX + cellSize,
+                                cells[j + 1][i].endY,
+                                redPaint);
                         break;
                     case "West":
                         canvas.drawLine(cells[j + 1][20 - i].startX, cells[j + 1][i].startY,
@@ -201,35 +224,6 @@ public class GridMap extends View {
             }
         }
 
-        /*
-        // draw image bearing
-        showLog("imageBearings size = " + imageBearings.size());
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 20; j++) {
-                switch (imageBearings.get(19-i)[j]) {
-                    case "North":
-                        canvas.drawLine(cells[j+1][20-i].startX, cells[j+1][i+1].startY,
-                                cells[j+1][20-i].endX, cells[j+1][i+1].startY, redPaint);
-                        break;
-
-                    case "South":
-                        canvas.drawLine(cells[j+1][20-i].startX, cells[j+1][i+1].startY + cellSize,
-                                cells[j+1][20-i].endX, cells[j+1][i+1].startY + cellSize, redPaint);
-                        break;
-
-                    case "East":
-                        canvas.drawLine(cells[j+1][20-i].startX, cells[j+1][i+1].startY,
-                                cells[j+1][20-i].startX, cells[j+1][i+1].endY, redPaint);
-                        break;
-                    case "West":
-                        canvas.drawLine(cells[j+1][20-i].startX + cellSize, cells[j+1][i+1].startY,
-                                cells[j+1][20-i].startX + cellSize, cells[j+1][i+1].endY, redPaint);
-                        break;
-                }
-            }
-        }
-
-         */
         showLog("Exiting drawObstacles");
     }
 
@@ -240,14 +234,19 @@ public class GridMap extends View {
             for (int y = 0; y < ROW; y++)
                 for (int i = 0; i < this.getArrowCoord().size(); i++)
                     if (!cells[x][y].type.equals("image") && cells[x][y].getId() == -1) {
-                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
+                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX,
+                                cells[x][y].endY, cells[x][y].paint);
                     } else {
                         Paint textPaint = new Paint();
                         textPaint.setTextSize(20);
                         textPaint.setColor(Color.WHITE);
                         textPaint.setTextAlign(Paint.Align.CENTER);
-                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
-                        canvas.drawText(String.valueOf(cells[x][y].getId()),(cells[x][y].startX+cells[x][y].endX)/2, cells[x][y].endY + (cells[x][y].startY-cells[x][y].endY)/4, textPaint);
+                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX,
+                                cells[x][y].endY, cells[x][y].paint);
+                        canvas.drawText(String.valueOf(cells[x][y].getId()),
+                                (cells[x][y].startX+cells[x][y].endX)/2,
+                                cells[x][y].endY + (cells[x][y].startY-cells[x][y].endY)/4,
+                                textPaint);
                     }
 
         showLog("Exiting drawIndividualCell");
@@ -261,12 +260,22 @@ public class GridMap extends View {
 
     private void drawHorizontalLines(Canvas canvas) {
         for (int y = 0; y <= ROW; y++)
-            canvas.drawLine(cells[1][y].startX, cells[1][y].startY - (cellSize / 30), cells[20][y].endX, cells[20][y].startY - (cellSize / 30), blackPaint);
+            canvas.drawLine(
+                    cells[1][y].startX,
+                    cells[1][y].startY - (cellSize / 30),
+                    cells[20][y].endX,
+                    cells[20][y].startY - (cellSize / 30),
+                    blackPaint);
     }
 
     private void drawVerticalLines(Canvas canvas) {
         for (int x = 0; x <= COL; x++)
-            canvas.drawLine(cells[x][0].startX - (cellSize / 30) + cellSize, cells[x][0].startY - (cellSize / 30), cells[x][0].startX - (cellSize / 30) + cellSize, cells[x][19].endY + (cellSize / 30), blackPaint);
+            canvas.drawLine(
+                    cells[x][0].startX - (cellSize / 30) + cellSize,
+                    cells[x][0].startY - (cellSize / 30),
+                    cells[x][0].startX - (cellSize / 30) + cellSize,
+                    cells[x][19].endY + (cellSize / 30),
+                    blackPaint);
     }
 
     // this draws the axis numbers
@@ -274,47 +283,139 @@ public class GridMap extends View {
         showLog("Entering drawGridNumber");
         for (int x = 1; x <= COL; x++) {
             if (x > 9)
-                canvas.drawText(Integer.toString(x-1), cells[x][20].startX + (cellSize / 5), cells[x][20].startY + (cellSize / 3), blackPaint);
+                canvas.drawText(
+                        Integer.toString(x-1),
+                        cells[x][20].startX + (cellSize / 5),
+                        cells[x][20].startY + (cellSize / 3),
+                        blackPaint);
             else
-                canvas.drawText(Integer.toString(x-1), cells[x][20].startX + (cellSize / 3), cells[x][20].startY + (cellSize / 3), blackPaint);
+                canvas.drawText(
+                        Integer.toString(x-1),
+                        cells[x][20].startX + (cellSize / 3),
+                        cells[x][20].startY + (cellSize / 3),
+                        blackPaint);
         }
         for (int y = 0; y < ROW; y++) {
             if ((20 - y) > 9)
-                canvas.drawText(Integer.toString(19 - y), cells[0][y].startX + (cellSize / 2), cells[0][y].startY + (cellSize / 1.5f), blackPaint);
+                canvas.drawText(
+                        Integer.toString(19 - y),
+                        cells[0][y].startX + (cellSize / 2),
+                        cells[0][y].startY + (cellSize / 1.5f),
+                        blackPaint);
             else
-                canvas.drawText(Integer.toString(19 - y), cells[0][y].startX + (cellSize / 1.5f), cells[0][y].startY + (cellSize / 1.5f), blackPaint);
+                canvas.drawText(
+                        Integer.toString(19 - y),
+                        cells[0][y].startX + (cellSize / 1.5f),
+                        cells[0][y].startY + (cellSize / 1.5f),
+                        blackPaint);
         }
         showLog("Exiting drawGridNumber");
     }
 
     private void drawRobot(Canvas canvas, int[] curCoord) {
-        showLog("Entering drawRobot");
-        int androidRowCoord = this.convertRow(curCoord[1]);
-        for (int y = androidRowCoord; y <= androidRowCoord + 1; y++)
-            canvas.drawLine(cells[curCoord[0] - 1][y].startX, cells[curCoord[0] - 1][y].startY - (cellSize / 30), cells[curCoord[0] + 1][y].endX, cells[curCoord[0] + 1][y].startY - (cellSize / 30), robotColor);
-        for (int x = curCoord[0] - 1; x < curCoord[0] + 1; x++)
-            canvas.drawLine(cells[x][androidRowCoord - 1].startX - (cellSize / 30) + cellSize, cells[x][androidRowCoord - 1].startY, cells[x][androidRowCoord + 1].startX - (cellSize / 30) + cellSize, cells[x][androidRowCoord + 1].endY, robotColor);
 
-        switch (this.getRobotDirection()) {
-            case "up":
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord + 1].startX, cells[curCoord[0] - 1][androidRowCoord + 1].endY, (cells[curCoord[0]][androidRowCoord - 1].startX + cells[curCoord[0]][androidRowCoord - 1].endX) / 2, cells[curCoord[0]][androidRowCoord - 1].startY, blackPaint);
-                canvas.drawLine((cells[curCoord[0]][androidRowCoord - 1].startX + cells[curCoord[0]][androidRowCoord - 1].endX) / 2, cells[curCoord[0]][androidRowCoord - 1].startY, cells[curCoord[0] + 1][androidRowCoord + 1].endX, cells[curCoord[0] + 1][androidRowCoord + 1].endY, blackPaint);
-                break;
-            case "down":
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord - 1].startX, cells[curCoord[0] - 1][androidRowCoord - 1].startY, (cells[curCoord[0]][androidRowCoord + 1].startX + cells[curCoord[0]][androidRowCoord + 1].endX) / 2, cells[curCoord[0]][androidRowCoord + 1].endY, blackPaint);
-                canvas.drawLine((cells[curCoord[0]][androidRowCoord + 1].startX + cells[curCoord[0]][androidRowCoord + 1].endX) / 2, cells[curCoord[0]][androidRowCoord + 1].endY, cells[curCoord[0] + 1][androidRowCoord - 1].endX, cells[curCoord[0] + 1][androidRowCoord - 1].startY, blackPaint);
-                break;
-            case "right":
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord - 1].startX, cells[curCoord[0] - 1][androidRowCoord - 1].startY, cells[curCoord[0] + 1][androidRowCoord].endX, cells[curCoord[0] + 1][androidRowCoord - 1].endY + (cells[curCoord[0] + 1][androidRowCoord].endY - cells[curCoord[0] + 1][androidRowCoord - 1].endY) / 2, blackPaint);
-                canvas.drawLine(cells[curCoord[0] + 1][androidRowCoord].endX, cells[curCoord[0] + 1][androidRowCoord - 1].endY + (cells[curCoord[0] + 1][androidRowCoord].endY - cells[curCoord[0] + 1][androidRowCoord - 1].endY) / 2, cells[curCoord[0] - 1][androidRowCoord + 1].startX, cells[curCoord[0] - 1][androidRowCoord + 1].endY, blackPaint);
-                break;
-            case "left":
-                canvas.drawLine(cells[curCoord[0] + 1][androidRowCoord - 1].endX, cells[curCoord[0] + 1][androidRowCoord - 1].startY, cells[curCoord[0] - 1][androidRowCoord].startX, cells[curCoord[0] - 1][androidRowCoord - 1].endY + (cells[curCoord[0] - 1][androidRowCoord].endY - cells[curCoord[0] - 1][androidRowCoord - 1].endY) / 2, blackPaint);
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord].startX, cells[curCoord[0] - 1][androidRowCoord - 1].endY + (cells[curCoord[0] - 1][androidRowCoord].endY - cells[curCoord[0] - 1][androidRowCoord - 1].endY) / 2, cells[curCoord[0] + 1][androidRowCoord + 1].endX, cells[curCoord[0] + 1][androidRowCoord + 1].endY, blackPaint);
-                break;
-            default:
-                Toast.makeText(this.getContext(), "Error with drawing robot (unknown direction)", Toast.LENGTH_LONG).show();
-                break;
+
+        showLog("Entering drawRobot");
+//        int androidRowCoord = this.convertRow(curCoord[1]);
+        showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
+        int androidRowCoord = curCoord[1];
+
+        if ((androidRowCoord-1) < 0 || androidRowCoord > 19) {
+            showLog("row is out of bounds");
+            return;
+        } else if (curCoord[0] > 20 || curCoord[0] < 2) {
+            showLog("col is out of bounds");
+            return;
+        } else {
+            // draws the 2x2 squares in colour robotColor (green)
+            // horizontal lines
+            for (int y = androidRowCoord - 2; y <= androidRowCoord; y++) {
+                canvas.drawLine(
+                        cells[curCoord[0] - 1][21 - y - 2].startX,
+                        cells[curCoord[0]][21 - y - 2].startY,
+                        cells[curCoord[0]][21 - y - 2].endX,
+                        cells[curCoord[0]][21 - y - 2].startY,
+                        robotColor);
+            }
+            // vertical lines
+            for (int x = curCoord[0] - 2; x <= curCoord[0]; x++) {
+                canvas.drawLine(
+                        cells[x][21 - androidRowCoord - 1].endX,
+                        cells[x][21 - androidRowCoord - 1].endY,
+                        cells[x][21 - androidRowCoord - 1].endX,
+                        cells[x][21 - androidRowCoord - 2].startY,
+                        robotColor);
+            }
+
+//            if (getRobotDirection() == "None") {
+//                setRobotDirection();
+//            }
+
+            // use cells[initalCol][20 - initialRow] as ref
+            switch (this.getRobotDirection()) {
+                case "up":
+                    canvas.drawLine(
+                            cells[curCoord[0] - 1][20 - androidRowCoord].startX,
+                            cells[curCoord[0] - 1][20 - androidRowCoord].endY,
+                            cells[curCoord[0] - 1][20 - androidRowCoord].endX,
+                            cells[curCoord[0]][20 - androidRowCoord - 1].startY,
+                            blackPaint);
+                    canvas.drawLine(
+                            cells[curCoord[0]][21 - androidRowCoord].endX,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].endY,
+                            cells[curCoord[0] - 1][21 - androidRowCoord].endX,
+                            cells[curCoord[0]][21 - androidRowCoord - 2].startY,
+                            blackPaint);
+                    break;
+                case "down":
+                    canvas.drawLine(
+                            cells[curCoord[0]][21 - androidRowCoord].endX,
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 2].startY,
+                            cells[curCoord[0] - 1][21 - androidRowCoord].endX,
+                            cells[curCoord[0]][21 - androidRowCoord].startY,
+                            blackPaint);
+                    canvas.drawLine(
+                            cells[curCoord[0] - 2][21 - androidRowCoord].endX,
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 2].startY,
+                            cells[curCoord[0] - 1][21 - androidRowCoord].endX,
+                            cells[curCoord[0]][21 - androidRowCoord].startY,
+                            blackPaint);
+                    break;
+                case "right":
+                    canvas.drawLine(
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 2].startX,
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 2].startY,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].endX,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].startY,
+                            blackPaint);
+                    canvas.drawLine(
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 2].startX,
+                            cells[curCoord[0] - 1][21 - androidRowCoord].startY,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].endX,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].startY,
+                            blackPaint);
+                    break;
+                case "left":
+                    canvas.drawLine(
+                            cells[curCoord[0]][21 - androidRowCoord - 1].endX,
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 1].endY,
+                            cells[curCoord[0] - 2][21 - androidRowCoord].endX,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].startY,
+                            blackPaint);
+                    canvas.drawLine(
+                            cells[curCoord[0]][21 - androidRowCoord - 1].endX,
+                            cells[curCoord[0] - 1][21 - androidRowCoord - 2].startY,
+                            cells[curCoord[0] - 2][21 - androidRowCoord].endX,
+                            cells[curCoord[0]][21 - androidRowCoord - 1].startY,
+                            blackPaint);
+                    break;
+                default:
+                    Toast.makeText(this.getContext(),
+                            "Error with drawing robot (unknown direction)",
+                            Toast.LENGTH_LONG
+                    ).show();
+                    break;
+            }
         }
         showLog("Exiting drawRobot");
     }
@@ -448,15 +549,26 @@ public class GridMap extends View {
 
     public void setCurCoord(int col, int row, String direction) {
         showLog("Entering setCurCoord");
+        // this 2 ifs check setstartingwaypoint
+        if (row < 1 || row > 19) {
+            showLog("y is out of bounds");
+            return;
+        }
+        if (col > 20 || col < 2) {
+            showLog("x is out of bounds");
+            return;
+        }
         curCoord[0] = col;
         curCoord[1] = row;
         this.setRobotDirection(direction);
         this.updateRobotAxis(col, row, direction);
 
         row = this.convertRow(row);
-        for (int x = col - 1; x <= col + 1; x++)
-            for (int y = row - 1; y <= row + 1; y++)
+
+        for (int x = col - 1; x <= col; x++)
+            for (int y = row - 1; y <= row; y++)
                 cells[x][y].setType("robot");
+
         showLog("Exiting setCurCoord");
     }
 
@@ -480,13 +592,19 @@ public class GridMap extends View {
         return cellSize;
     }
 
+    // changed to 2x2 explored grids
     private void setOldRobotCoord(int oldCol, int oldRow) {
         showLog("Entering setOldRobotCoord");
         oldCoord[0] = oldCol;
         oldCoord[1] = oldRow;
         oldRow = this.convertRow(oldRow);
-        for (int x = oldCol - 1; x <= oldCol + 1; x++)
-            for (int y = oldRow - 1; y <= oldRow + 1; y++)
+//        showLog("oldRow = " + oldRow + ", oldCol = " + oldCol);
+        if (oldRow == 0) {
+            showLog("oldRow has gone out of grid.");
+            return;
+        }
+        for (int x = oldCol - 1; x <= oldCol; x++)
+            for (int y = oldRow - 1; y <= oldRow; y++)
                 cells[x][y].setType("explored");
         showLog("Exiting setOldRobotCoord");
     }
@@ -545,10 +663,12 @@ public class GridMap extends View {
         return waypointCoord;
     }
 
-    private void setObstacleCoord(int col, int row) {
+    public void setObstacleCoord(int col, int row) {
         showLog("Entering setObstacleCoord");
-        int[] obstacleCoord = new int[]{col, row};
+        int[] obstacleCoord = new int[]{col - 1, row - 1};
         GridMap.obstacleCoord.add(obstacleCoord);
+//        col++;
+//        row++;
         row = this.convertRow(row);
         cells[col][row].setType("obstacle");
         showLog("Exiting setObstacleCoord");
@@ -558,7 +678,7 @@ public class GridMap extends View {
         return obstacleCoord;
     }
 
-    private void showLog(String message) {
+    private static void showLog(String message) {
         Log.d(TAG, message);
     }
 
@@ -593,7 +713,6 @@ public class GridMap extends View {
         }
     }
 
-    // TODO
     private class Cell {
         float startX, startY, endX, endY;
         Paint paint;
@@ -656,7 +775,8 @@ public class GridMap extends View {
         }
     }
 
-    // TODO
+    int endColumn, endRow;
+    String oldItem;
     // drag event to move obstacle
     @Override
     public boolean onDragEvent(DragEvent dragEvent) {
@@ -664,34 +784,60 @@ public class GridMap extends View {
         clipData = dragEvent.getClipData();
         localState = dragEvent.getLocalState();
 
-        int endColumn, endRow;
+//        int endColumn, endRow;
         String tempID, tempBearing;
         tempID = tempBearing = "";
         endColumn = endRow = -999;
+        oldItem = ITEM_LIST.get(initialRow - 1)[initialColumn - 1];
         showLog("dragEvent.getAction() == " + dragEvent.getAction());
         showLog("dragEvent.getResult() is " + dragEvent.getResult());
+        showLog("initialColumn = " + initialColumn + ", initialRow = " + initialRow);
 
-        if ((dragEvent.getAction() == DragEvent.ACTION_DRAG_ENDED) && (endColumn == -999 || endRow == -999)
-            && dragEvent.getResult() == false) {
-            obstacleCoord.remove(new int[]{initialColumn, initialRow});
+        // drag and drop out of gridmap
+        if ((dragEvent.getAction() == DragEvent.ACTION_DRAG_ENDED)
+                && (endColumn == -999 || endRow == -999) && dragEvent.getResult() == false) {
+            // check if 2 arrays are same, then remove
+            for (int i = 0; i < obstacleCoord.size(); i++) {
+                if (Arrays.equals(obstacleCoord.get(i), new int[]{initialColumn - 1, initialRow - 1}))
+                    obstacleCoord.remove(i);
+            }
             cells[initialColumn][20-initialRow].setType("unexplored");
             ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
             imageBearings.get(initialRow-1)[initialColumn-1] = "";
-        } else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
+            showLog(commandMsgGenerator(REMOVE_OBSTACLE));
+//            MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
+        }
+        // drop within gridmap
+        else if (dragEvent.getAction() == DragEvent.ACTION_DROP && this.getAutoUpdate() == false) {
             endColumn = (int) (dragEvent.getX() / cellSize);
             endRow = this.convertRow((int) (dragEvent.getY() / cellSize));
 
-            if (ITEM_LIST.get(initialRow-1)[initialColumn-1] == "" || imageBearings.get(initialRow-1)[initialColumn-1] == "") {
+            // if the currently dragged cell is empty, do nothing
+            if (ITEM_LIST.get(initialRow-1)[initialColumn-1].equals("")
+                    && imageBearings.get(initialRow-1)[initialColumn-1].equals("")) {
                 showLog("Cell is empty");
-            } else if (endColumn < 0 || endRow < 0) {
-                obstacleCoord.remove(new int[]{initialColumn, initialRow});
+            }
+            // if dropped within gridmap but outside drawn grids, remove obstacle from lists
+            else if (endColumn <= 0 || endRow <= 0) {
+                for (int i = 0; i < obstacleCoord.size(); i++) {
+                    if (Arrays.equals(obstacleCoord.get(i), new int[]{initialColumn - 1, initialRow - 1}))
+                        obstacleCoord.remove(i);
+                }
                 cells[initialColumn][20-initialRow].setType("unexplored");
                 ITEM_LIST.get(initialRow-1)[initialColumn-1] = "";
                 imageBearings.get(initialRow-1)[initialColumn-1] = "";
-            } else if ((1 <= initialColumn && initialColumn <= 20) && (1 <= initialRow && initialRow <= 20)
-                    && (1 <= endColumn && endColumn <= 20) && (1 <= endRow && endRow <= 20)) {
+                showLog(commandMsgGenerator(REMOVE_OBSTACLE));
+//                MainActivity.printMessage(commandMsgGenerator(REMOVE_OBSTACLE));
+            }
+            // if dropped within gridmap, shift it to new position unless already got existing
+            else if ((1 <= initialColumn && initialColumn <= 20)
+                    && (1 <= initialRow && initialRow <= 20)
+                    && (1 <= endColumn && endColumn <= 20)
+                    && (1 <= endRow && endRow <= 20)) {
                 tempID = ITEM_LIST.get(initialRow-1)[initialColumn-1];
                 tempBearing = imageBearings.get(initialRow-1)[initialColumn-1];
+
+                // check if got existing obstacle at drop location
                 if (ITEM_LIST.get(endRow-1)[endColumn-1] != "" || imageBearings.get(endRow-1)[endColumn-1] != "") {
                     showLog("An obstacle is already at drop location");
                 } else {
@@ -701,23 +847,32 @@ public class GridMap extends View {
                     imageBearings.get(endRow - 1)[endColumn - 1] = tempBearing;
 
                     setObstacleCoord(endColumn, endRow);
-                    obstacleCoord.remove(new int[]{initialColumn, initialRow});
+                    for (int i = 0; i < obstacleCoord.size(); i++) {
+                        if (Arrays.equals(obstacleCoord.get(i), new int[]{initialColumn - 1, initialRow - 1}))
+                            obstacleCoord.remove(i);
+                    }
                     cells[initialColumn][20 - initialRow].setType("unexplored");
+                    showLog(commandMsgGenerator(MOVE_OBSTACLE));
+//                    MainActivity.printMessage(commandMsgGenerator(MOVE_OBSTACLE));
                 }
             } else {
                 showLog("Drag event failed.");
             }
         }
         showLog("initialColumn = " + initialColumn
-                + "\ninitialRow = " + initialRow
+                + ", initialRow = " + initialRow
                 + "\nendColumn = " + endColumn
-                + "\nendRow = " + endRow);
+                + ", endRow = " + endRow);
         this.invalidate();
         return true;
     }
 
-    // TODO
-    // add in obstacle id and direction
+    public void callInvalidate() {
+        showLog("Entering callinvalidate");
+        this.invalidate();
+    }
+
+    // added in obstacle id and direction
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         showLog("Entering onTouchEvent");
@@ -727,42 +882,145 @@ public class GridMap extends View {
             initialColumn = column;
             initialRow = row;
 
-            ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setStartPointToggleBtn);
-            ToggleButton setWaypointToggleBtn = ((Activity)this. getContext()).findViewById(R.id.setWaypointToggleBtn);
+            ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.startpointToggleBtn);
+            ToggleButton setWaypointToggleBtn = ((Activity)this. getContext()).findViewById(R.id.waypointToggleBtn);
             showLog("event.getX = " + event.getX() + ", event.getY = " + event.getY());
             showLog("row = " + row + ", column = " + column);
 
-            // TODO
             // start drag
             if (MapTabFragment.dragStatus) {
                 if (!((1 <= initialColumn && initialColumn <= 20)
                         && (1 <= initialRow && initialRow <= 20))) {
                     return false;
-                } else if (ITEM_LIST.get(row - 1)[column - 1] == "") {
+                } else if (ITEM_LIST.get(row - 1)[column - 1].equals("")
+                    && imageBearings.get(row - 1)[column - 1].equals("")) {
                     return false;
                 }
                 DragShadowBuilder dragShadowBuilder = new MyDragShadowBuilder(this);
                 this.startDrag(null, dragShadowBuilder, null, 0);
             }
 
+            // start change obstacle
+            if (MapTabFragment.changeObstacleStatus) {
+                if (!((1 <= initialColumn && initialColumn <= 20)
+                        && (1 <= initialRow && initialRow <= 20))) {
+                    return false;
+                } else if (ITEM_LIST.get(row - 1)[column - 1] == ""
+                        && imageBearings.get(row - 1)[column - 1] == "") {
+                    return false;
+                } else {
+                    showLog("Enter change obstacle status");
+                    String imageId = ITEM_LIST.get(row -1)[column - 1];
+                    String imageBearing = imageBearings.get(row - 1)[column - 1];
+                    final int tRow = row;
+                    final int tCol = column;
+
+                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(this.getContext());
+                    View mView = ((Activity) this.getContext()).getLayoutInflater()
+                            .inflate(R.layout.activity_dialog_change_obstacle,
+                                    null);
+                    mBuilder.setTitle("Change Existing Obstacle ID/Bearing");
+                    final Spinner mIDSpinner = mView.findViewById(R.id.imageIDSpinner2);
+                    final Spinner mBearingSpinner = mView.findViewById(R.id.bearingSpinner2);
+
+                    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                            this.getContext(), R.array.imageID_array,
+                            android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mIDSpinner.setAdapter(adapter);
+                    ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(
+                            this.getContext(), R.array.imageBearing_array,
+                            android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mBearingSpinner.setAdapter(adapter2);
+
+                    // start at current id and bearing
+                    if (imageId.equals("")) {
+                        mIDSpinner.setSelection(0);
+                    } else {
+                        mIDSpinner.setSelection(Integer.parseInt(imageId) - 1);
+                    }
+                    switch (imageBearing) {
+                        case "North": mBearingSpinner.setSelection(0);
+                            break;
+                        case "South": mBearingSpinner.setSelection(1);
+                            break;
+                        case "East": mBearingSpinner.setSelection(2);
+                            break;
+                        case "West": mBearingSpinner.setSelection(3);
+                    }
+
+                    // do what when user presses ok
+                    mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            String newID = mIDSpinner.getSelectedItem().toString();
+                            String newBearing = mBearingSpinner.getSelectedItem().toString();
+
+                            ITEM_LIST.get(tRow - 1)[tCol - 1] = newID;
+                            imageBearings.get(tRow - 1)[tCol - 1] = newBearing;
+                            showLog("tRow - 1 = " + (tRow - 1));
+                            showLog("tCol - 1 = " + (tCol - 1));
+                            showLog("newID = " + newID);
+                            showLog("newBearing = " + newBearing);
+
+                            callInvalidate();
+                        }
+                    });
+
+                    // dismiss
+                    mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+
+                    mBuilder.setView(mView);
+                    AlertDialog dialog = mBuilder.create();
+                    dialog.show();
+                    Window window =  dialog.getWindow();
+                    WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                    layoutParams.width = 150;
+//                    window.setAttributes(layoutParams);
+                    window.setLayout(layoutParams.WRAP_CONTENT, layoutParams.WRAP_CONTENT);
+                }
+                showLog("Exit change obstacle");
+            }
+
+            // change robot size and make sure its within the grid
             if (startCoordStatus) {
                 if (canDrawRobot) {
+                    // removes green grids when user changes robot startpoint
+                    for (int i = 0; i < 21; i++) {
+                        for (int j = 0; j < 21; j++) {
+                            if (cells[i][j].type == "robot") {
+                                cells[i][j].setType("explored");
+                            }
+                        }
+                    }
+                    // don't set robot if obstacles are there
                     int[] startCoord = this.getStartCoord();
+
                     if (startCoord[0] >= 2 && startCoord[1] >= 2) {
-                        startCoord[1] = this.convertRow(startCoord[1]);
-                        for (int x = startCoord[0] - 1; x <= startCoord[0] + 1; x++)
-                            for (int y = startCoord[1] - 1; y <= startCoord[1] + 1; y++)
+//                        startCoord[1] = this.convertRow(startCoord[1]);
+                        showLog("startCoord = " + startCoord[0] + " " + startCoord[1]);
+                        for (int x = startCoord[0] - 1; x <= startCoord[0]; x++)
+                            for (int y = startCoord[1] - 1; y <= startCoord[1]; y++)
                                 cells[x][y].setType("unexplored");
                     }
                 }
                 else
                     canDrawRobot = true;
+                showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
+                showLog("");
                 this.setStartCoord(column, row);
                 startCoordStatus = false;
                 String direction = getRobotDirection();
                 if(direction.equals("None")) {
                     direction = "up";
                 }
+                //getRobotSetpoint(column, row);
                 try {
                     int directionInt = 0;
                     if(direction.equals("up")){
@@ -774,7 +1032,8 @@ public class GridMap extends View {
                     } else if(direction.equals("down")) {
                         directionInt = 2;
                     }
-                    MainActivity.printMessage("starting " + "(" + String.valueOf(row-1) + "," + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
+                    showLog("starting " + "(" + String.valueOf(row-1) + ","
+                            + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -800,52 +1059,21 @@ public class GridMap extends View {
                 return true;
             }
 
-            // TODO
-            // edit this to add id and the bar, popup to ask for user input
+            // add id and the image bearing, popup to ask for user input
             if (setObstacleStatus) {
-                if ((1 <= row && row <= 20) && (1 <= column && column < 20)) {
+                if ((1 <= row && row <= 20) && (1 <= column && column <= 20)) {
                     // get user input from spinners in MapTabFragment static values
-                    String imageID = MapTabFragment.imageID;
+                    String imageID = (MapTabFragment.imageID).equals("Nil") ? "" : MapTabFragment.imageID;
                     String imageBearing = MapTabFragment.imageBearing;
 
                     // after init, at stated column and row, add the id to use as ref to update the grid
                     ITEM_LIST.get(row - 1)[column - 1] = imageID;
+                    imageBearings.get(row - 1)[column - 1] = imageBearing;
 
-
-                /*
-                add border colour to grid on the side image is on (N,S,E or W)
-                 */
-                    switch (imageBearing) {
-                        case "North":
-                            imageBearings.get(row - 1)[column - 1] = "North";
-                            break;
-                        case "South":
-                            imageBearings.get(row - 1)[column - 1] = "South";
-                            break;
-                        case "East":
-                            imageBearings.get(row - 1)[column - 1] = "East";
-                            break;
-                        case "West":
-                            imageBearings.get(row - 1)[column - 1] = "West";
-                            break;
-                    }
-
-
-                /* test boundaries of cells
-                showLog("row = " + row + ", column = " + column);
-                showLog("ITEM_LIST(" + String.valueOf(19-(row-1)) + ")[" + String.valueOf(column-1) + "] = " + ITEM_LIST.get(19-(row-1))[column-1]);
-
-                showLog("startX = " + (cells[column][row].startX));
-                showLog("endX = " + (cells[column][row].endX));
-                showLog("startY = " + (cells[row][column].startY));
-                showLog("endY = " + (cells[row][column].endY));
-                showLog("endX - startX = " + (cells[column][row].endX + cells[column][row].startX));
-                showLog("endY - startY = " + (cells[column][row].endY + cells[column][row].startY));
-                showLog("(cells[col][row].endX - cells[col][row].startX) / 2 = " + (cells[column][row].endX - cells[column][row].startX) / 2);
-                */
-
-
+                    // this function affects obstacle turning too
                     this.setObstacleCoord(column, row);
+                    showLog(commandMsgGenerator(ADD_OBSTACLE));
+                    //MainActivity.printMessage(commandMsgGenerator(ADD_OBSTACLE));
                 }
                 this.invalidate();
                 return true;
@@ -948,6 +1176,7 @@ public class GridMap extends View {
         showLog("Exiting resetMap");
         this.invalidate();
     }
+
 
     public void updateMapInformation() throws JSONException {
         showLog("Entering updateMapInformation");
@@ -1086,6 +1315,7 @@ public class GridMap extends View {
         this.invalidate();
     }
 
+    // e.g obstacle is on right side of 2x2 and can turn left and vice versa
     public void moveRobot(String direction) {
         showLog("Entering moveRobot");
         setValidPosition(false);
@@ -1096,6 +1326,7 @@ public class GridMap extends View {
         String robotDirection = getRobotDirection();
         String backupDirection = robotDirection;
 
+        // check if got obstacle when moving one grid up before turning in each case
         switch (robotDirection) {
             case "up":
                 switch (direction) {
@@ -1106,16 +1337,36 @@ public class GridMap extends View {
                         }
                         break;
                     case "right":
-                        robotDirection = "right";
+                        if ((1 < curCoord[1] && curCoord[1] < 19) && (0 < curCoord[0] && curCoord[0] < 20)) {
+                            curCoord[1] += 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[1] -= 1;
+                            } else {
+                                curCoord[0] += 1;
+                                robotDirection = "right";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     case "back":
-                        if (curCoord[1] != 2) {
+                        if (curCoord[1] != 1) {
                             curCoord[1] -= 1;
                             validPosition = true;
                         }
                         break;
                     case "left":
-                        robotDirection = "left";
+                        if ((0 < curCoord[1] && curCoord[1] < 19) && (2 < curCoord[0] && curCoord[0] <= 20)) {
+                            curCoord[1] += 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[1] -= 1;
+                            } else {
+                                curCoord[0] -= 1;
+                                robotDirection = "left";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     default:
                         robotDirection = "error up";
@@ -1125,22 +1376,42 @@ public class GridMap extends View {
             case "right":
                 switch (direction) {
                     case "forward":
-                        if (curCoord[0] != 14) {
+                        if (0 < curCoord[0] && curCoord[0] < 20) {
                             curCoord[0] += 1;
                             validPosition = true;
                         }
                         break;
                     case "right":
-                        robotDirection = "down";
+                        if ((1 < curCoord[1] && curCoord[1] < 20) && (0 < curCoord[0] && curCoord[0] < 20)) {
+                            curCoord[0] += 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[0] -= 1;
+                            } else {
+                                curCoord[1] -= 1;
+                                robotDirection = "down";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     case "back":
-                        if (curCoord[0] != 2) {
+                        if (curCoord[0] > 2) {
                             curCoord[0] -= 1;
                             validPosition = true;
                         }
                         break;
                     case "left":
-                        robotDirection = "up";
+                        if ((0 < curCoord[1] && curCoord[1] < 19) && (0 < curCoord[0] && curCoord[0] < 20)) {
+                            curCoord[0] += 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[0] -= 1;
+                            } else {
+                                curCoord[1] += 1;
+                                robotDirection = "up";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     default:
                         robotDirection = "error right";
@@ -1149,22 +1420,42 @@ public class GridMap extends View {
             case "down":
                 switch (direction) {
                     case "forward":
-                        if (curCoord[1] != 2) {
+                        if (curCoord[1] != 1) {
                             curCoord[1] -= 1;
                             validPosition = true;
                         }
                         break;
                     case "right":
-                        robotDirection = "left";
+                        if ((1 < curCoord[1] && curCoord[1] < 19) && (2 < curCoord[0] && curCoord[0] <= 20)) {
+                            curCoord[1] -= 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[1] += 1;
+                            } else {
+                                curCoord[0] -= 1;
+                                robotDirection = "left";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     case "back":
-                        if (curCoord[1] != 19) {
+                        if (0 < curCoord[1] && curCoord[1] < 19) {
                             curCoord[1] += 1;
                             validPosition = true;
                         }
                         break;
                     case "left":
-                        robotDirection = "right";
+                        if ((1 < curCoord[1] && curCoord[1] < 20) && (0 < curCoord[0] && curCoord[0] <= 20)) {
+                            curCoord[1] -= 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[1] += 1;
+                            } else {
+                                curCoord[0] += 1;
+                                robotDirection = "right";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     default:
                         robotDirection = "error down";
@@ -1173,22 +1464,42 @@ public class GridMap extends View {
             case "left":
                 switch (direction) {
                     case "forward":
-                        if (curCoord[0] != 2) {
+                        if (curCoord[0] > 2) {
                             curCoord[0] -= 1;
                             validPosition = true;
                         }
                         break;
                     case "right":
-                        robotDirection = "up";
+                        if ((0 < curCoord[1] && curCoord[1] < 19) && (2 < curCoord[0] && curCoord[0] < 20)) {
+                            curCoord[0] -= 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[0] += 1;
+                            } else {
+                                curCoord[1] += 1;
+                                robotDirection = "up";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     case "back":
-                        if (curCoord[0] != 14) {
+                        if (curCoord[0] < 20) {
                             curCoord[0] += 1;
                             validPosition = true;
                         }
                         break;
                     case "left":
-                        robotDirection = "down";
+                        if ((0 < curCoord[1] && curCoord[1] <= 20) && (2 < curCoord[0] && curCoord[0] < 20)) {
+                            curCoord[0] -= 1;
+                            if (checkObstaclesRightInFront(curCoord, obstacleCoord)) {
+                                validPosition = false;
+                                curCoord[0] += 1;
+                            } else {
+                                curCoord[1] -= 1;
+                                robotDirection = "down";
+                                validPosition = true;
+                            }
+                        }
                         break;
                     default:
                         robotDirection = "error left";
@@ -1198,15 +1509,21 @@ public class GridMap extends View {
                 robotDirection = "error moveCurCoord";
                 break;
         }
+        showLog("Enter checking for obstacles in destination 2x2 grid");
         if (getValidPosition())
-            for (int x = curCoord[0] - 1; x <= curCoord[0] + 1; x++) {
-                for (int y = curCoord[1] - 1; y <= curCoord[1] + 1; y++) {
+            // check obstacle for new position
+            for (int x = curCoord[0] - 1; x <= curCoord[0]; x++) {
+                for (int y = curCoord[1] - 1; y <= curCoord[1]; y++) {
                     for (int i = 0; i < obstacleCoord.size(); i++) {
-                        if (obstacleCoord.get(i)[0] != x || obstacleCoord.get(i)[1] != y)
-                            setValidPosition(true);
-                        else {
+                        showLog("x-1 = " + (x-1) + ", y = " + y);
+                        showLog("obstacleCoord.get(" + i + ")[0] = " + obstacleCoord.get(i)[0]
+                                + ", obstacleCoord.get(" + i + ")[1] = " + obstacleCoord.get(i)[1]);
+                        if (obstacleCoord.get(i)[0] == (x - 1) && obstacleCoord.get(i)[1] == y) {
                             setValidPosition(false);
+                            robotDirection = backupDirection;
                             break;
+                        } else {
+//                            setValidPosition(true);
                         }
                     }
                     if (!getValidPosition())
@@ -1215,6 +1532,7 @@ public class GridMap extends View {
                 if (!getValidPosition())
                     break;
             }
+        showLog("Exit checking for obstacles in destination 2x2 grid");
         if (getValidPosition())
             this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
         else {
@@ -1224,6 +1542,34 @@ public class GridMap extends View {
         }
         this.invalidate();
         showLog("Exiting moveRobot");
+    }
+
+    public boolean checkObstaclesRightInFront(int[] coord, List<int[]> obstacles) {
+        showLog("Enter checking for obstacles directly in front");
+//        if (getValidPosition())
+        // check obstacle for new position
+        for (int x = coord[0] - 1; x <= coord[0]; x++) {
+            for (int y = coord[1] - 1; y <= coord[1]; y++) {
+                for (int i = 0; i < obstacles.size(); i++) {
+                    showLog("x-1 = " + (x-1) + ", y = " + y);
+                    showLog("obstacle.get(" + i + ")[0] = " + obstacles.get(i)[0]
+                            + ", obstacle.get(" + i + ")[1] = " + obstacles.get(i)[1]);
+                    if (obstacles.get(i)[0] == (x - 1) && obstacles.get(i)[1] == y) {
+//                        setValidPosition(false);
+//                            robotDirection = backupDirection;
+                        return true;
+                    } else {
+//                            setValidPosition(true);
+                    }
+                }
+//                if (!getValidPosition())
+//                    break;
+            }
+//            if (!getValidPosition())
+//                break;
+        }
+        showLog("Exit checking for obstacles directly in front");
+        return false;   // false means no obstacles
     }
 
     public JSONObject getCreateJsonObject() {
@@ -1401,7 +1747,6 @@ public class GridMap extends View {
 
         }
 
-        // TODO
         // Defines a callback that sends the drag shadow dimensions and touch point back to the
         // system.
         @Override
@@ -1428,11 +1773,749 @@ public class GridMap extends View {
 
         @Override
         public void onDrawShadow(Canvas canvas) {
-
             // Draws the ColorDrawable in the Canvas passed in from the system.
-            canvas.scale(mScaleFactor.x/(float)getView().getWidth(), mScaleFactor.y/(float)getView().getHeight());
+            canvas.scale(mScaleFactor.x/(float)getView().getWidth(),
+                    mScaleFactor.y/(float)getView().getHeight());
             getView().draw(canvas);
         }
 
+    }
+
+    // TODO: edit such that when alg send us 0 still display it, maybe edit in MainActivity to +1
+    // week 8 req to update robot pos when alg sends updates
+    public void performAlgoCommand(int x, int y, String direction) {
+        showLog("Enter performAlgoCommand");
+        showLog("x = " + x + "\n" + "y = " + y);
+        if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            showLog("within grid");
+            robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
+            switch (direction) {
+                case "N":
+                    robotDirection = "up";
+                    break;
+                case "S":
+                    robotDirection = "down";
+                    break;
+                case "E":
+                    robotDirection = "right";
+                    break;
+                case "W":
+                    robotDirection = "left";
+                    break;
+            }
+        }
+        // if robot pos was not set initially, don't set as explored before moving to new coord
+        if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
+            showLog("if robot was not at invalid pos prev");
+            if ((curCoord[0] > 1 && curCoord[0] < 21) && (curCoord[1] > -1 && curCoord[1] < 20)) {
+                showLog("prev pos was within grid");
+                for (int i = curCoord[0] - 1; i <= curCoord[0]; i++) {
+                    for (int j = curCoord[1] - 1; j <= curCoord[1]; j++) {
+                        cells[i][20 - j - 1].setType("explored");
+//                        showLog("i = " + i + ", j = " + j);
+                    }
+                }
+            }
+        }
+        // if robot is still in frame
+        if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            showLog("within grid");
+            setCurCoord(x, y, robotDirection);    // set new coords and direction
+            canDrawRobot = true;
+        }
+        // if robot goes out of frame
+        else {
+            showLog("set canDrawRobot to false");
+            canDrawRobot = false;
+            curCoord[0] = -1;
+            curCoord[1] = -1;
+        }
+        this.invalidate();
+        showLog("Exit performAlgoCommand");
+    }
+
+    // TODO: edit such that when alg send us 0 still display it, maybe edit in MainActivity to +1 but might need to consider if obstacles are on the borders too then later on our end ram into them hmm but algo say they will check so shd be fine
+    public void performAlgoTurning(int x, int y, String facing, String cmd) {
+        showLog("Enter performAlgoTurning");
+        final int i = y;
+        final int j = x;
+        final String finalFacing = facing;
+        int delay = 500;   // add 1000 after each run cos its like a timestamp
+
+        if ((x > 1 && x < 21) && (y > -1 && y < 20)) {
+            showLog("within grid");
+            robotDirection = (robotDirection.equals("None")) ? "up" : robotDirection;
+
+            // call animation only when the robot is in frame
+            if (curCoord[0] != -1 && curCoord[1] != -1) {
+                showLog("robot is within grid");
+                switch (robotDirection) {
+                    case "up":
+                        switch (cmd) {
+                            case "fl":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 4, i - 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 3, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                // rest of the forward motion
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "fr":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 4, i - 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 3, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                // rest of the forward motion
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rl":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i + 3, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i + 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rr":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i + 3, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                // rest of the forward motion
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i + 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                        }
+                        break;
+                    case "down":
+                        switch (cmd) {
+                            case "fl":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 4, i + 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 3, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // move 1 grid forward
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "fr":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 4, i + 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 3, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // move 1 grid forward
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rl":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i - 3, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i - 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rr":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i - 3, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i - 1, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                        }
+                        break;
+
+                    case "right":
+                        switch (cmd) {
+                            case "fl":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i - 4, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 3, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // move 1 grid forward
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 2, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "fr":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i + 4, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 3, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // move 1 grid forward
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 2, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rl":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 3, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rr":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 3, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 2, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                        }
+                        break;
+                    case "left":
+                        switch (cmd) {
+                            case "fl":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i + 4, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 3, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // move 1 grid forward
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 2, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                break;
+                            case "fr":
+                                // move forward 1 grid
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j + 1, i - 4, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // turn
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 3, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                // move 1 grid forward
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 2, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                break;
+                            case "rl":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 3, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i + 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i + 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                            case "rr":
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 3, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 2, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j - 1, i - 2, robotDirection);
+                                    }
+                                }, delay);
+                                delay += 500;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i - 1, finalFacing);
+                                    }
+                                }, delay);
+                                delay += 1000;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        performAlgoCommand(j, i, finalFacing);
+                                    }
+                                }, delay);
+                                break;
+                        }
+                        break;
+                }
+            }
+            // if robot was out of frame in prev state
+            else {
+                showLog("robot was out of grid in prev state");
+                performAlgoCommand(x, y, facing);
+            }
+        }
+        // if robot goes out of frame
+        else {
+            // colour explored before disappearing
+            if (!(curCoord[0] == -1 && curCoord[1] == -1)) {
+                showLog("if robot was alr in grid");
+                if ((curCoord[0] > 1 && curCoord[0] < 21) && (curCoord[1] > -1 && curCoord[1] < 20)) {
+                    showLog("pos is good before going out of grid");
+                    for (int n = curCoord[0] - 1; n <= curCoord[0]; n++) {
+                        for (int m = curCoord[1] - 1; m <= curCoord[1]; m++) {
+                            cells[n][20 - m - 1].setType("explored");
+//                        showLog("i = " + i + ", j = " + j);
+                        }
+                    }
+                }
+            }
+            showLog("setting canDrawRobot to false");
+            canDrawRobot = false;
+            curCoord[0] = -1;
+            curCoord[1] = -1;
+        }
+        this.invalidate();
+        showLog("Exit performAlgoTurning");
+    }
+
+
+
+    // week 8 req to send algo obstacle info
+    public String getObstacles() {
+        String msg = "ALG|";
+
+        for (int i = 0; i < obstacleCoord.size(); i++) {
+            showLog("i = " + Integer.toString(i));
+            msg +=  (Float.toString((float) (obstacleCoord.get(i)[0] + 0.5)) + ","
+                    + Float.toString((float) (obstacleCoord.get(i)[1] + 0.5)) + ","
+                    + imageBearings.get(obstacleCoord.get(i)[1])[obstacleCoord.get(i)[0]].charAt(0)
+                    + ";");
+        }
+        msg += "\n";
+        return msg;
+    }
+
+    // checklist req
+    public String commandMsgGenerator (int command) {
+        String msg = "";
+        switch (command) {
+            case ADD_OBSTACLE:
+                // format: <target component>|<command>,<image id>,<obstacle coord>,<face direction>
+                msg = "ADD_OBSTACLE,"
+                        + ITEM_LIST.get(initialRow - 1)[initialColumn - 1] + ","
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
+                        + imageBearings.get(initialRow - 1)[initialColumn - 1].charAt(0) + "\n";
+                break;
+            case REMOVE_OBSTACLE:
+                // format: <target component>|<command>,<image id>,<obstacle coord>
+                msg = "REMOVE_OBSTACLE,"
+                        + oldItem + ","
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + ")" + "\n";
+                break;
+            case MOVE_OBSTACLE:
+                // format: <target component>|<command>,<old coord>,<new coord>
+                msg = "MOVE_OBSTACLE,"
+                        + "(" + (initialColumn - 1) + "," + (initialRow - 1) + "),"
+                        + "(" + (endColumn - 1) + "," + (endRow - 1) + ")" + "\n";
+                break;
+            case ROBOT_MOVING:
+                // format: <target component>|<command>,<string>
+                msg = "MSG," + "Move robot" + "\n";
+                break;
+            case START_AUTO_MOVE:
+                // format: <target component>|<command>,<string>
+                msg = "MSG," + "Start auto movement." + "\n";
+                break;
+            case START_FASTEST_CAR:
+                // format: <target component>|<command>,<string>
+                msg = "MSG," + "Start fastest car." + "\n";
+        }
+        return msg;
+    }
+
+    // wk 8 task
+    public boolean updateIDFromRpi(String obstacleID, String imageID) {
+        showLog("starting updateIDFromRpi");
+        int x = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[0];
+        int y = obstacleCoord.get(Integer.parseInt(obstacleID) - 1)[1];
+        ITEM_LIST.get(y)[x] = (imageID.equals("-1")) ? "" : imageID;
+        this.invalidate();
+        return true;
     }
 }

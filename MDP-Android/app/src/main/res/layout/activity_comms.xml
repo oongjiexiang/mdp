@@ -10,8 +10,10 @@
 
     <EditText
         android:id="@+id/typeBoxEditText"
-        android:layout_width="540dp"
-        android:layout_height="50dp"
+        android:layout_width="500dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/rounded_corner"
         android:gravity="center|start"
@@ -21,12 +23,16 @@
         app:layout_constraintEnd_toStartOf="@+id/messageButton"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextVie" />
 
     <TextView
-        android:id="@+id/messageReceivedTextView"
+        android:id="@+id/messageReceivedTextVie"
         android:layout_width="fill_parent"
         android:layout_height="160dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/rounded_corner"
         android:gravity="bottom"
         android:scrollbars="vertical"
@@ -47,7 +53,8 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/messageButton"
@@ -55,12 +62,12 @@
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:foreground="@drawable/ic_send"
         android:foregroundGravity="center"
-        app:backgroundTint="#0288D1"
+        app:backgroundTint="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextView"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+        app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextVie"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

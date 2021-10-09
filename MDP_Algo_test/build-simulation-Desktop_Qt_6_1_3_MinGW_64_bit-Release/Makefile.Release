@@ -577,19 +577,6 @@ release/hamiltonian.o: ../simulation/src/hamiltonian.cpp ../simulation/include/h
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qframe.h \
 		../Navigate/include/actionFormulator.h \
 		ui_hamiltonian.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/QVariant \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QAbstractButton \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qabstractbutton.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/qicon.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QApplication \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qapplication.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/qcoreapplication.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/qeventloop.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/qguiapplication.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/qinputmethod.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/qlocale.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QDialogButtonBox \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qdialogbuttonbox.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QHBoxLayout \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qboxlayout.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qlayout.h \
@@ -597,6 +584,8 @@ release/hamiltonian.o: ../simulation/src/hamiltonian.cpp ../simulation/include/h
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qgridlayout.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QPushButton \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qpushbutton.h \
+		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qabstractbutton.h \
+		C:/Qt/6.1.3/mingw81_64/include/QtGui/qicon.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QFormLayout \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qformlayout.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QLayout \
@@ -610,6 +599,7 @@ release/hamiltonian.o: ../simulation/src/hamiltonian.cpp ../simulation/include/h
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qcombobox.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qabstractitemdelegate.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qstyleoption.h \
+		C:/Qt/6.1.3/mingw81_64/include/QtCore/qlocale.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qabstractspinbox.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtGui/qvalidator.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtCore/qregularexpression.h \
@@ -895,26 +885,6 @@ release/mainwindow.o: ../simulation/src/mainwindow.cpp ../simulation/include/mai
 		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qtabwidget.h \
 		C:/Qt/6.1.3/mingw81_64/include/QtGui/qicon.h \
 		ui_mainwindow.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/QVariant \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/QAction \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/qaction.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QApplication \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qapplication.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/qcoreapplication.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/qeventloop.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/qguiapplication.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtGui/qinputmethod.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtCore/qlocale.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QMenu \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qmenu.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QMenuBar \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qmenubar.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QPushButton \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qpushbutton.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qabstractbutton.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QStatusBar \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/qstatusbar.h \
-		C:/Qt/6.1.3/mingw81_64/include/QtWidgets/QWidget \
 		../simulation/include/hamiltonian.h \
 		../simulation/include/component.h \
 		../simulation/include/pathPlanning.h \

@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -28,6 +27,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.example.mdp_android_grp15.MainActivity;
 import com.example.mdp_android_grp15.R;
 
 import java.util.ArrayList;
@@ -204,7 +204,7 @@ public class BluetoothPopUp extends AppCompatActivity {
         });
 
 
-        ImageButton backBtn = findViewById(R.id.backBtn);
+        Button backBtn = findViewById(R.id.backBtn);
 
         connStatusTextView = (TextView) findViewById(R.id.connStatusTextView);
         connStatus ="Disconnected";
@@ -220,6 +220,9 @@ public class BluetoothPopUp extends AppCompatActivity {
                 editor = sharedPreferences.edit();
                 editor.putString("connStatus", connStatusTextView.getText().toString());
                 editor.commit();
+                TextView status = MainActivity.getBluetoothStatus();
+                String s = connStatusTextView.getText().toString();
+                //status.setText(s);
                 finish();
             }
         });
@@ -392,6 +395,7 @@ public class BluetoothPopUp extends AppCompatActivity {
                 Toast.makeText(BluetoothPopUp.this, "Device now connected to "+mDevice.getName(), Toast.LENGTH_LONG).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
                 connStatusTextView.setText("Connected to " + mDevice.getName());
+
             }
             else if(status.equals("disconnected") && retryConnection == false){
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from "+mDevice.getName());
@@ -428,6 +432,7 @@ public class BluetoothPopUp extends AppCompatActivity {
         Log.d(TAG, "startBTConnection: Initializing RFCOM Bluetooth Connection");
 
         mBluetoothConnection.startClientThread(device, uuid);
+
     }
 
     @Override
