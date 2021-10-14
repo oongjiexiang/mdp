@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15;
+package com.example.mdp_android_grp25;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,14 +21,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
-import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
-import com.example.mdp_android_grp15.ui.main.BluetoothChatFragment;
-import com.example.mdp_android_grp15.ui.main.ControlFragment;
-import com.example.mdp_android_grp15.ui.main.GridMap;
-import com.example.mdp_android_grp15.ui.main.MapTabFragment;
-import com.example.mdp_android_grp15.ui.main.ReconfigureFragment;
-import com.example.mdp_android_grp15.ui.main.SectionsPagerAdapter;
+import com.example.mdp_android_grp25.ui.main.BluetoothConnectionService;
+import com.example.mdp_android_grp25.ui.main.BluetoothPopUp;
+import com.example.mdp_android_grp25.ui.main.BluetoothChatFragment;
+import com.example.mdp_android_grp25.ui.main.ControlFragment;
+import com.example.mdp_android_grp25.ui.main.GridMap;
+import com.example.mdp_android_grp25.ui.main.MapTabFragment;
+import com.example.mdp_android_grp25.ui.main.ReconfigureFragment;
+import com.example.mdp_android_grp25.ui.main.SectionsPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
@@ -38,7 +37,6 @@ import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 
@@ -411,9 +409,9 @@ public class MainActivity extends AppCompatActivity {
 
                      if (cmd.length == 4){
                         String command = cmd[3];
-//                        if(command.equals("fl") || command.equals("fr")){
-//                            gridMap.performAlgoCommand(a, b, direction);
-//                        }
+                        if(command.equals("f") || command.equals("r")){
+                            gridMap.performAlgoCommand(a, b, direction);
+                        }
                         gridMap.performAlgoTurning(a, b, direction, command);
                     }
                 }

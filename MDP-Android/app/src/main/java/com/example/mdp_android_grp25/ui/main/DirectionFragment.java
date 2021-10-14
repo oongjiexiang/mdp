@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.app.DialogFragment;
 import android.content.Context;
@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.MainActivity;
+import com.example.mdp_android_grp25.R;
 
 public class DirectionFragment extends DialogFragment {
 

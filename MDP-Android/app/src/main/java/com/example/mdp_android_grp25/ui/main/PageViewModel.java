@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;

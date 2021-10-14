@@ -1,6 +1,5 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -15,8 +14,6 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.Handler;
-import android.os.Looper;
-import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -34,20 +31,19 @@ import android.widget.ToggleButton;
 
 import androidx.annotation.Nullable;
 
-import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.MainActivity;
+import com.example.mdp_android_grp25.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.mdp_android_grp15.Constants.*;
+import static com.example.mdp_android_grp25.Constants.*;
 
 public class GridMap extends View {
 

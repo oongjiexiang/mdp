@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,8 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.MainActivity;
+import com.example.mdp_android_grp25.R;
 
 import org.json.JSONException;
 
