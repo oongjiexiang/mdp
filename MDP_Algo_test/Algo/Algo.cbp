@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Algo" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Simulate" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-lwsock32" />
+					<Add option="-lws2_32" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Simulate" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="libws2_32.a" />
+					<Add library="libwsock32.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Simulation/include" />
+			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Navigate/include" />
+			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Network_Stuff/include" />
+			<Add directory="C:/Users/oongj/Desktop/mdp/MDP_Algo_test/Utilities/include" />
+			<Add directory="../Navigate/include" />
+			<Add directory="../Network_Stuff/include" />
+			<Add directory="../simulation/include" />
+			<Add directory="../Utilities/include" />
+		</Compiler>
+		<Unit filename="../Navigate/include/actionFormulator.h" />
+		<Unit filename="../Navigate/src/actionFormulator.cpp" />
+		<Unit filename="../Network_Stuff/NetworkClass.cpp" />
+		<Unit filename="../Network_Stuff/NetworkClass.h" />
+		<Unit filename="../Network_Stuff/main.cpp" />
+		<Unit filename="../Simulation/include/action.h" />
+		<Unit filename="../Simulation/include/asearch.h" />
+		<Unit filename="../Simulation/include/component.h" />
+		<Unit filename="../Simulation/include/config.h" />
+		<Unit filename="../Simulation/include/pathPlanning.h" />
+		<Unit filename="../Simulation/src/action.cpp" />
+		<Unit filename="../Simulation/src/asearch.cpp" />
+		<Unit filename="../Simulation/src/component.cpp" />
+		<Unit filename="../Simulation/src/config.cpp" />
+		<Unit filename="../Simulation/src/pathPlanning.cpp" />
+		<Unit filename="../Utilities/include/UtilityFunctions.h" />
+		<Unit filename="../Utilities/src/UtilityFunctions.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

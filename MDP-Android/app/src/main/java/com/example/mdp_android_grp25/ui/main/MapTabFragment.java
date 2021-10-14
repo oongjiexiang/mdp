@@ -307,23 +307,41 @@ public class MapTabFragment extends Fragment {
             }
         });
 
-//        updateButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                showLog("Clicked updateButton");
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLog("Clicked updateButton");
 //                MainActivity.printMessage("sendArena");
 //                manualUpdateRequest = true;
-//                showLog("Exiting updateButton");
+                gridMap.imageBearings.get(9)[5] = "South";
+                gridMap.imageBearings.get(15)[15] = "South";
+                gridMap.imageBearings.get(14)[7] = "West";
+                gridMap.imageBearings.get(4)[15] = "West";
+                gridMap.imageBearings.get(9)[12] = "East";
+
+                gridMap.setObstacleCoord(5+1, 9+1);
+                gridMap.setObstacleCoord(15+1, 15+1);
+                gridMap.setObstacleCoord(7+1, 14+1);
+                gridMap.setObstacleCoord(15+1, 4+1);
+                gridMap.setObstacleCoord(12+1, 9+1);
+
+//                gridMap.setStartCoord(1, 0);
+//                gridMap.setStartCoordStatus(true);
+//                gridMap.setRobotDirection("up");
+
+                gridMap.invalidate();
+                showLog("Exiting updateButton");
 //                try {
 //                    String message = "{\"map\":[{\"explored\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"length\":300,\"obstacle\":\"00000000000000000706180400080010001e000400000000200044438f840000000000000080\"}]}";
-//
+
 //                    gridMap.setReceivedJsonObject(new JSONObject(message));
 //                    gridMap.updateMapInformation();
+//                    gridMap.imageBearings.get(row)[column]
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
-//            }
-//        });
+            }
+        });
 
 
 

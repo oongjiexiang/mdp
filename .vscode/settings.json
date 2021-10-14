@@ -1,6 +1,12 @@
 {
     "files.associations": {
         "vector": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "qgroupbox": "cpp",
+        "utility": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "algorithm": "cpp",
+        "cstdlib": "cpp"
     }
 }

@@ -1,0 +1,11 @@
+debug/hamiltonian.o
+debug/main.o
+debug/mainwindow.o
+debug/component.o
+debug/config.o
+debug/action.o
+debug/asearch.o
+debug/pathPlanning.o
+debug/actionFormulator.o
+debug/moc_hamiltonian.o
+debug/moc_mainwindow.o
