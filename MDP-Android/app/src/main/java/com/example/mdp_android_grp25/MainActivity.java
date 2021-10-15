@@ -27,7 +27,6 @@ import com.example.mdp_android_grp25.ui.main.BluetoothChatFragment;
 import com.example.mdp_android_grp25.ui.main.ControlFragment;
 import com.example.mdp_android_grp25.ui.main.GridMap;
 import com.example.mdp_android_grp25.ui.main.MapTabFragment;
-import com.example.mdp_android_grp25.ui.main.ReconfigureFragment;
 import com.example.mdp_android_grp25.ui.main.SectionsPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
@@ -55,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice, exploreTime;
     static Button f1, f2;
     static Button upBtn, downBtn, leftBtn, rightBtn;
-    Button reconfigure;
-    ReconfigureFragment reconfigureFragment = new ReconfigureFragment();
 
     BluetoothConnectionService mBluetoothConnection;
     BluetoothDevice mBTDevice;
@@ -165,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
 
         f1 = (Button) findViewById(R.id.f1ActionButton);
         f2 = (Button) findViewById(R.id.f2ActionButton);
-        reconfigure = (Button) findViewById(R.id.configureButton);
 
         if (sharedPreferences.contains("F1")) {
             f1.setContentDescription(sharedPreferences.getString("F1", ""));
