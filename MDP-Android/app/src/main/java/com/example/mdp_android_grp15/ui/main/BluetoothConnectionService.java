@@ -239,6 +239,9 @@ public class BluetoothConnectionService {
 
                     connectionStatus = new Intent("ConnectionStatus");
                     connectionStatus.putExtra("Status", "disconnected");
+                    TextView status = MainActivity.getBluetoothStatus();
+                    status.setText("Disconnected");
+                    status.setTextColor(Color.RED);
                     connectionStatus.putExtra("Device", mDevice);
                     LocalBroadcastManager.getInstance(mContext).sendBroadcast(connectionStatus);
                     BluetoothConnectionStatus = false;

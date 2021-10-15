@@ -168,7 +168,7 @@ public class BluetoothPopUp extends AppCompatActivity {
                         Log.d(TAG, "enableDisableBT: Making device discoverable for 600 seconds.");
 
                         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 600);
+                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 5);
                         startActivity(discoverableIntent);
 
                         compoundButton.setChecked(true);

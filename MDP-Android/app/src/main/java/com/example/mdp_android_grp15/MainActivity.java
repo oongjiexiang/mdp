@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main Activity";
     public static boolean stopTimerFlag = false;
+    public static boolean stopWk9TimerFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -432,11 +433,18 @@ public class MainActivity extends AppCompatActivity {
                 // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
                 // end the corresponding timer
                 ToggleButton exploreButton = findViewById(R.id.exploreToggleBtn2);
+                ToggleButton fastestButton = findViewById(R.id.fastestToggleBtn2);
+
                 if (exploreButton.isChecked()) {
                     showLog("explorebutton is checked");
                     stopTimerFlag = true;
                     exploreButton.setChecked(false);
                     robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
+                } else if (fastestButton.isChecked()) {
+                    showLog("fastestbutton is checked");
+                    stopTimerFlag = true;
+                    fastestButton.setChecked(false);
+                    robotStatusTextView.setText("Week 9 Stopped");
                 }
             }
 

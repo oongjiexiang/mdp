@@ -80,9 +80,10 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             int minutesFastest = secondsFastest / 60;
             secondsFastest = secondsFastest % 60;
 
-            fastestTimeTextView.setText(String.format("%02d:%02d", minutesFastest, secondsFastest));
-
-            timerHandler.postDelayed(this, 500);
+            if (MainActivity.stopWk9TimerFlag == false) {
+                fastestTimeTextView.setText(String.format("%02d:%02d", minutesFastest, secondsFastest));
+                timerHandler.postDelayed(this, 500);
+            }
         }
     };
 
@@ -258,7 +259,12 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 }
                 else if (fastestToggleBtn.getText().equals("STOP")) {
                     showToast("Fastest car timer start!");
-//                    MainActivity.printMessage("FS|");
+                    try {
+                        MainActivity.printMessage("STM|G");
+                    } catch (Exception e) {
+                        showLog(e.getMessage());
+                    }
+                    MainActivity.stopWk9TimerFlag = false;
                     robotStatusTextView.setText("Fastest Car Started");
                     fastestTimer = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnableFastest, 0);
