@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15;
+package com.example.mdp_android_grp25;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,14 +21,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.mdp_android_grp15.ui.main.BluetoothConnectionService;
-import com.example.mdp_android_grp15.ui.main.BluetoothPopUp;
-import com.example.mdp_android_grp15.ui.main.BluetoothChatFragment;
-import com.example.mdp_android_grp15.ui.main.ControlFragment;
-import com.example.mdp_android_grp15.ui.main.GridMap;
-import com.example.mdp_android_grp15.ui.main.MapTabFragment;
-import com.example.mdp_android_grp15.ui.main.ReconfigureFragment;
-import com.example.mdp_android_grp15.ui.main.SectionsPagerAdapter;
+import com.example.mdp_android_grp25.ui.main.BluetoothConnectionService;
+import com.example.mdp_android_grp25.ui.main.BluetoothPopUp;
+import com.example.mdp_android_grp25.ui.main.BluetoothChatFragment;
+import com.example.mdp_android_grp25.ui.main.ControlFragment;
+import com.example.mdp_android_grp25.ui.main.GridMap;
+import com.example.mdp_android_grp25.ui.main.MapTabFragment;
+import com.example.mdp_android_grp25.ui.main.ReconfigureFragment;
+import com.example.mdp_android_grp25.ui.main.SectionsPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
@@ -38,7 +37,6 @@ import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 
@@ -71,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main Activity";
     public static boolean stopTimerFlag = false;
+    public static boolean stopWk9TimerFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,23 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 showLog("Exiting f2Btn");
             }
         });
-
-        /*reconfigure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showLog("Clicked reconfigureBtn");
-                reconfigureFragment.show(getFragmentManager(), "Reconfigure Fragment");
-                showLog("Exiting reconfigureBtn");
-            }
-        });*/
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.appbar_menu, menu);
-        return true;
-    }*/
 
     public static Button getF1() { return f1; }
 
@@ -339,18 +322,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to "+mDevice.getName());
                 Toast.makeText(MainActivity.this, "Device now connected to "+mDevice.getName(), Toast.LENGTH_LONG).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
-//                TextView connStatusTextView = findViewById(R.id.connStatusTextView);
-//                connStatusTextView.setText("Connected to " + mDevice.getName());
             }
             else if(status.equals("disconnected")){
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from "+mDevice.getName());
                 Toast.makeText(MainActivity.this, "Disconnected from "+mDevice.getName(), Toast.LENGTH_LONG).show();
-//                mBluetoothConnection = new BluetoothConnectionService(MainActivity.this);
-//                mBluetoothConnection.startAcceptThread();
 
                 editor.putString("connStatus", "Disconnected");
-//                TextView connStatusTextView = findViewById(R.id.connStatusTextView);
-//                connStatusTextView.setText("Disconnected");
 
                 myDialog.show();
             }
@@ -403,10 +380,6 @@ public class MainActivity extends AppCompatActivity {
 
                     String direction = cmd[2];
 
-                    // update robot pos from cmds sent by algo
-//                    if (cmd.length == 3) {
-//                        gridMap.performAlgoCommand(a, b, direction);
-//                    }
 
                     // allow robot to show up on grid if its on the very boundary
                     if (a == 1) a++;
@@ -432,78 +405,20 @@ public class MainActivity extends AppCompatActivity {
                 // if wk 8 btn is checked, means running wk 8 challenge and likewise for wk 9
                 // end the corresponding timer
                 ToggleButton exploreButton = findViewById(R.id.exploreToggleBtn2);
+                ToggleButton fastestButton = findViewById(R.id.fastestToggleBtn2);
+
                 if (exploreButton.isChecked()) {
                     showLog("explorebutton is checked");
                     stopTimerFlag = true;
                     exploreButton.setChecked(false);
                     robotStatusTextView.setText("Auto Movement/ImageRecog Stopped");
+                } else if (fastestButton.isChecked()) {
+                    showLog("fastestbutton is checked");
+                    stopTimerFlag = true;
+                    fastestButton.setChecked(false);
+                    robotStatusTextView.setText("Week 9 Stopped");
                 }
             }
-
-            try {
-                if (message.length() > 7 && message.substring(2,6).equals("grid")) {
-                    String resultString = "";
-                    String amdString = message.substring(11,message.length()-2);
-                    showLog("amdString: " + amdString);
-                    BigInteger hexBigIntegerExplored = new BigInteger(amdString, 16);
-                    String exploredString = hexBigIntegerExplored.toString(2);
-
-                    while (exploredString.length() < 300)
-                        exploredString = "0" + exploredString;
-
-                    for (int i=0; i<exploredString.length(); i=i+15) {
-                        int j=0;
-                        String subString = "";
-                        while (j<15) {
-                            subString = subString + exploredString.charAt(j+i);
-                            j++;
-                        }
-                        resultString = subString + resultString;
-                    }
-                    hexBigIntegerExplored = new BigInteger(resultString, 2);
-                    resultString = hexBigIntegerExplored.toString(16);
-
-                    JSONObject amdObject = new JSONObject();
-                    amdObject.put("explored", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-                    amdObject.put("length", amdString.length()*4);
-                    amdObject.put("obstacle", resultString);
-                    JSONArray amdArray = new JSONArray();
-                    amdArray.put(amdObject);
-                    JSONObject amdMessage = new JSONObject();
-                    amdMessage.put("map", amdArray);
-                    message = String.valueOf(amdMessage);
-                    showLog("Executed for AMD message, message: " + message);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if (message.length() > 8 && message.substring(2,7).equals("image")) {
-                    JSONObject jsonObject = new JSONObject(message);
-                    JSONArray jsonArray = jsonObject.getJSONArray("image");
-                    gridMap.drawImageNumberCell(jsonArray.getInt(0),jsonArray.getInt(1),jsonArray.getInt(2));
-                    showLog("Image Added for index: " + jsonArray.getInt(0) + "," +jsonArray.getInt(1));
-                }
-            } catch (JSONException e) {
-                showLog("Adding Image Failed");
-            }
-
-            if (gridMap.getAutoUpdate() || MapTabFragment.manualUpdateRequest) {
-                try {
-                    gridMap.setReceivedJsonObject(new JSONObject(message));
-                    gridMap.updateMapInformation();
-                    MapTabFragment.manualUpdateRequest = false;
-                    showLog("messageReceiver: try decode successful");
-                } catch (JSONException e) {
-                    showLog("messageReceiver: try decode unsuccessful");
-                }
-            }
-            sharedPreferences();
-            String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
-            editor.putString("message", receivedText);
-            editor.commit();
-            refreshMessageReceived();
         }
     };
 

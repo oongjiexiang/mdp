@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.mdp_android_grp15.MainActivity;
+import com.example.mdp_android_grp25.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -239,6 +239,9 @@ public class BluetoothConnectionService {
 
                     connectionStatus = new Intent("ConnectionStatus");
                     connectionStatus.putExtra("Status", "disconnected");
+                    TextView status = MainActivity.getBluetoothStatus();
+                    status.setText("Disconnected");
+                    status.setTextColor(Color.RED);
                     connectionStatus.putExtra("Device", mDevice);
                     LocalBroadcastManager.getInstance(mContext).sendBroadcast(connectionStatus);
                     BluetoothConnectionStatus = false;

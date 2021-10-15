@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,8 +24,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.MainActivity;
+import com.example.mdp_android_grp25.R;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -80,9 +80,10 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             int minutesFastest = secondsFastest / 60;
             secondsFastest = secondsFastest % 60;
 
-            fastestTimeTextView.setText(String.format("%02d:%02d", minutesFastest, secondsFastest));
-
-            timerHandler.postDelayed(this, 500);
+            if (MainActivity.stopWk9TimerFlag == false) {
+                fastestTimeTextView.setText(String.format("%02d:%02d", minutesFastest, secondsFastest));
+                timerHandler.postDelayed(this, 500);
+            }
         }
     };
 
@@ -258,7 +259,12 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 }
                 else if (fastestToggleBtn.getText().equals("STOP")) {
                     showToast("Fastest car timer start!");
-//                    MainActivity.printMessage("FS|");
+                    try {
+                        MainActivity.printMessage("STM|G");
+                    } catch (Exception e) {
+                        showLog(e.getMessage());
+                    }
+                    MainActivity.stopWk9TimerFlag = false;
                     robotStatusTextView.setText("Fastest Car Started");
                     fastestTimer = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnableFastest, 0);
@@ -281,17 +287,31 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 showLog("Exiting exploreResetImageBtn");            }
         });
 
-        fastestResetButton.setOnClickListener(new View.OnClickListener() {
+        fastestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showLog("Clicked fastestResetImageBtn");
-                showToast("Reseting fastest time...");
-                fastestTimeTextView.setText("00:00");
-                robotStatusTextView.setText("Not Available");
-                if (fastestButton.isChecked())
-                    fastestButton.toggle();
-                timerHandler.removeCallbacks(timerRunnableFastest);
-                showLog("Exiting fastestResetImageBtn");            }
+                showLog("Clicked fastestToggleBtn");
+                ToggleButton fastestToggleBtn = (ToggleButton) v;
+                if (fastestToggleBtn.getText().equals("WK9 START")) {
+                    showToast("Fastest car timer stop!");
+                    robotStatusTextView.setText("Fastest Car Stopped");
+                    timerHandler.removeCallbacks(timerRunnableFastest);
+                }
+                else if (fastestToggleBtn.getText().equals("STOP")) {
+                    showToast("Fastest car timer start!");
+                    try {
+                        MainActivity.printMessage("STM|G");
+                    } catch (Exception e) {
+                        showLog(e.getMessage());
+                    }
+                    MainActivity.stopWk9TimerFlag = false;
+                    robotStatusTextView.setText("Fastest Car Started");
+                    fastestTimer = System.currentTimeMillis();
+                    timerHandler.postDelayed(timerRunnableFastest, 0);
+                }
+                else
+                    showToast(fastestToggleBtn.getText().toString());
+                showLog("Exiting fastestToggleBtn");            }
         });
 
         /*phoneTiltSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

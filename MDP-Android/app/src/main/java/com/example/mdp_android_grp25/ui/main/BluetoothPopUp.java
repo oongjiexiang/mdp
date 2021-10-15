@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -27,8 +27,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.MainActivity;
+import com.example.mdp_android_grp25.R;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -168,7 +168,7 @@ public class BluetoothPopUp extends AppCompatActivity {
                         Log.d(TAG, "enableDisableBT: Making device discoverable for 600 seconds.");
 
                         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 600);
+                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 5);
                         startActivity(discoverableIntent);
 
                         compoundButton.setChecked(true);

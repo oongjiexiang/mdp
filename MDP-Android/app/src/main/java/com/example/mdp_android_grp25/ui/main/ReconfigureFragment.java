@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.app.DialogFragment;
 import android.content.Context;
@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.example.mdp_android_grp15.MainActivity;
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.MainActivity;
+import com.example.mdp_android_grp25.R;
 
 public class ReconfigureFragment extends DialogFragment {
     private static final String TAG = "ReconfigureFragment";
@@ -103,11 +103,11 @@ public class ReconfigureFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         showLog("Entering onDismiss");
         super.onDismiss(dialog);
-        if (f1Value != null && !f1Value.equals(""))
-            MainActivity.getF1().setContentDescription(f1Value);
-        if (f2Value != null && !f2Value.equals(""))
-            MainActivity.getF2().setContentDescription(f2Value);
-        f1ValueEditText.clearFocus();
+//        if (f1Value != null && !f1Value.equals(""))
+//            MainActivity.getF1().setContentDescription(f1Value);
+//        if (f2Value != null && !f2Value.equals(""))
+//            MainActivity.getF2().setContentDescription(f2Value);
+//        f1ValueEditText.clearFocus();
 
         showLog("Exiting onDismiss");
     }
