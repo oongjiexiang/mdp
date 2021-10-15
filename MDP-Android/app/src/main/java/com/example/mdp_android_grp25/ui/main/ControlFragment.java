@@ -287,17 +287,31 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 showLog("Exiting exploreResetImageBtn");            }
         });
 
-        fastestResetButton.setOnClickListener(new View.OnClickListener() {
+        fastestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showLog("Clicked fastestResetImageBtn");
-                showToast("Reseting fastest time...");
-                fastestTimeTextView.setText("00:00");
-                robotStatusTextView.setText("Not Available");
-                if (fastestButton.isChecked())
-                    fastestButton.toggle();
-                timerHandler.removeCallbacks(timerRunnableFastest);
-                showLog("Exiting fastestResetImageBtn");            }
+                showLog("Clicked fastestToggleBtn");
+                ToggleButton fastestToggleBtn = (ToggleButton) v;
+                if (fastestToggleBtn.getText().equals("WK9 START")) {
+                    showToast("Fastest car timer stop!");
+                    robotStatusTextView.setText("Fastest Car Stopped");
+                    timerHandler.removeCallbacks(timerRunnableFastest);
+                }
+                else if (fastestToggleBtn.getText().equals("STOP")) {
+                    showToast("Fastest car timer start!");
+                    try {
+                        MainActivity.printMessage("STM|G");
+                    } catch (Exception e) {
+                        showLog(e.getMessage());
+                    }
+                    MainActivity.stopWk9TimerFlag = false;
+                    robotStatusTextView.setText("Fastest Car Started");
+                    fastestTimer = System.currentTimeMillis();
+                    timerHandler.postDelayed(timerRunnableFastest, 0);
+                }
+                else
+                    showToast(fastestToggleBtn.getText().toString());
+                showLog("Exiting fastestToggleBtn");            }
         });
 
         /*phoneTiltSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
