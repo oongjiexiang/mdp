@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Robot Controller</string>
     <string name="tab_text_1">Bluetooth</string>
-    <string name="tab_text_2">Comms</string>
+    <string name="tab_text_2">Chat</string>
     <string name="tab_text_3">Map Config</string>
-    <string name="tab_text_4">Control</string>
+    <string name="tab_text_4">Challenge</string>
 
     <!--  Comms  -->
     <string name="send">SEND</string>

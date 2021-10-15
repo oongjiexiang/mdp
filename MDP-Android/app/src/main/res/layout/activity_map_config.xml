@@ -93,6 +93,7 @@
         android:textOff="@string/manual"
         android:textOn="@string/auto"
         android:textSize="28px"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -114,9 +115,9 @@
         android:id="@+id/startpointToggleBtn"
         android:layout_width="139dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginStart="92dp"
+        android:layout_marginLeft="92dp"
+        android:layout_marginTop="12dp"
         android:textOff="SET STARTPOINT"
         android:textOn="CANCEL"
         app:layout_constraintStart_toStartOf="parent"
@@ -131,6 +132,7 @@
         android:layout_marginRight="288dp"
         android:textOff="SET WAYPOINT"
         android:textOn="CANCEL"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

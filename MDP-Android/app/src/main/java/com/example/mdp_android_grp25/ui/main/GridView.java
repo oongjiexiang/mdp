@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,7 +13,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

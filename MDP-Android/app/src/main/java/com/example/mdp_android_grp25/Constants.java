@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15;
+package com.example.mdp_android_grp25;
 
 public class Constants {
     // received bluetooth constants (start with 8001)

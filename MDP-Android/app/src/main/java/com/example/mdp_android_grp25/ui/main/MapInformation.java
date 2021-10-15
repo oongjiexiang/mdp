@@ -1,4 +1,4 @@
-package com.example.mdp_android_grp15.ui.main;
+package com.example.mdp_android_grp25.ui.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.mdp_android_grp15.R;
+import com.example.mdp_android_grp25.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
