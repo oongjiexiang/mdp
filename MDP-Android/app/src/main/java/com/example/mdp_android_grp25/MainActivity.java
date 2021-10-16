@@ -26,19 +26,14 @@ import com.example.mdp_android_grp25.ui.main.BluetoothPopUp;
 import com.example.mdp_android_grp25.ui.main.BluetoothChatFragment;
 import com.example.mdp_android_grp25.ui.main.ControlFragment;
 import com.example.mdp_android_grp25.ui.main.GridMap;
-import com.example.mdp_android_grp25.ui.main.MapTabFragment;
 import com.example.mdp_android_grp25.ui.main.SectionsPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.UUID;
-
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -51,16 +46,13 @@ public class MainActivity extends AppCompatActivity {
     private static GridMap gridMap;
     private ControlFragment controlFragment;
     static TextView xAxisTextView, yAxisTextView, directionAxisTextView;
-    static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice, exploreTime;
-    static Button f1, f2;
+    static TextView robotStatusTextView, bluetoothStatus, bluetoothDevice;
     static Button upBtn, downBtn, leftBtn, rightBtn;
 
-    BluetoothConnectionService mBluetoothConnection;
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
     ProgressDialog myDialog;
 
-    int count=0;
     String obstacleID = "";
     String imageID = "";
 
@@ -74,14 +66,16 @@ public class MainActivity extends AppCompatActivity {
         // Initialization
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this,
+                getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.setOffscreenPageLimit(9999);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("incomingMessage"));
-
+        LocalBroadcastManager
+                .getInstance(this)
+                .registerReceiver(messageReceiver, new IntentFilter("incomingMessage"));
 
         // Set up sharedPreferences
         MainActivity.context = getApplicationContext();
@@ -90,22 +84,6 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("direction","None");
         editor.putString("connStatus", "Disconnected");
         editor.commit();
-
-        /*Button printMDFStringButton = (Button) findViewById(R.id.printMDFString);
-        printMDFStringButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "Explored : " + GridMap.getPublicMDFExploration();
-                editor = sharedPreferences.edit();
-                editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
-                editor.commit();
-                refreshMessageReceived();
-                message = "Obstacle : " + GridMap.getPublicMDFObstacle() + "0";
-                editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
-                editor.commit();
-                refreshMessageReceived();
-            }
-        });*/
 
         // Toolbar
         Button bluetoothButton = (Button) findViewById(R.id.bluetoothButton);
@@ -120,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         // Bluetooth Status
         bluetoothStatus = findViewById(R.id.bluetoothStatus);
         bluetoothDevice = findViewById(R.id.bluetoothConnectedDevice);
-
 
         // Map
         gridMap = new GridMap(this);
@@ -146,58 +123,23 @@ public class MainActivity extends AppCompatActivity {
         leftBtn = findViewById(R.id.leftBtn);
         rightBtn = findViewById(R.id.rightBtn);
 
-
         // Robot Status
         robotStatusTextView = findViewById(R.id.robotStatus);
 
         myDialog = new ProgressDialog(MainActivity.this);
         myDialog.setMessage("Waiting for other device to reconnect...");
         myDialog.setCancelable(false);
-        myDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+        myDialog.setButton(
+            DialogInterface.BUTTON_NEGATIVE,
+            "Cancel",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
             }
-        });
-
-        f1 = (Button) findViewById(R.id.f1ActionButton);
-        f2 = (Button) findViewById(R.id.f2ActionButton);
-
-        if (sharedPreferences.contains("F1")) {
-            f1.setContentDescription(sharedPreferences.getString("F1", ""));
-            showLog("setText for f1Btn: " + f1.getContentDescription().toString());
-        }
-        if (sharedPreferences.contains("F2")) {
-            f2.setContentDescription(sharedPreferences.getString("F2", ""));
-            showLog("setText for f2Btn: " + f2.getContentDescription().toString());
-        }
-
-        f1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showLog("Clicked f1Btn");
-                if (!f1.getContentDescription().toString().equals("empty"))
-                    MainActivity.printMessage(f1.getContentDescription().toString());
-                showLog("f1Btn value: " + f1.getContentDescription().toString());
-                showLog("Exiting f1Btn");
-            }
-        });
-
-        f2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showLog("Clicked f2Btn");
-                if (!f2.getContentDescription().toString().equals("empty"))
-                    MainActivity.printMessage(f2.getContentDescription().toString());
-                showLog("f2Btn value: " + f2.getContentDescription().toString());
-                showLog("Exiting f2Btn");
-            }
-        });
+        );
     }
-
-    public static Button getF1() { return f1; }
-
-    public static Button getF2() { return f2; }
 
     public static GridMap getGridMap() {
         return gridMap;
@@ -210,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
     public static Button getLeftBtn() { return leftBtn; }
     public static Button getRightBtn() { return rightBtn; }
 
-
     public static TextView getBluetoothStatus() { return bluetoothStatus; }
     public static TextView getConnectedDevice() { return bluetoothDevice; }
 
@@ -220,9 +161,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Send message to bluetooth
-    public static void
-
-    printMessage(String message) {
+    public static void printMessage(String message) {
         showLog("Entering printMessage");
         editor = sharedPreferences.edit();
 
@@ -231,15 +170,14 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnectionService.write(bytes);
         }
         showLog(message);
-        editor.putString("message", BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message",
+            BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
         showLog("Exiting printMessage");
     }
 
     // Store received message into string
-
-
     public static void printMessage(String name, int x, int y) throws JSONException {
         showLog("Entering printMessage");
         sharedPreferences();
@@ -248,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
         String message;
 
         switch(name) {
-//            case "starting":
             case "waypoint":
                 jsonObject.put(name, name);
                 jsonObject.put("x", x);
@@ -259,7 +196,8 @@ public class MainActivity extends AppCompatActivity {
                 message = "Unexpected default for printMessage: " + name;
                 break;
         }
-        editor.putString("message", BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.putString("message",
+            BluetoothChatFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
@@ -269,9 +207,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void refreshMessageReceived() {
-        BluetoothChatFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+        BluetoothChatFragment
+            .getMessageReceivedTextView()
+            .setText(sharedPreferences.getString("message", ""));
     }
-
 
     public void refreshDirection(String direction) {
         gridMap.setRobotDirection(direction);
@@ -288,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
     public static void receiveMessage(String message) {
         showLog("Entering receiveMessage");
         sharedPreferences();
-        editor.putString("message", sharedPreferences.getString("message", "") + "\n" + message);
+        editor.putString("message",
+            sharedPreferences.getString("message", "") + "\n" + message);
         editor.commit();
         showLog("Exiting receiveMessage");
     }
@@ -316,12 +256,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to "+mDevice.getName());
-                Toast.makeText(MainActivity.this, "Device now connected to "+mDevice.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Device now connected to "
+                        + mDevice.getName(), Toast.LENGTH_LONG).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
             }
             else if(status.equals("disconnected")){
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from "+mDevice.getName());
-                Toast.makeText(MainActivity.this, "Disconnected from "+mDevice.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Disconnected from "
+                        + mDevice.getName(), Toast.LENGTH_LONG).show();
 
                 editor.putString("connStatus", "Disconnected");
 
@@ -375,7 +317,6 @@ public class MainActivity extends AppCompatActivity {
                     b = (b / 10) + 1;
 
                     String direction = cmd[2];
-
 
                     // allow robot to show up on grid if its on the very boundary
                     if (a == 1) a++;
