@@ -1,0 +1,19 @@
+# STM USB connection settings
+SERIAL_PORT = '/dev/ttyUSB0'
+BAUD_RATE = 115200
+
+# Algorithm (PC) Wifi connection settings
+#WIFI_IP = '192.168.25.56' #Jie Xiang
+#WIFI_IP = '192.168.25.68' #Zhi Yu
+WIFI_IP = '192.168.25.1' #RPI
+#WIFI_IP = '192.168.25.2' #Yi You
+WIFI_PORT = 5180
+ALGORITHM_SOCKET_BUFFER_SIZE = 2048
+
+# Android BT connection settings
+RFCOMM_CHANNEL = 4
+UUID = '00001101-0000-1000-8000-00805f9b34fb'
+ANDROID_SOCKET_BUFFER_SIZE = 2048
+
+MESSAGE_SEPARATOR = '|'
+NEWLINE = '\n'
