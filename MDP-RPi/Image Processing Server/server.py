@@ -131,13 +131,13 @@ while True:
             if dataset.mode == 'image':
                 cv2.imwrite(save_path, im0)
 
-                # Compare the confidence of the same image id 
+                # Check if there is object detected in the image file
                 if detected_img:
                     for i in processed_image_id:
                         id = i[0] #Image ID
                         conf = i[1] #Confidence
                         filepath = i[2] #Filepath
-                        if id in results:
+                        if id in results: # Compare the confidence of the same image id 
                             print('ID has been detected before')
                             if float(conf) > float(results[id][1]):
                                 print('Replacing existing image as confidence higher')
@@ -149,7 +149,7 @@ while True:
                                 os.remove(filepath) #Remove the image file from the folder
                                 pass
                         else:
-                            print('New ID. Saving to results dict.') #save new result to dict.
+                            print('New ID. Saving to results dict.') #Save new image id to dict.
                             results[id] = i
                 else:
                     os.remove(processed_image_filepath + p.name) #Remove no object detected image file from the folder
