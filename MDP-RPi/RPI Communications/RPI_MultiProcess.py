@@ -202,29 +202,20 @@ class MultiProcess:
         while True:
             try:
                 if not self.image_queue.empty():
-                    msg = self.image_queue.get_nowait()
-                    #print(Fore.LIGHTGREEN_EX + 'Image Server connected')
-            
-                    self.rpi_name = socket.gethostname() # send RPi hostname with each image
-                    #print('debug: image server rpi_name')
-                    self.camera = PiCamera(resolution=(640, 640)) #max resolution 2592,1944
-                    #print('debug: image server socket')
+                    self.rpi_name = socket.gethostname()
+                    self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                     self.rawCapture = PiRGBArray(self.camera)
-                    #print('debug: image server rawCapture')
 
-                    #time.sleep(1)  # allow camera sensor to warm up
-
-                    #while True:  # send images as stream until Ctrl-C
-                        #time.sleep(5)
                     self.camera.capture(self.rawCapture, format="bgr")
                     self.image = self.rawCapture.array
                     self.rawCapture.truncate(0)
-                    #sender.send_image(rpi_name, image)
-                    #print('debug: send')
+
+                    #Reply received from the Image Processing Server
                     self.reply = self.sender.send_image(self.rpi_name, self.image)
-                    #print('debug: reply')
                     self.reply = str(self.reply.decode())
                     print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
+
+                    #Messages sent to ALG & AND')
                     if self.reply == 'n':
                         self.reply = 'RPI,-1'
                         self.message_queue.put_nowait(self._format_for('AND',self.reply.encode()))
@@ -243,9 +234,7 @@ class MultiProcess:
                         self.message_queue.put_nowait(self._format_for('ALG',self.reply.encode()))
                         print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
 
-                    #print('message sent out from Image Rec to ALG & Android:')
                     self.camera.close()
-                    #print(reply)
             
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
