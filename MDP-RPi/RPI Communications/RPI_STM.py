@@ -1,11 +1,3 @@
-###################################################
-#
-# Note:
-# To test RPI_STM code without MultiProcess, 
-# uncomment all the commented lines in the code
-#
-###################################################
-
 import serial
 import time
 
@@ -15,7 +7,7 @@ from colorama import *
 init(autoreset=True)
 
 
-class STMComm:
+class STM:
     def __init__(self):
         self.port = SERIAL_PORT
         self.baud_rate = BAUD_RATE
@@ -58,8 +50,6 @@ class STMComm:
             self.STM_connection.flush()
             get_message = self.STM_connection.readline().strip()
             get_message = get_message[-5:]
-            #print('Transmission from STM:')
-            #print('\t %s' % get_message)
 
             if len(get_message) > 0:
                 return get_message
@@ -87,7 +77,7 @@ class STMComm:
 
 
 # if __name__ == '__main__':
-#     ser = STMComm()
+#     ser = STM()
 #     ser.__init__()
 #     ser.connect_STM()
 #     while True:

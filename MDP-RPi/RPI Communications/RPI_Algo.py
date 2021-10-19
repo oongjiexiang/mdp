@@ -1,11 +1,3 @@
-###################################################
-#
-# Note:
-# To test RPI_PC code without MultiProcess, 
-# uncomment all the commented lines in the code
-#
-###################################################
-
 import socket
 import time
 
@@ -15,7 +7,7 @@ from colorama import *
 init(autoreset=True)
 
 
-class PcComm:
+class Algo:
     def __init__(self, ip=WIFI_IP, port=WIFI_PORT):
         self.ip = ip
         self.port = port
@@ -30,16 +22,16 @@ class PcComm:
         self.connect.bind((self.ip, self.port))
         self.connect.listen(1)
 
-    def connect_PC(self):
+    def connect_ALG(self):
         while True:
             retry = False
 
             try:
-                print(Fore.LIGHTYELLOW_EX + '[ALG-CONN] Listening for PC connections...')
+                print(Fore.LIGHTYELLOW_EX + '[ALG-CONN] Listening for ALG connections...')
 
                 if self.client is None:
                     self.client, self.address = self.connect.accept()
-                    print(Fore.LIGHTGREEN_EX + '[ALG-CONN] Successfully connected with PC: %s' % str(self.address))
+                    print(Fore.LIGHTGREEN_EX + '[ALG-CONN] Successfully connected with ALG: %s' % str(self.address))
                     retry = False
 
             except Exception as e:
@@ -53,7 +45,7 @@ class PcComm:
             if not retry:
                 break
 
-            print(Fore.LIGHTYELLOW_EX + '[ALG-CONN] Retrying connection with PC...')
+            print(Fore.LIGHTYELLOW_EX + '[ALG-CONN] Retrying connection with ALG...')
             time.sleep(1)
 
     def disconnect_all(self):
@@ -73,7 +65,7 @@ class PcComm:
         except Exception as e:
             print(Fore.RED + '[ALG-DCONN ERROR] %s' % str(e))
 
-    def disconnect_PC(self):
+    def disconnect_ALG(self):
         try:
             if self.client is not None:
                 self.client.shutdown(socket.SHUT_RDWR)
@@ -84,11 +76,9 @@ class PcComm:
         except Exception as e:
             print(Fore.RED + '[ALG-DCONN ERROR] %s' % str(e))
 
-    def read_from_pc(self):
+    def read_from_ALG(self):
         try:
             data = self.client.recv(ALGORITHM_SOCKET_BUFFER_SIZE).strip()
-            #print('Transmission from PC:')
-            #print('\t %s' % data)
 
             if len(data) > 0:
                 return data
@@ -99,10 +89,8 @@ class PcComm:
             print(Fore.RED + '[ALG-READ ERROR] %s' % str(e))
             raise e
 
-    def write_to_pc(self, message):
+    def write_to_ALG(self, message):
         try:
-            #print('Transmitted to PC:')
-            #print('\t %s' % message)
             self.client.send(message)
 
         except Exception as e:
@@ -111,16 +99,16 @@ class PcComm:
 
 
 # if __name__ == '__main__':
-#     ser = PcComm()
+#     ser = Algo()
 #     ser.__init__()
-#     ser.connect_PC()
+#     ser.connect_ALG()
 #     time.sleep(3)
 #     print('Connection established')
 #     while True: 
 #         try:
-#             ser.read_from_pc()
-#             ser.write_to_pc('Received input!'.encode())
+#             ser.read_from_ALG()
+#             ser.write_to_ALG('Received input!'.encode())
 #         except KeyboardInterrupt:
 #             print('Communication interrupted')
-#             ser.disconnect_PC()
+#             ser.disconnect_ALG()
 #             break

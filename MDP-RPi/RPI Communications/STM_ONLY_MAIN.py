@@ -1,21 +1,13 @@
-###################################################
-#
-# Note:
-# To test RPI_STM code without MultiProcess,
-# uncomment all the commented lines in the code
-#
-###################################################
-
 import serial
 import time
 
-from config import SERIAL_PORT, BAUD_RATE, LOCALE
+from config import SERIAL_PORT, BAUD_RATE
 from colorama import *
 
 init(autoreset=True)
 
 
-class STMComm:
+class STM:
     def __init__(self):
         self.port = SERIAL_PORT
         self.baud_rate = BAUD_RATE
@@ -86,14 +78,13 @@ class STMComm:
 
 
 if __name__ == '__main__':
-    ser = STMComm()
+    ser = STM()
     ser.__init__()
     ser.connect_STM()
     while True:
         try:
             msg = input("Enter message to send to STM: ")
             ser.write_to_STM(msg.encode())
-            #print(ser.read_from_STM())
 
         except KeyboardInterrupt:
             print('Serial Communication Interrupted.')

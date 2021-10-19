@@ -1,11 +1,3 @@
-###################################################
-#
-# Note:
-# To test RPI_Android code without MultiProcess, 
-# uncomment all the commented lines in the code
-#
-###################################################
-
 import socket
 from bluetooth import *
 import os
@@ -16,7 +8,7 @@ from colorama import *
 init(autoreset=True)
 
 
-class AndroidComm:
+class Android:
     def __init__(self):
         self.server = None
         self.client = None
@@ -35,16 +27,16 @@ class AndroidComm:
         )
         print(Fore.LIGHTYELLOW_EX + '[BT] Waiting for BT connection on RFCOMM channel %d' % self.port)
 
-    def connect_android(self):
+    def connect_AND(self):
         while True:
             retry = False
 
             try:
-                print(Fore.LIGHTYELLOW_EX + '[AND-CONN] Connecting to Android...')
+                print(Fore.LIGHTYELLOW_EX + '[AND-CONN] Connecting to AND...')
 
                 if self.client is None:
                     self.client, address = self.server.accept()
-                    print(Fore.LIGHTGREEN_EX + '[AND-CONN] Successful connected with Android: %s ' % str(address))
+                    print(Fore.LIGHTGREEN_EX + '[AND-CONN] Successful connected with AND: %s ' % str(address))
                     retry = False
 
             except Exception as e:
@@ -59,9 +51,9 @@ class AndroidComm:
             if not retry:
                 break
 
-            print(Fore.LIGHTYELLOW_EX + '[AND-CONN] Retrying connection with Android...')
+            print(Fore.LIGHTYELLOW_EX + '[AND-CONN] Retrying connection with AND...')
 
-    def disconnect_android(self):
+    def disconnect_AND(self):
         try:
             if self.client is not None:
                 self.client.shutdown(socket.SHUT_RDWR)
@@ -89,11 +81,9 @@ class AndroidComm:
         except Exception as e:
             print(Fore.RED + '[AND-DCONN ERROR] %s' % str(e))
 
-    def read_from_android(self):
+    def read_from_AND(self):
         try:
             msg = self.client.recv(ANDROID_SOCKET_BUFFER_SIZE).strip()
-            #print('Transmission from Android:')
-            #print('\t %s' % msg.decode())
 
             if msg is None:
                 return None
@@ -107,10 +97,8 @@ class AndroidComm:
             print(Fore.RED + '[AND-READ ERROR] %s' % str(e))
             raise e
 
-    def write_to_android(self, message):
+    def write_to_AND(self, message):
         try:
-            #print('Transmitted to Android:')
-            #print('\t %s' % message)
             self.client.send(message)
 
         except BluetoothError as e:
@@ -119,16 +107,16 @@ class AndroidComm:
 
 
 # if __name__ == '__main__':
-#     ser = AndroidComm()
+#     ser = Android()
 #     ser.__init__()
-#     ser.connect_android()
+#     ser.connect_AND()
 #     while True:
 #         try:
 #             print('In loop')
-#             ser.read_from_android()
-#             ser.write_to_android('from rpi')
+#             ser.read_from_AND()
+#             ser.write_to_AND('from rpi')
 #         except KeyboardInterrupt:
-#             print('Android communication interrupted.')
-#             ser.disconnect_android()
+#             print('AND communication interrupted.')
+#             ser.disconnect_AND()
 #             break
 
